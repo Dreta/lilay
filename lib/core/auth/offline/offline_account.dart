@@ -19,6 +19,7 @@
 import 'package:lilay/core/auth/account.dart';
 import 'package:uuid/uuid.dart';
 
+/// OfflineAccount represents a Minecraft offline account (does not require login)
 class OfflineAccount extends Account {
   final String _name;
   final UuidValue _uuid = Uuid().v4obj();

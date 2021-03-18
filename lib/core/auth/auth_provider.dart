@@ -18,8 +18,14 @@
 
 import 'package:lilay/core/auth/account.dart';
 
+/// AuthProvider allows other classes to provide custom
+/// authentication methods (e.g. Yggdrasil, authlib-injector)
 abstract class AuthProvider {
+  /// Whether this authentication method requires a password.
+  /// e.g. Logging in to an offline account does not require
+  ///      a password.
   bool requiresPassword();
 
+  /// Create an account object with a username and a password.
   Future<Account> login(String username, String? password);
 }

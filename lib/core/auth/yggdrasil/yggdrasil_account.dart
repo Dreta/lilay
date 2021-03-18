@@ -20,6 +20,8 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/utils.dart';
 import 'package:uuid/uuid.dart';
 
+/// YggdrasilAccount represents a Minecraft account using the Mojang
+/// account authentication system.
 class YggdrasilAccount extends Account {
   final Map<String, dynamic> jsonValue;
 

@@ -21,9 +21,12 @@ import 'package:lilay/utils.dart';
 
 part 'core_config.g.dart';
 
+/// Contains core launcher configurations.
 @JsonSerializable()
 class CoreConfig {
   String workingDirectory;
+
+  /// The working directory of the launcher. Defaults to .minecraft.
 
   CoreConfig(String? workingDirectory)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft();

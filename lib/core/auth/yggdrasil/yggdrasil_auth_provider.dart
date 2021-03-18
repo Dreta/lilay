@@ -23,6 +23,8 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 
+/// YggdrasilAuthProvider logs a user into their Mojang account
+/// with the provided username (email) and password.
 class YggdrasilAuthProvider extends AuthProvider {
   @override
   Future<Account> login(String username, String? password) async {

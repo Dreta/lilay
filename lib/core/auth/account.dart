@@ -18,6 +18,8 @@
 
 import 'package:uuid/uuid.dart';
 
+/// Account represents an extensible account for custom Minecraft
+/// authentication systems.
 abstract class Account {
   const Account();
 

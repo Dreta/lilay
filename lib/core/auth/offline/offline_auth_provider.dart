@@ -20,6 +20,8 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/auth/offline/offline_account.dart';
 
+/// OfflineAuthProvider creates an OfflineAccount for a given
+/// username.
 class OfflineAuthProvider extends AuthProvider {
   @override
   Future<Account> login(String username, String? password) async {
