@@ -16,23 +16,37 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/utils.dart';
 
 part 'core_config.g.dart';
 
 /// Contains core launcher configurations.
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class CoreConfig {
-  String workingDirectory;
+  /// This is the default location for the core configuration.
+  // ignore: non_constant_identifier_names
+  static File DEFAULT_CORE_CONFIG = File("config.json");
 
   /// The working directory of the launcher. Defaults to .minecraft.
+  String workingDirectory;
 
   CoreConfig(String? workingDirectory)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft();
 
-  factory CoreConfig.fromJson(Map<String, dynamic> json) =>
-      _$CoreConfigFromJson(json);
+  /// Load a new CoreConfig from a file.
+  factory CoreConfig.fromFile(File file) {
+    // Because this will only be called on startup,
+    // using readAsStringSYNC is perfectly fine.
+    return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
+  }
+
+  void write(File file) {
+    file.writeAsString(jsonEncode(_$CoreConfigToJson(this)));
+  }
 
   Map<String, dynamic> toJson() => _$CoreConfigToJson(this);
 }

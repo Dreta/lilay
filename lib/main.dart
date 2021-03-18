@@ -17,10 +17,12 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/launcher.dart';
 import 'package:logging/logging.dart';
 
-Logger logger = Logger('Lilay');
+Logger logger = Logger('Lilay'); // TODO Fix possible circular dependency
+CoreConfig? coreConfig;
 
 void main() {
   logger.onRecord.listen((record) {
@@ -28,6 +30,9 @@ void main() {
   });
 
   logger.info('Setting up core config...');
+  coreConfig = CoreConfig.fromFile(CoreConfig.DEFAULT_CORE_CONFIG);
+
+  // TODO Save on exit and periodically
 
   runApp(Launcher());
 }
