@@ -41,6 +41,9 @@ class CoreConfig {
   factory CoreConfig.fromFile(File file) {
     // Because this will only be called on startup,
     // using readAsStringSYNC is perfectly fine.
+    if (!file.existsSync()) {
+      return CoreConfig(null);
+    }
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }
 
