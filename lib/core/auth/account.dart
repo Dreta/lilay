@@ -23,12 +23,32 @@ import 'package:uuid/uuid.dart';
 abstract class Account {
   const Account();
 
-  String
-      get username; // Username for unmigrated account, email for migrated accounts.
-  // Not to be confused with getProfileName()
+  /// This is the username that the user types in when
+  /// signing in.
+  ///
+  /// This is an email for Mojang accounts and a username
+  /// for legacy accounts.
+  ///
+  /// Not to be confused with [profileName].
+  String get username;
+
+  /// This is a valid access token of the user.
   String get accessToken;
 
+  /// This is the in-game-name of the user.
   String get profileName;
 
+  /// This is the unique ID assigned to the user.
   UuidValue get uuid;
+
+  /// Whether the user must re-authenticate to use
+  /// this account. This happens when the access token
+  /// is invalidated by the user.
+  bool get requiresReauth;
+
+  /// This method refreshes the accessToken for this account
+  /// if it is unavailable.
+  ///
+  /// This method will be called when the account is loaded.
+  Future<void> refresh();
 }

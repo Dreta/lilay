@@ -27,8 +27,7 @@ class OfflineAccount extends Account {
   OfflineAccount({required String name}) : this._name = name;
 
   @override
-  String get accessToken =>
-      throw UnimplementedError(); // Offline accounts don't get an access token
+  String get accessToken => "nevergonnagiveyouup";
 
   @override
   String get username => _name;
@@ -38,4 +37,12 @@ class OfflineAccount extends Account {
 
   @override
   UuidValue get uuid => _uuid;
+
+  // An offline account never needs to be refreshed.
+  @override
+  Future<void> refresh() async {}
+
+  // An offline account never needs re-authentication.
+  @override
+  bool get requiresReauth => false;
 }
