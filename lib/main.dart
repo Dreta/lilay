@@ -22,12 +22,14 @@ import 'package:lilay/core/auth/offline/offline_account.dart';
 import 'package:lilay/core/auth/offline/offline_auth_provider.dart';
 import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 import 'package:lilay/core/auth/yggdrasil/yggdrasil_auth_provider.dart';
+import 'package:lilay/core/configuration/accounts/account_database.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/launcher.dart';
 import 'package:logging/logging.dart';
 
 Logger logger = Logger('Lilay'); // TODO Fix possible circular dependency
 CoreConfig? coreConfig;
+AccountDatabase? accounts;
 
 void main() {
   logger.onRecord.listen((record) {
@@ -46,7 +48,10 @@ void main() {
   logger.info('Setting up core config.');
   coreConfig = CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
 
-  // TODO Save on exit and periodically
+  logger.info('Loading accounts.');
+  accounts = AccountDatabase(file: AccountDatabase.defaultAccountDB);
+
+  // TODO Save accounts/core config on exit and periodically
 
   runApp(Launcher());
 }

@@ -39,5 +39,5 @@ String getDefaultMinecraft() {
   } else if (Platform.isLinux) {
     return '${Platform.environment['HOME']}/.minecraft/';
   }
-  throw "Incompatible platform";
+  throw 'Incompatible platform';
 }

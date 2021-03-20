@@ -27,8 +27,8 @@ part 'core_config.g.dart';
 /// Contains core launcher configurations.
 @JsonSerializable(explicitToJson: true)
 class CoreConfig {
-  /// This is the default location for the core configuration.
-  static final File defaultCoreConfig = File("config.json");
+  /// This is where the core config will be loaded from.
+  static final File defaultCoreConfig = File('config.json');
 
   /// The working directory of the launcher. Defaults to .minecraft.
   String workingDirectory;

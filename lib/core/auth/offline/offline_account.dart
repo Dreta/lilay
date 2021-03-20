@@ -38,7 +38,7 @@ class OfflineAccount extends Account {
   OfflineAccount({required String name}) : this._name = name;
 
   @override
-  String get accessToken => "nevergonnagiveyouup";
+  String get accessToken => 'nevergonnagiveyouup';
 
   @override
   String get username => _name;
