@@ -21,11 +21,11 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/utils.dart';
-import 'package:uuid/uuid.dart';
 
 /// YggdrasilAccount represents a Minecraft account using the Mojang
 /// account authentication system.
 class YggdrasilAccount extends Account {
+  // TODO Do not use the direct JSON value - extract separate values instead.
   final Map<String, dynamic> jsonValue;
 
   // This happens when the user manually revokes the
@@ -44,8 +44,7 @@ class YggdrasilAccount extends Account {
   String get username => jsonValue['user']['username'];
 
   @override
-  UuidValue get uuid =>
-      UuidValue(dashifyUUID(jsonValue['selectedProfile']['id']));
+  String get uuid => dashifyUUID(jsonValue['selectedProfile']['id']);
 
   @override
   Future<void> refresh() async {

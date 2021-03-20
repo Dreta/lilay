@@ -16,10 +16,12 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:uuid/uuid.dart';
-
 /// Account represents an extensible account for custom Minecraft
 /// authentication systems.
+///
+/// IMPORTANT: Subclasses of [Account] must also implement
+/// a factory method fromJson(Map<String, dynamic>) to create
+/// an instance of this [Account] from the saved JSON object.
 abstract class Account {
   const Account();
 
@@ -39,7 +41,7 @@ abstract class Account {
   String get profileName;
 
   /// This is the unique ID assigned to the user.
-  UuidValue get uuid;
+  String get uuid;
 
   /// Whether the user must re-authenticate to use
   /// this account. This happens when the access token
@@ -51,4 +53,6 @@ abstract class Account {
   ///
   /// This method will be called when the account is loaded.
   Future<void> refresh();
+
+// TODO Implement concrete toJson and fromJson here
 }

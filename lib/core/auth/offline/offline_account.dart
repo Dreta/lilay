@@ -22,7 +22,7 @@ import 'package:uuid/uuid.dart';
 /// OfflineAccount represents a Minecraft offline account (does not require login)
 class OfflineAccount extends Account {
   final String _name;
-  final UuidValue _uuid = Uuid().v4obj();
+  final String _uuid = Uuid().v4obj().uuid;
 
   OfflineAccount({required String name}) : this._name = name;
 
@@ -36,7 +36,7 @@ class OfflineAccount extends Account {
   String get profileName => _name;
 
   @override
-  UuidValue get uuid => _uuid;
+  String get uuid => _uuid;
 
   // An offline account never needs to be refreshed.
   @override
