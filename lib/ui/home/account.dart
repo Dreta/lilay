@@ -30,18 +30,18 @@ class Account extends StatelessWidget {
         tooltip: 'Account ' + name,
         offset: const Offset(50, 0),
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-          const PopupMenuItem(
-              child: ListTile(
-                  leading: Icon(Icons.refresh),
-                  title: Text('Refresh'),
-                  minLeadingWidth: 20)),
-          const PopupMenuItem(
-              child: ListTile(
-                  leading: Icon(Icons.delete, color: Colors.red),
-                  title:
-                  Text('Delete', style: TextStyle(color: Colors.red)),
-                  minLeadingWidth: 20))
-        ],
+              const PopupMenuItem(
+                  child: ListTile(
+                      leading: Icon(Icons.refresh),
+                      title: Text('Refresh'),
+                      minLeadingWidth: 20)),
+              const PopupMenuItem(
+                  child: ListTile(
+                      leading: Icon(Icons.delete, color: Colors.red),
+                      title:
+                          Text('Delete', style: TextStyle(color: Colors.red)),
+                      minLeadingWidth: 20))
+            ],
         child: ListTile(
             leading: Icon(Icons.account_circle, color: theme.accentColor),
             title: Text(name),

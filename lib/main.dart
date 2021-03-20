@@ -17,6 +17,11 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/core/auth/offline/offline_account.dart';
+import 'package:lilay/core/auth/offline/offline_auth_provider.dart';
+import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
+import 'package:lilay/core/auth/yggdrasil/yggdrasil_auth_provider.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/launcher.dart';
 import 'package:logging/logging.dart';
@@ -29,8 +34,17 @@ void main() {
     print('[${record.level.name}] [${record.time}]: ${record.message}');
   });
 
-  logger.info('Setting up core config...');
-  coreConfig = CoreConfig.fromFile(CoreConfig.DEFAULT_CORE_CONFIG);
+  logger.info('Registering authentication methods.');
+  // Yggdrasil
+  Account.authProviders['yggdrasil'] = YggdrasilAuthProvider();
+  Account.accountFactories['yggdrasil'] = YggdrasilAccount.fromJson;
+
+  // Offline
+  Account.authProviders['offline'] = OfflineAuthProvider();
+  Account.accountFactories['offline'] = OfflineAccount.fromJson;
+
+  logger.info('Setting up core config.');
+  coreConfig = CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
 
   // TODO Save on exit and periodically
 

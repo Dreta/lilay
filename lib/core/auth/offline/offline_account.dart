@@ -21,8 +21,19 @@ import 'package:uuid/uuid.dart';
 
 /// OfflineAccount represents a Minecraft offline account (does not require login)
 class OfflineAccount extends Account {
-  final String _name;
-  final String _uuid = Uuid().v4obj().uuid;
+  /// Create an instance of [OfflineAccount] from a saved JSON state.
+  static final Function(Map<String, dynamic>) fromJson =
+      (Map<String, dynamic> json) {
+    OfflineAccount account = OfflineAccount._();
+    account._name = json['username'];
+    account._uuid = json['uuid'];
+    return account;
+  };
+
+  late String _name;
+  late String _uuid = Uuid().v4obj().uuid;
+
+  OfflineAccount._();
 
   OfflineAccount({required String name}) : this._name = name;
 
@@ -45,4 +56,7 @@ class OfflineAccount extends Account {
   // An offline account never needs re-authentication.
   @override
   bool get requiresReauth => false;
+
+  @override
+  String get type => 'offline';
 }

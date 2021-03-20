@@ -25,26 +25,49 @@ import 'package:lilay/utils.dart';
 /// YggdrasilAccount represents a Minecraft account using the Mojang
 /// account authentication system.
 class YggdrasilAccount extends Account {
-  // TODO Do not use the direct JSON value - extract separate values instead.
-  final Map<String, dynamic> jsonValue;
+  /// Create an instance of [YggdrasilAccount] from a saved JSON state.
+  static final Function(Map<String, dynamic>) fromJson =
+      (Map<String, dynamic> json) {
+    YggdrasilAccount account = YggdrasilAccount._();
+    account._accessToken = json['accessToken'];
+    account._profileName = json['profileName'];
+    account._username = json['username'];
+    account._uuid = json['uuid'];
+    account._requiresReauth = json['requiresReauth'];
+    return account;
+  };
+
+  late String _accessToken;
+  late String _profileName;
+  late String _username;
+  late String _uuid;
 
   // This happens when the user manually revokes the
   // access token.
   bool _requiresReauth = false;
 
-  YggdrasilAccount({required this.jsonValue});
+  YggdrasilAccount._();
+
+  /// Create a [YggdrasilAccount] from a Mojang /authenticate
+  /// response body.
+  YggdrasilAccount({required Map<String, dynamic> json}) {
+    _accessToken = json['accessToken'];
+    _profileName = json['selectedProfile']['name'];
+    _username = json['user']['username'];
+    _uuid = dashifyUUID(json['selectedProfile']['id']);
+  }
 
   @override
-  String get accessToken => jsonValue['accessToken'];
+  String get accessToken => _accessToken;
 
   @override
-  String get profileName => jsonValue['selectedProfile']['name'];
+  String get profileName => _profileName;
 
   @override
-  String get username => jsonValue['user']['username'];
+  String get username => _username;
 
   @override
-  String get uuid => dashifyUUID(jsonValue['selectedProfile']['id']);
+  String get uuid => _uuid;
 
   @override
   Future<void> refresh() async {
@@ -80,12 +103,15 @@ class YggdrasilAccount extends Account {
 
       // Update the access token and user info
       Map<String, dynamic> resp = jsonDecode(rRefresh.body);
-      jsonValue['accessToken'] = resp['accessToken'];
-      jsonValue['user']['username'] = resp['user']['username'];
-      jsonValue['selectedProfile']['name'] = resp['selectedProfile']['name'];
+      _accessToken = resp['accessToken'];
+      _username = resp['user']['username'];
+      _profileName = resp['selectedProfile']['name'];
     }
   }
 
   @override
   bool get requiresReauth => _requiresReauth;
+
+  @override
+  String get type => 'yggdrasil';
 }

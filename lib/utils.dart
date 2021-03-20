@@ -27,8 +27,8 @@ String dashifyUUID(String uuid) =>
     uuid.substring(12, 16) +
     '-' +
     uuid.substring(16, 20) +
-        '-' +
-        uuid.substring(20);
+    '-' +
+    uuid.substring(20);
 
 // Get the default platform-dependent .minecraft directory location.
 String getDefaultMinecraft() {

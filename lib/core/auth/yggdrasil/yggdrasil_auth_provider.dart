@@ -49,7 +49,7 @@ class YggdrasilAuthProvider extends AuthProvider {
       throw resp['errorMessage'];
     }
 
-    return YggdrasilAccount(jsonValue: resp);
+    return YggdrasilAccount(json: resp);
   }
 
   @override

@@ -16,14 +16,21 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:lilay/core/auth/auth_provider.dart';
+
 /// Account represents an extensible account for custom Minecraft
 /// authentication systems.
 ///
-/// IMPORTANT: Subclasses of [Account] must also implement
-/// a factory method fromJson(Map<String, dynamic>) to create
-/// an instance of this [Account] from the saved JSON object.
+/// **Important**: Each authentication method must register themselves
+/// with their respective types at [Account.authProviders] and
+/// [Account.accountFactories].
 abstract class Account {
-  const Account();
+  /// Maps string keys to their respective authentication provider.
+  static final Map<String, AuthProvider> authProviders = new Map();
+
+  /// Maps string keys to their respective [Account] factory.
+  static final Map<String, Function(Map<String, dynamic>)> accountFactories =
+      new Map();
 
   /// This is the username that the user types in when
   /// signing in.
@@ -43,6 +50,11 @@ abstract class Account {
   /// This is the unique ID assigned to the user.
   String get uuid;
 
+  /// This is the type of this account. It is used to
+  /// identify which [accountFactories] factories should
+  /// be used to load this account.
+  String get type;
+
   /// Whether the user must re-authenticate to use
   /// this account. This happens when the access token
   /// is invalidated by the user.
@@ -54,5 +66,15 @@ abstract class Account {
   /// This method will be called when the account is loaded.
   Future<void> refresh();
 
-// TODO Implement concrete toJson and fromJson here
+  /// Manually convert this class to JSON.
+  Map<String, dynamic> toJson() {
+    return {
+      'username': username,
+      'accessToken': accessToken,
+      'profileName': profileName,
+      'type': type,
+      'uuid': uuid,
+      'requiresReauth': requiresReauth
+    };
+  }
 }
