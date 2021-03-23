@@ -33,6 +33,7 @@ class YggdrasilAccount extends Account {
     account._profileName = json['profileName'];
     account._username = json['username'];
     account._uuid = json['uuid'];
+    account._paid = json['paid'];
     account._requiresReauth = json['requiresReauth'];
     return account;
   };
@@ -41,6 +42,7 @@ class YggdrasilAccount extends Account {
   late String _profileName;
   late String _username;
   late String _uuid;
+  late bool _paid;
 
   // This happens when the user manually revokes the
   // access token.
@@ -54,6 +56,7 @@ class YggdrasilAccount extends Account {
     _accessToken = json['accessToken'];
     _profileName = json['selectedProfile']['name'];
     _username = json['user']['username'];
+    _paid = json['selectedProfile']['paid'];
     _uuid = dashifyUUID(json['selectedProfile']['id']);
   }
 
@@ -106,6 +109,7 @@ class YggdrasilAccount extends Account {
       _accessToken = resp['accessToken'];
       _username = resp['user']['username'];
       _profileName = resp['selectedProfile']['name'];
+      _paid = resp['selectedProfile']['paid'];
     }
   }
 
@@ -114,4 +118,20 @@ class YggdrasilAccount extends Account {
 
   @override
   String get type => 'yggdrasil';
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'username': username,
+      'accessToken': accessToken,
+      'profileName': profileName,
+      'paid': _paid,
+      'type': type,
+      'uuid': uuid,
+      'requiresReauth': requiresReauth
+    };
+  }
+
+  @override
+  Future<bool> paid() async => _paid;
 }

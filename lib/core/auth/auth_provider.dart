@@ -24,8 +24,17 @@ abstract class AuthProvider {
   /// Whether this authentication method requires a password.
   /// e.g. Logging in to an offline account does not require
   ///      a password.
-  bool requiresPassword();
+  bool requiresPassword() => true;
+
+  /// Whether this authentication method does not use the standard
+  /// username-password prompts that's built-in.
+  /// e.g. Microsoft account requires a webview.
+  bool useManualAuthentication() => false;
 
   /// Create an account object with a username and a password.
-  Future<Account> login(String username, String? password);
+  ///
+  /// [callback] should probably be done with a [Future] instead,
+  /// however in [MicrosoftAuthProvider], I can't think of a way to
+  /// integrate a [Future] into it. Please PR if you have a good idea.
+  void login(String? username, String? password, Function(Account) callback);
 }

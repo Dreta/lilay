@@ -27,7 +27,9 @@ import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 /// with the provided username (email) and password.
 class YggdrasilAuthProvider extends AuthProvider {
   @override
-  Future<Account> login(String username, String? password) async {
+  void login(
+      String? username, String? password, Function(Account) callback) async {
+    assert(username != null);
     assert(password != null);
 
     // TODO Use the saved accessToken whenever possible, create a full configuration system for this
@@ -49,11 +51,6 @@ class YggdrasilAuthProvider extends AuthProvider {
       throw resp['errorMessage'];
     }
 
-    return YggdrasilAccount(json: resp);
-  }
-
-  @override
-  bool requiresPassword() {
-    return true;
+    callback(YggdrasilAccount(json: resp));
   }
 }

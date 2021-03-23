@@ -26,11 +26,11 @@ import 'package:lilay/core/auth/auth_provider.dart';
 /// [Account.accountFactories].
 abstract class Account {
   /// Maps string keys to their respective authentication provider.
-  static final Map<String, AuthProvider> authProviders = new Map();
+  static final Map<String, AuthProvider> authProviders = Map();
 
   /// Maps string keys to their respective [Account] factory.
   static final Map<String, Function(Map<String, dynamic>)> accountFactories =
-      new Map();
+      Map();
 
   /// This is the username that the user types in when
   /// signing in.
@@ -66,7 +66,12 @@ abstract class Account {
   /// This method will be called when the account is loaded.
   Future<void> refresh();
 
+  /// Checks if we have paid for a Minecraft license.
+  Future<bool> paid();
+
   /// Manually convert this class to JSON.
+  /// Individual subclasses might want to override this method
+  /// for extra control over how to serialize.
   Map<String, dynamic> toJson() {
     return {
       'username': username,
