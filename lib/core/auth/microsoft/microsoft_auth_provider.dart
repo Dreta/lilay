@@ -2,7 +2,7 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_auth_server.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:open_url/open_url.dart';
 
 /// MicrosoftAuthProvider logs a user into their Microsoft account.
 class MicrosoftAuthProvider extends AuthProvider {
@@ -22,11 +22,7 @@ class MicrosoftAuthProvider extends AuthProvider {
         '&scope=XboxLive.signin%20offline_access';
 
     // Open the browser window.
-    if (await canLaunch(authUrl)) {
-      launch(authUrl);
-    } else {
-      throw 'Can\'t open Microsoft account login browser window';
-    }
+    openUrl(authUrl);
 
     // Make the auth server use the callback we have from the user.
     _authServer.accountCallback = callback;
