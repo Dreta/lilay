@@ -18,10 +18,11 @@
 
 import 'package:flutter/material.dart';
 
-class Account extends StatelessWidget {
+/// This widget represents an account in Lilay.
+class AccountWidget extends StatelessWidget {
   final String name;
 
-  const Account({required this.name});
+  const AccountWidget({required this.name});
 
   @override
   Widget build(BuildContext context) {

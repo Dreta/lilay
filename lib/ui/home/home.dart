@@ -17,14 +17,13 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:lilay/ui/accounts/accounts_section.dart';
 import 'package:lilay/ui/home/profile.dart';
 
-class Homepage extends StatefulWidget {
-  @override
-  _HomepageState createState() => _HomepageState();
-}
-
-class _HomepageState extends State<Homepage> {
+/// This widget represents the main page of Lilay,
+/// consisting of the accounts, the game profiles
+/// and the play button.
+class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -39,13 +38,7 @@ class _HomepageState extends State<Homepage> {
         Divider(height: 1, thickness: 1, color: theme.dividerColor),
 
         // Accounts
-        Padding(
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 5),
-            child: Text('ACCOUNTS', style: textTheme.subtitle2)),
-        Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Divider(height: 1, thickness: 1, color: theme.dividerColor)),
+        AccountsSection(),
 
         // Profiles
         Padding(

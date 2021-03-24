@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 
+/// This widget represents a game profile in Lilay.
 class Profile extends StatelessWidget {
   final String name;
   final bool modded;
