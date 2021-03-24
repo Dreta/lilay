@@ -1,3 +1,21 @@
+/*
+ * Lilay is a custom Minecraft launcher.
+ * Copyright (c) 2021 Dreta
+ *
+ * Lilay is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Lilay is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 import 'dart:convert';
 
 import 'package:http/http.dart';
@@ -46,16 +64,16 @@ class MicrosoftAccount extends Account {
   Future<void> refresh() async {
     // Send a request to MS's token refresh server.
     Response resp =
-        await post(Uri.parse('https://login.live.com/oauth20_token.srf'),
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'User-Agent': 'lilay-minecraft-launcher'
-            },
-            body: 'client_id=$CLIENT_ID'
-                '&client_secret=$CLIENT_SECRET'
-                '&refresh_token=$refreshToken'
-                '&grant_type=refresh_token'
-                '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth');
+    await post(Uri.parse('https://login.live.com/oauth20_token.srf'),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'lilay-minecraft-launcher'
+        },
+        body: 'client_id=$CLIENT_ID'
+            '&client_secret=$CLIENT_SECRET'
+            '&refresh_token=$refreshToken'
+            '&grant_type=refresh_token'
+            '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth');
 
     if (resp.statusCode != 200) {
       throw 'Microsoft returned non-200 code from token refresh request.';

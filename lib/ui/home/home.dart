@@ -17,10 +17,7 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:lilay/ui/home/account.dart';
 import 'package:lilay/ui/home/profile.dart';
-
-import 'account.dart';
 
 class Homepage extends StatefulWidget {
   @override
@@ -49,8 +46,6 @@ class _HomepageState extends State<Homepage> {
         Padding(
             padding: const EdgeInsets.only(left: 16, right: 16),
             child: Divider(height: 1, thickness: 1, color: theme.dividerColor)),
-        Account(name: 'Dreta'),
-        Account(name: 'DretaAlt'),
 
         // Profiles
         Padding(

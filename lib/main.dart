@@ -59,7 +59,5 @@ void main() {
   logger.info('Loading accounts.');
   accounts = AccountDatabase(file: AccountDatabase.defaultAccountDB);
 
-  // TODO Save accounts/core config on exit and periodically
-
   runApp(Launcher());
 }
