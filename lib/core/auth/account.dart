@@ -60,6 +60,12 @@ abstract class Account {
   /// is invalidated by the user.
   bool get requiresReauth;
 
+  /// Whether this is the account that the user selected.
+  bool get selected;
+
+  /// Set whether this account is selected.
+  set selected(bool sel);
+
   /// This method refreshes the accessToken for this account
   /// if it is unavailable.
   ///
@@ -79,7 +85,8 @@ abstract class Account {
       'profileName': profileName,
       'type': type,
       'uuid': uuid,
-      'requiresReauth': requiresReauth
+      'requiresReauth': requiresReauth,
+      'selected': selected
     };
   }
 }

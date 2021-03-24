@@ -27,11 +27,13 @@ class OfflineAccount extends Account {
     OfflineAccount account = OfflineAccount._();
     account._name = json['username'];
     account._uuid = json['uuid'];
+    account.selected = json['selected'];
     return account;
   };
 
   late String _name;
   late String _uuid = Uuid().v4obj().uuid;
+  late bool selected;
 
   OfflineAccount._();
 

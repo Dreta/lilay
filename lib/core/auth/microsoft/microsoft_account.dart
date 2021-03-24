@@ -39,6 +39,7 @@ class MicrosoftAccount extends Account {
     account._profileName = json['profileName'];
     account._uuid = json['uuid'];
     account._requiresReauth = json['requiresReauth'];
+    account.selected = json['selected'];
     return account;
   };
 
@@ -52,6 +53,7 @@ class MicrosoftAccount extends Account {
   late String xstsToken; // XSTS token
   late String _profileName;
   late String _uuid;
+  late bool selected;
 
   // This happens when the user manually revokes the
   // access token.
@@ -64,16 +66,16 @@ class MicrosoftAccount extends Account {
   Future<void> refresh() async {
     // Send a request to MS's token refresh server.
     Response resp =
-    await post(Uri.parse('https://login.live.com/oauth20_token.srf'),
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'lilay-minecraft-launcher'
-        },
-        body: 'client_id=$CLIENT_ID'
-            '&client_secret=$CLIENT_SECRET'
-            '&refresh_token=$refreshToken'
-            '&grant_type=refresh_token'
-            '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth');
+        await post(Uri.parse('https://login.live.com/oauth20_token.srf'),
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'User-Agent': 'lilay-minecraft-launcher'
+            },
+            body: 'client_id=$CLIENT_ID'
+                '&client_secret=$CLIENT_SECRET'
+                '&refresh_token=$refreshToken'
+                '&grant_type=refresh_token'
+                '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth');
 
     if (resp.statusCode != 200) {
       throw 'Microsoft returned non-200 code from token refresh request.';
@@ -129,7 +131,8 @@ class MicrosoftAccount extends Account {
       'profileName': profileName,
       'type': type,
       'uuid': uuid,
-      'requiresReauth': requiresReauth
+      'requiresReauth': requiresReauth,
+      'selected': selected
     };
   }
 

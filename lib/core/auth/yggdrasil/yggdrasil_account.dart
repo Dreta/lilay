@@ -35,6 +35,7 @@ class YggdrasilAccount extends Account {
     account._uuid = json['uuid'];
     account._paid = json['paid'];
     account._requiresReauth = json['requiresReauth'];
+    account.selected = json['selected'];
     return account;
   };
 
@@ -43,6 +44,7 @@ class YggdrasilAccount extends Account {
   late String _username;
   late String _uuid;
   late bool _paid;
+  late bool selected;
 
   // This happens when the user manually revokes the
   // access token.
@@ -128,7 +130,8 @@ class YggdrasilAccount extends Account {
       'paid': _paid,
       'type': type,
       'uuid': uuid,
-      'requiresReauth': requiresReauth
+      'requiresReauth': requiresReauth,
+      'selected': selected
     };
   }
 
