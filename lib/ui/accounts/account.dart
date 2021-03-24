@@ -22,7 +22,12 @@ import 'package:flutter/material.dart';
 class AccountWidget extends StatelessWidget {
   final String name;
 
-  const AccountWidget({required this.name});
+  /// Whether the menu icon will be shown.
+  /// The menu icon should be shown for the selected account in the
+  /// navigation drawer.
+  final bool showMenuIcon;
+
+  const AccountWidget({required this.name, this.showMenuIcon = false});
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +36,16 @@ class AccountWidget extends StatelessWidget {
         tooltip: 'Account ' + name,
         offset: const Offset(50, 0),
         itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              const PopupMenuItem(
+              PopupMenuItem(
                   child: ListTile(
                       leading: Icon(Icons.refresh),
+                      trailing: (showMenuIcon ? Icon(Icons.menu) : null),
                       title: Text('Refresh'),
                       minLeadingWidth: 20)),
-              const PopupMenuItem(
+          PopupMenuItem(
                   child: ListTile(
                       leading: Icon(Icons.delete, color: Colors.red),
+                      trailing: (showMenuIcon ? Icon(Icons.menu) : null),
                       title:
                           Text('Delete', style: TextStyle(color: Colors.red)),
                       minLeadingWidth: 20))
