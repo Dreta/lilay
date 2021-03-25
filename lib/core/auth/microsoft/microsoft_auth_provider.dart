@@ -50,4 +50,11 @@ class MicrosoftAuthProvider extends AuthProvider {
 
   @override
   bool useManualAuthentication() => true;
+
+  @override
+  String get name => 'Microsoft';
+
+  @override
+  // TODO: implement type
+  String get type => 'microsoft';
 }

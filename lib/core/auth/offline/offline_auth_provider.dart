@@ -31,4 +31,10 @@ class OfflineAuthProvider extends AuthProvider {
 
   @override
   bool requiresPassword() => false;
+
+  @override
+  String get name => 'Offline';
+
+  @override
+  String get type => 'offline';
 }

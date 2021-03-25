@@ -32,6 +32,9 @@ abstract class Account {
   static final Map<String, Function(Map<String, dynamic>)> accountFactories =
       Map();
 
+  /// The default auth provider to use in the login dialog.
+  static final String defaultAuthProvider = 'yggdrasil';
+
   /// This is the username that the user types in when
   /// signing in.
   ///

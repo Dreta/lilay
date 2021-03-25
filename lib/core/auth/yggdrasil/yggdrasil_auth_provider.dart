@@ -32,8 +32,6 @@ class YggdrasilAuthProvider extends AuthProvider {
     assert(username != null);
     assert(password != null);
 
-    // TODO Use the saved accessToken whenever possible, create a full configuration system for this
-
     Response response = await post(
         Uri.parse('https://authserver.mojang.com/authenticate'),
         headers: {
@@ -53,4 +51,10 @@ class YggdrasilAuthProvider extends AuthProvider {
 
     callback(YggdrasilAccount(json: resp));
   }
+
+  @override
+  String get name => 'Yggdrasil (Mojang)';
+
+  @override
+  String get type => 'yggdrasil';
 }

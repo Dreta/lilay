@@ -31,6 +31,12 @@ abstract class AuthProvider {
   /// e.g. Microsoft account requires a webview.
   bool useManualAuthentication() => false;
 
+  /// Get the human-friendly name of this [AuthProvider].
+  String get name;
+
+  /// Get the type of the respective [Account] for this [AuthProvider].
+  String get type;
+
   /// Create an account object with a username and a password.
   ///
   /// [callback] should probably be done with a [Future] instead,
