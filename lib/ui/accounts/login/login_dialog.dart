@@ -70,11 +70,11 @@ class _LoginDialogState extends State<LoginDialog> {
                   borderSide: BorderSide(color: theme.accentColor)))));
 
       if (selected.requiresPassword()) {
-        // Masking the password is unnecessary.
         fields.add(TextFormField(
             enabled: !_loggingIn,
             cursorColor: theme.textSelectionTheme.cursorColor,
             controller: _password,
+            obscureText: true,
             decoration: InputDecoration(
                 labelText: 'Password',
                 enabledBorder: UnderlineInputBorder(
