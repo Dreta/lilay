@@ -31,8 +31,10 @@ class MicrosoftAuthServer {
   late HttpServer _server;
 
   MicrosoftAuthServer(int port) {
-    HttpServer.bind(InternetAddress.loopbackIPv4, port)
-        .then((server) => _server = server);
+    HttpServer.bind(InternetAddress.loopbackIPv4, port).then((server) {
+      _server = server;
+      _handle();
+    });
     logger.info('Microsoft auth server listening on localhost:$port.');
 
     _handle();
@@ -119,10 +121,10 @@ class MicrosoftAuthServer {
     account.xblUHS = xblBody['DisplayClaims']['xui'][0]['uhs'];
 
     // Authenticate with XSTS
-    Response rXSTS = await post(
-        Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
-        headers: {
-          'Content-Type': 'application/json',
+    Response rXSTS =
+        await post(Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
+            headers: {
+              'Content-Type': 'application/json',
               'Accept': 'application/json',
               'User-Agent': 'lilay-minecraft-launcher'
             },
