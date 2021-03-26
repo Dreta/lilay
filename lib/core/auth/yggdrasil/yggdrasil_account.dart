@@ -54,7 +54,6 @@ class YggdrasilAccount extends Account {
   /// Create a [YggdrasilAccount] from a Mojang /authenticate
   /// response body.
   YggdrasilAccount({required Map<String, dynamic> json}) {
-    print(json);
     _accessToken = json['accessToken'];
     _profileName = json['selectedProfile']['name'];
     _username = json['user']['username'];

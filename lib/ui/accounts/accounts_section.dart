@@ -24,6 +24,7 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/main.dart';
 import 'package:lilay/ui/accounts/account.dart';
 import 'package:lilay/ui/accounts/login/login_button.dart';
+import 'package:lilay/ui/misc/error_dialog.dart';
 
 /// This is where the account database will be loaded from.
 File defaultAccountDB = File('accounts.json');
@@ -44,6 +45,8 @@ class _AccountsSectionState extends State<AccountsSection> {
   _AccountsSectionState({required File file}) : _file = file {
     if (file.existsSync()) {
       _load(file);
+    } else {
+      _loading = false;
     }
   }
 
@@ -109,6 +112,15 @@ class _AccountsSectionState extends State<AccountsSection> {
       }
 
       widgets.add(LoginButton(onAddAccount: (account) {
+        for (Account acc in _accounts) {
+          if (acc.uuid == account.uuid && !acc.requiresReauth) {
+            showDialog(
+                context: context,
+                builder: (context) =>
+                    ErrorDialog(text: 'This account is already available!'));
+            return;
+          }
+        }
         setState(() {
           _accounts.add(account);
           account.selected =
