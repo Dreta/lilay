@@ -88,8 +88,7 @@ class _AccountsSectionState extends State<AccountsSection> {
     // TODO Add a dedicated screen for all the accounts.
     for (Account account in _accounts) {
       if (account.selected) {
-        widgets
-            .add(AccountWidget(name: account.profileName, showMenuIcon: true));
+        widgets.add(AccountWidget(account: account, showMenuIcon: true));
         break;
       }
     }

@@ -17,17 +17,18 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:lilay/core/auth/account.dart';
 
 /// This widget represents an account in Lilay.
 class AccountWidget extends StatelessWidget {
-  final String name;
+  final Account account;
 
   /// Whether the menu icon will be shown.
   /// The menu icon should be shown for the selected account in the
   /// navigation drawer.
   final bool showMenuIcon;
 
-  const AccountWidget({required this.name, this.showMenuIcon = false});
+  const AccountWidget({required this.account, this.showMenuIcon = false});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,8 @@ class AccountWidget extends StatelessWidget {
         // TODO Use the user's skin as icon instead.
         leading: Icon(Icons.account_circle, color: theme.accentColor),
         trailing: (showMenuIcon ? Icon(Icons.menu) : null),
-        title: Text(name),
+        title: Text(account.profileName),
+        subtitle: Text(Account.authProviders[account.type]!.name),
         minLeadingWidth: 20);
   }
 }
