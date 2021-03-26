@@ -95,7 +95,7 @@ class MicrosoftAuthServer {
           'Accept': 'application/json',
           'User-Agent': 'lilay-minecraft-launcher'
         },
-        body: {
+        body: jsonEncode({
           'Properties': {
             'AuthMethod': 'RPS',
             'SiteName': 'user.auth.xboxlive.com',
@@ -103,7 +103,7 @@ class MicrosoftAuthServer {
           },
           'RelyingParty': 'http://auth.xboxlive.com',
           'TokenType': 'JWT'
-        });
+        }));
 
     if (rXBL.statusCode != 200) {
       request.response
@@ -123,17 +123,17 @@ class MicrosoftAuthServer {
         Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'lilay-minecraft-launcher'
-        },
-        body: {
-          'Properties': {
-            'SandboxId': 'RETAIL',
-            'UserTokens': [xblToken]
-          },
-          'RelyingParty': 'rp://api.minecraftservices.com/',
-          'TokenType': 'JWT'
-        });
+              'Accept': 'application/json',
+              'User-Agent': 'lilay-minecraft-launcher'
+            },
+            body: jsonEncode({
+              'Properties': {
+                'SandboxId': 'RETAIL',
+                'UserTokens': [xblToken]
+              },
+              'RelyingParty': 'rp://api.minecraftservices.com/',
+              'TokenType': 'JWT'
+            }));
 
     if (rXSTS.statusCode == 401) {
       Map<String, dynamic> xstsBody = jsonDecode(rXSTS.body);

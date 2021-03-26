@@ -38,12 +38,12 @@ class YggdrasilAuthProvider extends AuthProvider {
           'Content-Type': 'application/json',
           'User-Agent': 'lilay-minecraft-launcher'
         },
-        body: {
+        body: jsonEncode({
           'agent': {'name': 'Minecraft', 'version': 1},
           'username': username,
           'password': password,
           'requestUser': true
-        });
+        }));
     Map<String, dynamic> resp = jsonDecode(response.body);
     if (response.statusCode != 200) {
       throw resp['errorMessage'];
