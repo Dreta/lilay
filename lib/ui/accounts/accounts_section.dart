@@ -56,7 +56,7 @@ class _AccountsSectionState extends State<AccountsSection> {
         logger.severe('Found invalid account without type');
         continue;
       }
-      _accounts.add(Account.accountFactories[type]!(account));
+      setState(() => _accounts.add(Account.accountFactories[type]!(account)));
     }
   }
 
