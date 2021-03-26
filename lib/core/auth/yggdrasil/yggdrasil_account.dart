@@ -88,9 +88,7 @@ class YggdrasilAccount extends Account {
           'Content-Type': 'application/json',
           'User-Agent': 'lilay-minecraft-launcher'
         },
-        body: {
-          'accessToken': accessToken
-        });
+        body: jsonEncode({'accessToken': accessToken}));
     if (rValidate.statusCode == 403) {
       // The token is unusable.
       Response rRefresh = await post(
@@ -99,10 +97,10 @@ class YggdrasilAccount extends Account {
             'Content-Type': 'application/json',
             'User-Agent': 'lilay-minecraft-launcher'
           },
-          body: {
+          body: jsonEncode({
             'accessToken': accessToken,
             'requestUser': true // We also want to update the user just in case
-          });
+          }));
       if (rRefresh.statusCode != 200) {
         _requiresReauth = true; // We can't refresh. Force re-authenticate.
         return;
@@ -117,7 +115,7 @@ class YggdrasilAccount extends Account {
 
     // Check if we have paid
 
-    Response repsPaid = await get(
+    Response respPaid = await get(
         Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
         headers: {
           'Content-Type': 'application/json',
@@ -125,11 +123,11 @@ class YggdrasilAccount extends Account {
           'Authorization': 'Bearer $accessToken'
         });
 
-    if (repsPaid.statusCode != 200) {
+    if (respPaid.statusCode != 200) {
       return;
     }
 
-    Map<String, dynamic> respPaidJson = jsonDecode(repsPaid.body);
+    Map<String, dynamic> respPaidJson = jsonDecode(respPaid.body);
     for (Map<String, dynamic> product in respPaidJson['items']) {
       if (product['name'] == 'product_minecraft' ||
           product['name'] == 'game_minecraft') {

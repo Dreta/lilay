@@ -39,6 +39,7 @@ class AccountsSection extends StatefulWidget {
 class _AccountsSectionState extends State<AccountsSection> {
   final File _file;
   final _accounts = <Account>[];
+  bool _loading = true;
 
   _AccountsSectionState({required File file}) : _file = file {
     if (file.existsSync()) {
@@ -60,6 +61,7 @@ class _AccountsSectionState extends State<AccountsSection> {
       await acc.refresh();
       setState(() => _accounts.add(acc));
     }
+    setState(() => _loading = false);
   }
 
   /// Save the accounts to the data file.
@@ -87,21 +89,34 @@ class _AccountsSectionState extends State<AccountsSection> {
           child: Divider(height: 1, thickness: 1, color: theme.dividerColor))
     ];
 
-    // TODO Add a dedicated screen for all the accounts.
-    for (Account account in _accounts) {
-      if (account.selected) {
-        widgets.add(AccountWidget(account: account, showMenuIcon: true));
-        break;
+    if (_loading) {
+      widgets.add(Padding(
+          padding: EdgeInsets.only(left: 4),
+          child: ListTile(
+              leading: Container(
+                  width: 15,
+                  height: 15,
+                  child: CircularProgressIndicator(strokeWidth: 2)),
+              title: Text('Loading'),
+              minLeadingWidth: 17)));
+    } else {
+      // TODO Add a dedicated screen for all the accounts.
+      for (Account account in _accounts) {
+        if (account.selected) {
+          widgets.add(AccountWidget(account: account, showMenuIcon: true));
+          break;
+        }
       }
-    }
 
-    widgets.add(LoginButton(onAddAccount: (account) {
-      setState(() {
-        _accounts.add(account);
-        account.selected = true; // The latest account should always be selected
-        _save();
-      });
-    }));
+      widgets.add(LoginButton(onAddAccount: (account) {
+        setState(() {
+          _accounts.add(account);
+          account.selected =
+              true; // The latest account should always be selected
+          _save();
+        });
+      }));
+    }
 
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start, children: widgets);

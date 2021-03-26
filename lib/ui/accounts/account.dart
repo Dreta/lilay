@@ -33,12 +33,19 @@ class AccountWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return ListTile(
         // TODO Use the user's skin as icon instead.
         leading: Icon(Icons.account_circle, color: theme.accentColor),
         trailing: (showMenuIcon ? Icon(Icons.menu) : null),
-        title: Text(account.profileName),
-        subtitle: Text(Account.authProviders[account.type]!.name),
+        title: Text(account.profileName,
+            style: account.requiresReauth
+                ? TextStyle(color: theme.errorColor)
+                : null),
+        subtitle: account.requiresReauth // If re-auth is required
+            ? Text('Re-login required', // Show the message
+                style: TextStyle(color: theme.errorColor))
+            : Text(account.authProvider.name),
         minLeadingWidth: 20);
   }
 }

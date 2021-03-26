@@ -129,9 +129,7 @@ class MicrosoftAccount extends Account {
           'Content-Type': 'application/json',
           'User-Agent': 'lilay-minecraft-launcher'
         },
-        body: {
-          'identityToken': 'XBL3.0 x=$xblUHS;$xstsToken'
-        });
+        body: jsonEncode({'identityToken': 'XBL3.0 x=$xblUHS;$xstsToken'}));
 
     if (resp.statusCode != 200) {
       throw 'Minecraft authentication failed.';
