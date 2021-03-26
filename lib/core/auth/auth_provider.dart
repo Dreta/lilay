@@ -35,6 +35,10 @@ abstract class AuthProvider {
   /// to authenticate.
   bool canUseEmail() => true;
 
+  /// Whether you must pay for a Minecraft license with this
+  /// authentication method.
+  bool requiresPayment() => true;
+
   /// Get the human-friendly name of this [AuthProvider].
   String get name;
 

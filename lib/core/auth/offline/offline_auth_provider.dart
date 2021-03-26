@@ -36,6 +36,9 @@ class OfflineAuthProvider extends AuthProvider {
   bool canUseEmail() => false;
 
   @override
+  bool requiresPayment() => false;
+
+  @override
   String get name => 'Offline';
 
   @override
