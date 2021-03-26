@@ -72,6 +72,9 @@ abstract class Account {
   /// Set whether this account is selected.
   set selected(bool sel);
 
+  /// Get the auth provider that loaded this account.
+  AuthProvider get authProvider => authProviders[type]!;
+
   /// This method refreshes the accessToken for this account
   /// if it is unavailable.
   ///
