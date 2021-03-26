@@ -50,7 +50,7 @@ class _AccountsSectionState extends State<AccountsSection> {
   void _load(File file) async {
     for (Map<String, dynamic> account
         in (jsonDecode(await file.readAsString())['accounts']
-            as List<Map<String, dynamic>>)) {
+            as List<dynamic>)) {
       String? type = account['type'];
       if (type == null) {
         logger.severe('Found invalid account without type');
