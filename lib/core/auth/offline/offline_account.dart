@@ -63,5 +63,5 @@ class OfflineAccount extends Account {
   String get type => 'offline';
 
   @override
-  Future<bool> paid() async => true;
+  bool get paid => true;
 }

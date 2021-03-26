@@ -43,6 +43,7 @@ class YggdrasilAccount extends Account {
   late String _username;
   late String _uuid;
   late bool selected = false;
+  late bool _paid = false;
 
   // This happens when the user manually revokes the
   // access token.
@@ -71,6 +72,9 @@ class YggdrasilAccount extends Account {
 
   @override
   String get uuid => _uuid;
+
+  @override
+  bool get paid => _paid;
 
   @override
   Future<void> refresh() async {
@@ -110,6 +114,28 @@ class YggdrasilAccount extends Account {
       _username = resp['user']['username'];
       _profileName = resp['selectedProfile']['name'];
     }
+
+    // Check if we have paid
+
+    Response repsPaid = await get(
+        Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'lilay-minecraft-launcher',
+          'Authorization': 'Bearer $accessToken'
+        });
+
+    if (repsPaid.statusCode != 200) {
+      return;
+    }
+
+    Map<String, dynamic> respPaidJson = jsonDecode(repsPaid.body);
+    for (Map<String, dynamic> product in respPaidJson['items']) {
+      if (product['name'] == 'product_minecraft' ||
+          product['name'] == 'game_minecraft') {
+        _paid = true;
+      }
+    }
   }
 
   @override
@@ -129,29 +155,5 @@ class YggdrasilAccount extends Account {
       'requiresReauth': requiresReauth,
       'selected': selected
     };
-  }
-
-  @override
-  Future<bool> paid() async {
-    Response resp = await get(
-        Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'lilay-minecraft-launcher',
-          'Authorization': 'Bearer $accessToken'
-        });
-
-    if (resp.statusCode != 200) {
-      return true;
-    }
-
-    Map<String, dynamic> respJson = jsonDecode(resp.body);
-    for (Map<String, dynamic> product in respJson['items']) {
-      if (product['name'] == 'product_minecraft' ||
-          product['name'] == 'game_minecraft') {
-        return true;
-      }
-    }
-    return false;
   }
 }

@@ -66,6 +66,9 @@ abstract class Account {
   /// Whether this is the account that the user selected.
   bool get selected;
 
+  /// Whether the user have paid for a Minecraft license.
+  bool get paid;
+
   /// Set whether this account is selected.
   set selected(bool sel);
 
@@ -74,9 +77,6 @@ abstract class Account {
   ///
   /// This method will be called when the account is loaded.
   Future<void> refresh();
-
-  /// Checks if we have paid for a Minecraft license.
-  Future<bool> paid();
 
   /// Manually convert this class to JSON.
   /// Individual subclasses might want to override this method

@@ -54,6 +54,7 @@ class MicrosoftAccount extends Account {
   late String _profileName;
   late String _uuid;
   late bool selected = false;
+  late bool _paid = false;
 
   // This happens when the user manually revokes the
   // access token.
@@ -84,6 +85,27 @@ class MicrosoftAccount extends Account {
     Map<String, dynamic> respJson = jsonDecode(resp.body);
     msAccessToken = respJson['access_token'];
     refreshToken = respJson['refresh_token'];
+
+    // Check if we have paid
+    Response respPaid = await get(
+        Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'lilay-minecraft-launcher',
+          'Authorization': 'Bearer $accessToken'
+        });
+
+    if (resp.statusCode != 200) {
+      return;
+    }
+
+    Map<String, dynamic> respPaidJson = jsonDecode(respPaid.body);
+    for (Map<String, dynamic> product in respPaidJson['items']) {
+      if (product['name'] == 'product_minecraft' ||
+          product['name'] == 'game_minecraft') {
+        _paid = true;
+      }
+    }
   }
 
   @override
@@ -137,26 +159,5 @@ class MicrosoftAccount extends Account {
   }
 
   @override
-  Future<bool> paid() async {
-    Response resp = await get(
-        Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'lilay-minecraft-launcher',
-          'Authorization': 'Bearer $accessToken'
-        });
-
-    if (resp.statusCode != 200) {
-      return true;
-    }
-
-    Map<String, dynamic> respJson = jsonDecode(resp.body);
-    for (Map<String, dynamic> product in respJson['items']) {
-      if (product['name'] == 'product_minecraft' ||
-          product['name'] == 'game_minecraft') {
-        return true;
-      }
-    }
-    return false;
-  }
+  bool get paid => _paid;
 }
