@@ -36,8 +36,6 @@ class MicrosoftAuthServer {
       _handle();
     });
     logger.info('Microsoft auth server listening on localhost:$port.');
-
-    _handle();
   }
 
   void _handle() async {
