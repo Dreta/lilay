@@ -20,15 +20,7 @@ import 'dart:io';
 
 /// Add dashes to a UUID string for parsing into a UuidValue.
 String dashifyUUID(String uuid) =>
-    uuid.substring(0, 8) +
-    '-' +
-    uuid.substring(8, 12) +
-    '-' +
-    uuid.substring(12, 16) +
-    '-' +
-    uuid.substring(16, 20) +
-    '-' +
-    uuid.substring(20);
+    '${uuid.substring(0, 8)}-${uuid.substring(8, 12)}-${uuid.substring(12, 16)}-${uuid.substring(16, 20)}-${uuid.substring(20)}';
 
 // Get the default platform-dependent .minecraft directory location.
 String getDefaultMinecraft() {

@@ -33,7 +33,6 @@ class YggdrasilAccount extends Account {
     account._profileName = json['profileName'];
     account._username = json['username'];
     account._uuid = json['uuid'];
-    account._paid = json['paid'];
     account._requiresReauth = json['requiresReauth'];
     account.selected = json['selected'];
     return account;
@@ -43,7 +42,6 @@ class YggdrasilAccount extends Account {
   late String _profileName;
   late String _username;
   late String _uuid;
-  late bool _paid;
   late bool selected = false;
 
   // This happens when the user manually revokes the
@@ -55,10 +53,10 @@ class YggdrasilAccount extends Account {
   /// Create a [YggdrasilAccount] from a Mojang /authenticate
   /// response body.
   YggdrasilAccount({required Map<String, dynamic> json}) {
+    print(json);
     _accessToken = json['accessToken'];
     _profileName = json['selectedProfile']['name'];
     _username = json['user']['username'];
-    _paid = json['selectedProfile']['paid'];
     _uuid = dashifyUUID(json['selectedProfile']['id']);
   }
 
@@ -111,7 +109,6 @@ class YggdrasilAccount extends Account {
       _accessToken = resp['accessToken'];
       _username = resp['user']['username'];
       _profileName = resp['selectedProfile']['name'];
-      _paid = resp['selectedProfile']['paid'];
     }
   }
 
@@ -127,7 +124,6 @@ class YggdrasilAccount extends Account {
       'username': username,
       'accessToken': accessToken,
       'profileName': profileName,
-      'paid': _paid,
       'type': type,
       'uuid': uuid,
       'requiresReauth': requiresReauth,
@@ -136,5 +132,26 @@ class YggdrasilAccount extends Account {
   }
 
   @override
-  Future<bool> paid() async => _paid;
+  Future<bool> paid() async {
+    Response resp = await get(
+        Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'lilay-minecraft-launcher',
+          'Authorization': 'Bearer $accessToken'
+        });
+
+    if (resp.statusCode != 200) {
+      return true;
+    }
+
+    Map<String, dynamic> respJson = jsonDecode(resp.body);
+    for (Map<String, dynamic> product in respJson['items']) {
+      if (product['name'] == 'product_minecraft' ||
+          product['name'] == 'game_minecraft') {
+        return true;
+      }
+    }
+    return false;
+  }
 }

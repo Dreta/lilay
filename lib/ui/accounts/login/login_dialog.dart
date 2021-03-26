@@ -124,17 +124,21 @@ class _LoginDialogState extends State<LoginDialog> {
                       final AuthProvider provider =
                           Account.authProviders[_selectedAuthProvider]!;
 
-                      // Login the user
-                      provider.login(username, password, (account) {
-                        _addAccount(account); // Allow the account to be added
-                        _username.clear(); // Clear the fields
-                        _password.clear();
-                        setState(() {
-                          _loggingIn = false;
-                          _selectedAuthProvider = Account.defaultAuthProvider;
-                          Navigator.pop(context); // Close the dialog
+                      try {
+                        // Login the user
+                        provider.login(username, password, (account) {
+                          _addAccount(account); // Allow the account to be added
+                          _username.clear(); // Clear the fields
+                          _password.clear();
+                          setState(() {
+                            _loggingIn = false;
+                            _selectedAuthProvider = Account.defaultAuthProvider;
+                            Navigator.pop(context); // Close the dialog
+                          });
                         });
-                      });
+                      } catch (e) {
+                        // TODO Handle exception through popup dialog
+                      }
                     },
               style: theme.elevatedButtonTheme.style,
               child: Padding(

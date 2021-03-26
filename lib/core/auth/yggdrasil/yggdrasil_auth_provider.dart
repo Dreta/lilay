@@ -46,7 +46,7 @@ class YggdrasilAuthProvider extends AuthProvider {
         }));
     Map<String, dynamic> resp = jsonDecode(response.body);
     if (response.statusCode != 200) {
-      throw resp['errorMessage'];
+      throw '${resp['error']}: ${resp['errorMessage']}';
     }
 
     callback(YggdrasilAccount(json: resp));
