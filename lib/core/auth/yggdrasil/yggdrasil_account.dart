@@ -44,7 +44,7 @@ class YggdrasilAccount extends Account {
   late String _username;
   late String _uuid;
   late bool _paid;
-  late bool selected;
+  late bool selected = false;
 
   // This happens when the user manually revokes the
   // access token.

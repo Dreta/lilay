@@ -16,28 +16,24 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter/material.dart';
 import 'package:lilay/core/auth/account.dart';
-import 'package:lilay/core/auth/auth_provider.dart';
-import 'package:lilay/core/auth/offline/offline_account.dart';
+import 'package:lilay/ui/accounts/login/login_dialog.dart';
 
-/// OfflineAuthProvider creates an OfflineAccount for a given
-/// username.
-class OfflineAuthProvider extends AuthProvider {
+class LoginButton extends StatelessWidget {
+  final Function(Account) _addAccount;
+
+  LoginButton({required Function(Account) onAddAccount})
+      : _addAccount = onAddAccount;
+
   @override
-  void login(String? username, String? password, Function(Account) callback) {
-    assert(username != null);
-    callback(OfflineAccount(name: username!));
+  Widget build(BuildContext context) {
+    return ListTile(
+        leading: Icon(Icons.add),
+        title: Text('Add an account'),
+        minLeadingWidth: 20,
+        onTap: () => showDialog<void>(
+            context: context,
+            builder: (context) => LoginDialog(onAddAccount: _addAccount)));
   }
-
-  @override
-  bool requiresPassword() => false;
-
-  @override
-  bool canUseEmail() => false;
-
-  @override
-  String get name => 'Offline';
-
-  @override
-  String get type => 'offline';
 }

@@ -33,7 +33,7 @@ class OfflineAccount extends Account {
 
   late String _name;
   late String _uuid = Uuid().v4obj().uuid;
-  late bool selected;
+  late bool selected = false;
 
   OfflineAccount._();
 

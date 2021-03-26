@@ -53,7 +53,7 @@ class MicrosoftAccount extends Account {
   late String xstsToken; // XSTS token
   late String _profileName;
   late String _uuid;
-  late bool selected;
+  late bool selected = false;
 
   // This happens when the user manually revokes the
   // access token.

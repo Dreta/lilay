@@ -23,11 +23,12 @@ import 'package:flutter/material.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/main.dart';
 import 'package:lilay/ui/accounts/account.dart';
+import 'package:lilay/ui/accounts/login/login_button.dart';
 
 /// This is where the account database will be loaded from.
 File defaultAccountDB = File('accounts.json');
 
-/// This widget represents the entire "accounts" section
+/// This widget represents the entire accounts section
 /// in Lilay.
 class AccountsSection extends StatefulWidget {
   @override
@@ -61,6 +62,7 @@ class _AccountsSectionState extends State<AccountsSection> {
 
   /// Save the accounts to the data file.
   void _save() async {
+    // TODO It won't save / won't load
     List<Map<String, dynamic>> json = [];
     for (Account account in _accounts) {
       json.add(account.toJson());
@@ -92,6 +94,15 @@ class _AccountsSectionState extends State<AccountsSection> {
       }
     }
 
-    return Row(children: widgets);
+    widgets.add(LoginButton(onAddAccount: (account) {
+      setState(() {
+        _accounts.add(account);
+        account.selected = true; // The latest account should always be selected
+        _save();
+      });
+    }));
+
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start, children: widgets);
   }
 }

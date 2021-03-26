@@ -35,23 +35,24 @@ class AccountWidget extends StatelessWidget {
     return PopupMenuButton(
         tooltip: 'Account ' + name,
         offset: const Offset(50, 0),
-        itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+        itemBuilder: (BuildContext context) => [
               PopupMenuItem(
                   child: ListTile(
                       leading: Icon(Icons.refresh),
-                      trailing: (showMenuIcon ? Icon(Icons.menu) : null),
                       title: Text('Refresh'),
+                      // TODO Actually implement delete / refresh
                       minLeadingWidth: 20)),
-          PopupMenuItem(
+              PopupMenuItem(
                   child: ListTile(
                       leading: Icon(Icons.delete, color: Colors.red),
-                      trailing: (showMenuIcon ? Icon(Icons.menu) : null),
                       title:
                           Text('Delete', style: TextStyle(color: Colors.red)),
                       minLeadingWidth: 20))
             ],
         child: ListTile(
+          // TODO Use the user's skin as icon instead.
             leading: Icon(Icons.account_circle, color: theme.accentColor),
+            trailing: (showMenuIcon ? Icon(Icons.menu) : null),
             title: Text(name),
             minLeadingWidth: 20));
   }

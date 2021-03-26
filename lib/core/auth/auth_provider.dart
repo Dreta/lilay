@@ -31,6 +31,10 @@ abstract class AuthProvider {
   /// e.g. Microsoft account requires a webview.
   bool useManualAuthentication() => false;
 
+  /// Whether this authentication method allows you to use an email
+  /// to authenticate.
+  bool canUseEmail() => true;
+
   /// Get the human-friendly name of this [AuthProvider].
   String get name;
 
