@@ -53,7 +53,7 @@ class YggdrasilAuthProvider extends AuthProvider {
   }
 
   @override
-  String get name => 'Yggdrasil (Mojang)';
+  String get name => 'Mojang';
 
   @override
   String get type => 'yggdrasil';
