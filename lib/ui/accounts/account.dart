@@ -16,11 +16,15 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/main.dart';
 
 /// This widget represents an account in Lilay.
-class AccountWidget extends StatelessWidget {
+class AccountWidget extends StatefulWidget {
   final Account account;
 
   /// Whether the menu icon will be shown.
@@ -31,21 +35,46 @@ class AccountWidget extends StatelessWidget {
   const AccountWidget({required this.account, this.showMenuIcon = false});
 
   @override
+  _AccountWidgetState createState() =>
+      _AccountWidgetState(account: account, showMenuIcon: showMenuIcon);
+}
+
+class _AccountWidgetState extends State<AccountWidget> {
+  final Account _account;
+  final bool _showMenuIcon;
+
+  Uint8List? _skin;
+
+  _AccountWidgetState({required Account account, required bool showMenuIcon})
+      : _account = account,
+        _showMenuIcon = showMenuIcon {
+    logger.info('Attempting to get skin from ${_account.uuid}.');
+    get(
+        Uri.parse(
+            'https://crafatar.com/avatars/${_account.uuid}?size=24&overlay=nevergonnaletyoudown'),
+        headers: {'User-Agent': 'lilay-minecraft-launcher'}).then((resp) {
+      logger.info('Received skin response.');
+      setState(() => _skin = resp.bodyBytes);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
     return ListTile(
-        // TODO Use the user's skin as icon instead.
-        leading: Icon(Icons.account_circle, color: theme.accentColor),
-        trailing: (showMenuIcon ? Icon(Icons.menu) : null),
-        title: Text(account.profileName,
-            style: account.requiresReauth
+        leading: _skin == null
+            ? Icon(Icons.account_circle, color: theme.accentColor)
+            : ImageIcon(Image.memory(_skin!, width: 24, height: 24).image),
+        trailing: (_showMenuIcon ? Icon(Icons.menu) : null),
+        title: Text(_account.profileName,
+            style: _account.requiresReauth
                 ? TextStyle(color: theme.errorColor)
                 : null),
-        subtitle: account.requiresReauth // If re-auth is required
+        subtitle: _account.requiresReauth // If re-auth is required
             ? Text('Re-login required', // Show the message
                 style: TextStyle(color: theme.errorColor))
-            : Text(account.authProvider.name),
+            : Text(_account.authProvider.name),
         minLeadingWidth: 20);
   }
 }
