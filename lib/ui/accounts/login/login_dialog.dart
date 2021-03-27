@@ -16,8 +16,8 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/main.dart';
@@ -27,6 +27,16 @@ class LoginDialog extends StatefulWidget {
 
   LoginDialog({required Function(Account) onAddAccount})
       : _addAccount = onAddAccount;
+
+  static display(BuildContext context, Function(Account) onAddAccount) {
+    showAnimatedDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => LoginDialog(onAddAccount: onAddAccount),
+        animationType: DialogTransitionType.fadeScale,
+        curve: Curves.easeInOut,
+        duration: Duration(milliseconds: 400));
+  }
 
   @override
   _LoginDialogState createState() =>
@@ -47,14 +57,14 @@ class _LoginDialogState extends State<LoginDialog> {
       : _addAccount = onAddAccount;
 
   @override
-  void dispose() {
+  dispose() {
     super.dispose();
     _username.dispose();
     _password.dispose();
   }
 
   /// Log the user in with the input values.
-  void _login(AuthProvider selected) {
+  _login(AuthProvider selected) {
     if (_form.currentState!.validate()) {
       setState(() => _loggingIn = true);
       final String? username =
@@ -76,8 +86,8 @@ class _LoginDialogState extends State<LoginDialog> {
         });
       }, (error) {
         logger.severe(error);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $error')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Error: $error'), duration: Duration(seconds: 3)));
         Navigator.pop(context);
       });
     }

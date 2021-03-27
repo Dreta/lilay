@@ -50,7 +50,7 @@ class _AccountsSectionState extends State<AccountsSection> {
   }
 
   /// Load the saved accounts from a file.
-  void _load(File file) async {
+  _load(File file) async {
     for (Map<String, dynamic> account
         in (jsonDecode(await file.readAsString())['accounts']
             as List<dynamic>)) {
@@ -67,7 +67,7 @@ class _AccountsSectionState extends State<AccountsSection> {
   }
 
   /// Save the accounts to the data file.
-  void _save() async {
+  _save() async {
     List<Map<String, dynamic>> json = [];
     for (Account account in _accounts) {
       json.add(account.toJson());
@@ -112,8 +112,9 @@ class _AccountsSectionState extends State<AccountsSection> {
       widgets.add(LoginButton(onAddAccount: (account) {
         for (Account acc in _accounts) {
           if (acc.uuid == account.uuid && !acc.requiresReauth) {
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('This account already exist!')));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('This account already exist!'),
+                duration: Duration(seconds: 2)));
             return;
           }
         }

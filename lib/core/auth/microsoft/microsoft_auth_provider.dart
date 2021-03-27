@@ -30,7 +30,7 @@ class MicrosoftAuthProvider extends AuthProvider {
       : _authServer = authServer;
 
   @override
-  void login(String? username, String? password, Function(Account) callback,
+  login(String? username, String? password, Function(Account) callback,
       Function(String) error) {
     // This is where we will have to visit.
     String authUrl =

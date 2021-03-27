@@ -32,7 +32,7 @@ import 'package:logging/logging.dart';
 Logger logger = Logger('Lilay');
 CoreConfig? coreConfig;
 
-void main() {
+main() {
   logger.onRecord.listen((record) {
     print('[${record.level.name}] [${record.time}]: ${record.message}');
   });

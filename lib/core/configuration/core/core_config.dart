@@ -46,7 +46,7 @@ class CoreConfig {
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }
 
-  void write(File file) {
+  write(File file) {
     file.writeAsString(jsonEncode(_$CoreConfigToJson(this)));
   }
 

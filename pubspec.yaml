@@ -28,6 +28,7 @@ dependencies:
   logging: ^1.0.0
   http: ^0.13.0
   open_url: ^2.0.0
+  flutter_animated_dialog: ^2.0.0
 
 dev_dependencies:
   flutter_test:

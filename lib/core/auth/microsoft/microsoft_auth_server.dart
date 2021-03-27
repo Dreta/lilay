@@ -38,7 +38,7 @@ class MicrosoftAuthServer {
     logger.info('Microsoft auth server listening on localhost:$port.');
   }
 
-  void _handle() async {
+  _handle() async {
     await for (HttpRequest request in _server) {
       // If we are in /msauth
       // We are doing a simple check that won't be always accurate here,
@@ -49,7 +49,7 @@ class MicrosoftAuthServer {
     }
   }
 
-  void _handleRequest(HttpRequest request) async {
+  _handleRequest(HttpRequest request) async {
     // Get code from GET request
     String? code = request.uri.queryParameters['code'];
     if (code == null) {

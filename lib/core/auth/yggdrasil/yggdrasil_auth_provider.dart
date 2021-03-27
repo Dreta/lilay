@@ -27,7 +27,7 @@ import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 /// with the provided username (email) and password.
 class YggdrasilAuthProvider extends AuthProvider {
   @override
-  void login(String? username, String? password, Function(Account) callback,
+  login(String? username, String? password, Function(Account) callback,
       Function(String) error) {
     assert(username != null);
     assert(password != null);

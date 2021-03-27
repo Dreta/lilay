@@ -32,8 +32,6 @@ class LoginButton extends StatelessWidget {
         leading: Icon(Icons.add),
         title: Text('Add an account'),
         minLeadingWidth: 20,
-        onTap: () => showDialog<void>(
-            context: context,
-            builder: (context) => LoginDialog(onAddAccount: _addAccount)));
+        onTap: () => {LoginDialog.display(context, _addAccount)});
   }
 }

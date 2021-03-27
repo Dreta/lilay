@@ -121,7 +121,7 @@ class MicrosoftAccount extends Account {
   String get uuid => _uuid;
 
   /// Request a Minecraft access token from Minecraft Xbox services.
-  void requestMinecraftToken() async {
+  requestMinecraftToken() async {
     Response resp = await post(
         Uri.parse(
             'https://api.minecraftservices.com/authentication/login_with_xbox'),
