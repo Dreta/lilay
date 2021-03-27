@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
@@ -178,9 +179,10 @@ class _LoginDialogState extends State<LoginDialog> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO Make the whole dialog more like Google's login dialog when authenticating.
     // FIXME The animation is not fluid on first open
 
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
     final AuthProvider selected = Account.authProviders[_selectedAuthProvider]!;
 
     final List<Widget> fields = [];
@@ -192,21 +194,35 @@ class _LoginDialogState extends State<LoginDialog> {
       }
     }
 
-    return SimpleDialog(
-        title: const Text('Login'),
-        contentPadding: const EdgeInsets.all(24),
-        children: [
-          if (_loggingIn) LinearProgressIndicator(),
-          Form(
-              key: _form,
-              child: Column(children: [
-                // This the the dropdown menu for account type selection
-                _buildAccountTypeDropdown(),
-                // These are the email/password fields.
-                for (Widget widget in fields) widget,
-                // This is the submit button.
-                _buildSubmitButton(context, selected)
-              ]))
-        ]);
+    return Dialog(
+        child: Container(
+            width: 512,
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_loggingIn) LinearProgressIndicator(),
+                  Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                                padding: EdgeInsets.only(top: 5, bottom: 5),
+                                child:
+                                    Text('Login', style: textTheme.headline6)),
+                            Form(
+                                key: _form,
+                                child: Column(children: [
+                                  // This the the dropdown menu for account type selection
+                                  _buildAccountTypeDropdown(),
+                                  // These are the email/password fields.
+                                  for (Widget widget in fields) widget,
+                                  // This is the submit button.
+                                  _buildSubmitButton(context, selected)
+                                ]))
+                          ]))
+                ])));
   }
 }
