@@ -16,6 +16,8 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
@@ -31,6 +33,7 @@ import 'package:logging/logging.dart';
 
 Logger logger = Logger('Lilay');
 CoreConfig? coreConfig;
+Directory cacheDirectory = Directory('cache');
 
 main() {
   logger.onRecord.listen((record) {
@@ -53,6 +56,10 @@ main() {
 
   logger.info('Setting up core config.');
   coreConfig = CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
+
+  if (!cacheDirectory.existsSync()) {
+    cacheDirectory.createSync();
+  }
 
   runApp(Launcher());
 }

@@ -16,7 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -42,19 +42,22 @@ class AccountWidget extends StatefulWidget {
 class _AccountWidgetState extends State<AccountWidget> {
   final Account _account;
   final bool _showMenuIcon;
-
-  Uint8List? _skin;
+  late File _cachedSkinPath;
 
   _AccountWidgetState({required Account account, required bool showMenuIcon})
       : _account = account,
         _showMenuIcon = showMenuIcon {
+    _cachedSkinPath = File(
+        '${cacheDirectory.absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
+
     logger.info('Attempting to get skin from ${_account.uuid}.');
     get(
         Uri.parse(
             'https://crafatar.com/avatars/${_account.uuid}?size=24&overlay=nevergonnaletyoudown'),
-        headers: {'User-Agent': 'lilay-minecraft-launcher'}).then((resp) {
+        headers: {'User-Agent': 'lilay-minecraft-launcher'}).then((resp) async {
       logger.info('Received skin response.');
-      setState(() => _skin = resp.bodyBytes);
+      await _cachedSkinPath.writeAsBytes(List.from(resp.bodyBytes));
+      setState(() {}); // Force refresh of widget
     });
   }
 
@@ -63,9 +66,9 @@ class _AccountWidgetState extends State<AccountWidget> {
     final ThemeData theme = Theme.of(context);
 
     return ListTile(
-        leading: _skin == null
-            ? Icon(Icons.account_circle, color: theme.accentColor)
-            : ImageIcon(Image.memory(_skin!, width: 24, height: 24).image),
+        leading: _cachedSkinPath.existsSync()
+            ? Image.file(_cachedSkinPath, width: 24, height: 24)
+            : Icon(Icons.account_circle, color: theme.accentColor),
         trailing: (_showMenuIcon ? Icon(Icons.menu) : null),
         title: Text(_account.profileName,
             style: _account.requiresReauth
