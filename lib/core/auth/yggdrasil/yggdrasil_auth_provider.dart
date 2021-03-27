@@ -27,13 +27,12 @@ import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 /// with the provided username (email) and password.
 class YggdrasilAuthProvider extends AuthProvider {
   @override
-  void login(
-      String? username, String? password, Function(Account) callback) async {
+  void login(String? username, String? password, Function(Account) callback,
+      Function(String) error) {
     assert(username != null);
     assert(password != null);
 
-    Response response = await post(
-        Uri.parse('https://authserver.mojang.com/authenticate'),
+    post(Uri.parse('https://authserver.mojang.com/authenticate'),
         headers: {
           'Content-Type': 'application/json',
           'User-Agent': 'lilay-minecraft-launcher'
@@ -43,13 +42,15 @@ class YggdrasilAuthProvider extends AuthProvider {
           'username': username,
           'password': password,
           'requestUser': true
-        }));
-    Map<String, dynamic> resp = jsonDecode(response.body);
-    if (response.statusCode != 200) {
-      throw '${resp['error']}: ${resp['errorMessage']}';
-    }
+        })).then((response) {
+      Map<String, dynamic> resp = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        error('${resp['errorMessage']}');
+        return;
+      }
 
-    callback(YggdrasilAccount(json: resp));
+      callback(YggdrasilAccount(json: resp));
+    });
   }
 
   @override

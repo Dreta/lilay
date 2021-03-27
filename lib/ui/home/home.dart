@@ -26,10 +26,11 @@ import 'package:lilay/ui/home/profile.dart';
 class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
 
-    return Row(children: [
+    return Scaffold(
+        body: Row(children: [
       Drawer(
           child: ListView(padding: EdgeInsets.zero, children: <Widget>[
         Padding(
@@ -51,6 +52,6 @@ class Homepage extends StatelessWidget {
         Profile(name: 'Fabric 1.16.5', modded: true),
         Profile(name: 'Vanilla 1.16.5')
       ]))
-    ]);
+    ]));
   }
 }

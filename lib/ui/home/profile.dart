@@ -30,7 +30,7 @@ class Profile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final ThemeData theme = Theme.of(context);
     return ListTile(
         leading: Icon(modded ? Icons.hardware : Icons.sports_esports,
             color: theme.accentColor),

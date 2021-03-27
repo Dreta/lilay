@@ -24,7 +24,6 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/main.dart';
 import 'package:lilay/ui/accounts/account.dart';
 import 'package:lilay/ui/accounts/login/login_button.dart';
-import 'package:lilay/ui/misc/error_dialog.dart';
 
 /// This is where the account database will be loaded from.
 File defaultAccountDB = File('accounts.json');
@@ -69,7 +68,6 @@ class _AccountsSectionState extends State<AccountsSection> {
 
   /// Save the accounts to the data file.
   void _save() async {
-    // TODO It won't save / won't load
     List<Map<String, dynamic>> json = [];
     for (Account account in _accounts) {
       json.add(account.toJson());
@@ -79,8 +77,8 @@ class _AccountsSectionState extends State<AccountsSection> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
+    final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
 
     List<Widget> widgets = [
       Padding(
@@ -114,15 +112,16 @@ class _AccountsSectionState extends State<AccountsSection> {
       widgets.add(LoginButton(onAddAccount: (account) {
         for (Account acc in _accounts) {
           if (acc.uuid == account.uuid && !acc.requiresReauth) {
-            showDialog(
-                context: context,
-                builder: (context) =>
-                    ErrorDialog(text: 'This account is already available!'));
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('This account already exist!')));
             return;
           }
         }
         setState(() {
           _accounts.add(account);
+          for (Account acc in _accounts) {
+            acc.selected = false;
+          }
           account.selected =
               true; // The latest account should always be selected
           _save();

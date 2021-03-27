@@ -33,7 +33,7 @@ abstract class Account {
       Map();
 
   /// The default auth provider to use in the login dialog.
-  static final String defaultAuthProvider = 'yggdrasil';
+  static final defaultAuthProvider = 'yggdrasil';
 
   /// This is the username that the user types in when
   /// signing in.

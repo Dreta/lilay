@@ -19,6 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
+import 'package:lilay/main.dart';
 
 class LoginDialog extends StatefulWidget {
   final Function(Account) _addAccount;
@@ -35,8 +36,10 @@ class _LoginDialogState extends State<LoginDialog> {
   final Function(Account) _addAccount;
 
   String _selectedAuthProvider = Account.defaultAuthProvider;
+  final GlobalKey<FormState> _form = GlobalKey();
   final TextEditingController _username = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final FocusNode _passwordFocus = FocusNode();
   bool _loggingIn = false;
 
   _LoginDialogState({required Function(Account) onAddAccount})
@@ -49,100 +52,161 @@ class _LoginDialogState extends State<LoginDialog> {
     _password.dispose();
   }
 
+  /// Log the user in with the input values.
+  void _login(AuthProvider selected) {
+    if (_form.currentState!.validate()) {
+      setState(() => _loggingIn = true);
+      final String? username =
+          selected.useManualAuthentication() ? null : _username.value.text;
+      final String? password =
+          (selected.useManualAuthentication() || !selected.requiresPassword())
+              ? null
+              : _password.value.text;
+      final AuthProvider provider =
+          Account.authProviders[_selectedAuthProvider]!;
+
+      // Login the user
+      provider.login(username, password, (account) {
+        Navigator.pop(context); // Close the dialog
+        _addAccount(account); // Allow the account to be added
+        setState(() {
+          _loggingIn = false;
+          _selectedAuthProvider = Account.defaultAuthProvider;
+        });
+      }, (error) {
+        logger.severe(error);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error: $error')));
+        Navigator.pop(context);
+      });
+    }
+  }
+
+  /// Create the username input field
+  Widget _buildUsernameField(BuildContext context, AuthProvider selected) {
+    final ThemeData theme = Theme.of(context);
+
+    return TextFormField(
+        enabled: !_loggingIn,
+        // Disable the input field if we are logging in
+        cursorColor: theme.textSelectionTheme.cursorColor,
+        controller: _username,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return '${selected.canUseEmail() ? 'Email / Username' : 'Username'} is required.';
+          }
+          return null;
+        },
+        textInputAction: TextInputAction.next,
+        onFieldSubmitted: (value) {
+          if (selected.requiresPassword()) {
+            FocusScope.of(context).requestFocus(_passwordFocus);
+          }
+        },
+        decoration: InputDecoration(
+            labelText: selected.canUseEmail() ? 'Email / Username' : 'Username',
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: theme.accentColor))));
+  }
+
+  /// Create the password input field
+  Widget _buildPasswordField(BuildContext context, AuthProvider selected) {
+    final ThemeData theme = Theme.of(context);
+
+    return TextFormField(
+        enabled: !_loggingIn,
+        cursorColor: theme.textSelectionTheme.cursorColor,
+        controller: _password,
+        focusNode: _passwordFocus,
+        obscureText: true,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Password is required.';
+          }
+          return null;
+        },
+        onFieldSubmitted: (value) => _login(selected),
+        decoration: InputDecoration(
+            labelText: 'Password',
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: theme.accentColor))));
+  }
+
+  /// Create the account type dropdown
+  Widget _buildAccountTypeDropdown() {
+    return DropdownButtonFormField(
+        value: _selectedAuthProvider,
+        items: [
+          for (final AuthProvider provider in Account.authProviders.values)
+            DropdownMenuItem(value: provider.type, child: Text(provider.name))
+        ],
+        onChanged: _loggingIn // Disable the dropdown menu if we are logging in
+            ? null
+            : (value) {
+                setState(() {
+                  _selectedAuthProvider = value as String;
+                });
+              });
+  }
+
+  /// Create the submit button
+  Widget _buildSubmitButton(BuildContext context, AuthProvider selected) {
+    final ThemeData theme = Theme.of(context);
+    return Container(
+        alignment: AlignmentDirectional.centerEnd,
+        padding: EdgeInsets.fromLTRB(8, 24, 8, 8),
+        child: OverflowBar(
+            spacing: 8,
+            overflowAlignment: OverflowBarAlignment.end,
+            overflowDirection: VerticalDirection.down,
+            overflowSpacing: 0,
+            children: [
+              ElevatedButton(
+                  onPressed:
+                      _loggingIn // Disable the button if we are logging in
+                          ? null
+                          : () => _login(selected),
+                  style: theme.elevatedButtonTheme.style,
+                  child: Padding(
+                      padding: EdgeInsets.only(
+                          left: 15, right: 15, top: 10, bottom: 10),
+                      child: Text(selected.useManualAuthentication()
+                          ? 'Continue'
+                          : 'Login')))
+            ]));
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO Make the whole dialog more like Google's login dialog when authenticating.
     // FIXME The animation is not fluid on first open
 
-    final theme = Theme.of(context);
     final AuthProvider selected = Account.authProviders[_selectedAuthProvider]!;
 
     final List<Widget> fields = [];
     if (!selected.useManualAuthentication()) {
-      fields.add(TextFormField(
-          enabled: !_loggingIn, // Disable the input field if we are logging in
-          cursorColor: theme.textSelectionTheme.cursorColor,
-          controller: _username,
-          decoration: InputDecoration(
-              labelText:
-                  selected.canUseEmail() ? 'Email / Username' : 'Username',
-              enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: theme.accentColor)))));
+      fields.add(_buildUsernameField(context, selected));
 
       if (selected.requiresPassword()) {
-        fields.add(TextFormField(
-            enabled: !_loggingIn,
-            cursorColor: theme.textSelectionTheme.cursorColor,
-            controller: _password,
-            obscureText: true,
-            decoration: InputDecoration(
-                labelText: 'Password',
-                enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: theme.accentColor)))));
+        fields.add(_buildPasswordField(context, selected));
       }
     }
 
-    return AlertDialog(
+    return SimpleDialog(
         title: const Text('Login'),
         contentPadding: const EdgeInsets.all(24),
-        actionsPadding: const EdgeInsets.only(bottom: 20, right: 24),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
+        children: [
           if (_loggingIn) LinearProgressIndicator(),
-          DropdownButtonFormField(
-              value: _selectedAuthProvider,
-              items: [
-                for (final AuthProvider provider
-                    in Account.authProviders.values)
-                  DropdownMenuItem(
-                      value: provider.type, child: Text(provider.name))
-              ],
-              onChanged:
-                  _loggingIn // Disable the dropdown menu if we are logging in
-                      ? null
-                      : (value) {
-                          setState(() {
-                            _selectedAuthProvider = value as String;
-                          });
-                        }),
-          for (Widget widget in fields) widget
-        ]),
-        actions: [
-          ElevatedButton(
-              onPressed: _loggingIn // Disable the button if we are logging in
-                  ? null
-                  : () {
-                      setState(() => _loggingIn = true);
-                      final String? username =
-                          selected.useManualAuthentication()
-                              ? null
-                              : _username.value.text;
-                      final String? password =
-                          (selected.useManualAuthentication() ||
-                                  !selected.requiresPassword())
-                              ? null
-                              : _password.value.text;
-                      final AuthProvider provider =
-                          Account.authProviders[_selectedAuthProvider]!;
-
-                      try {
-                        // Login the user
-                        provider.login(username, password, (account) {
-                          Navigator.pop(context); // Close the dialog
-                          _addAccount(account); // Allow the account to be added
-                          setState(() {
-                            _loggingIn = false;
-                            _selectedAuthProvider = Account.defaultAuthProvider;
-                          });
-                        });
-                      } catch (e) {}
-                    },
-              style: theme.elevatedButtonTheme.style,
-              child: Padding(
-                  padding:
-                      EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
-                  child: Text(selected.useManualAuthentication()
-                      ? 'Continue'
-                      : 'Login')))
+          Form(
+              key: _form,
+              child: Column(children: [
+                // This the the dropdown menu for account type selection
+                _buildAccountTypeDropdown(),
+                // These are the email/password fields.
+                for (Widget widget in fields) widget,
+                // This is the submit button.
+                _buildSubmitButton(context, selected)
+              ]))
         ]);
   }
 }
