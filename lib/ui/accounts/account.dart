@@ -67,7 +67,9 @@ class _AccountWidgetState extends State<AccountWidget> {
 
     return ListTile(
         leading: _cachedSkinPath.existsSync()
-            ? Image.file(_cachedSkinPath, width: 24, height: 24)
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(24 / 2),
+                child: Image.file(_cachedSkinPath, width: 24, height: 24))
             : Icon(Icons.account_circle, color: theme.accentColor),
         trailing: (_showMenuIcon ? Icon(Icons.menu) : null),
         title: Text(_account.profileName,
