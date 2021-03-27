@@ -105,19 +105,17 @@ class _AccountsSectionState extends State<AccountsSection> {
       ));
     }
 
-    if (_loading) {
-      if (!_loadingFailed) {
-        widgets.add(Padding(
-            padding: EdgeInsets.only(left: 4),
-            child: ListTile(
-                leading: Container(
-                    width: 15,
-                    height: 15,
-                    child: CircularProgressIndicator(strokeWidth: 2)),
-                title: Text('Loading'),
-                minLeadingWidth: 17)));
-      }
-    } else {
+    if (_loading && !_loadingFailed) {
+      widgets.add(Padding(
+          padding: EdgeInsets.only(left: 4),
+          child: ListTile(
+              leading: Container(
+                  width: 15,
+                  height: 15,
+                  child: CircularProgressIndicator(strokeWidth: 2)),
+              title: Text('Loading'),
+              minLeadingWidth: 17)));
+    } else if (!_loadingFailed) {
       // TODO Add a dedicated screen for all the accounts.
       for (Account account in _accounts) {
         if (account.selected) {
