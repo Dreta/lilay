@@ -135,6 +135,7 @@ class YggdrasilAccount extends Account {
     }
   }
 
+  // TODO Make requires reauth actually work
   @override
   bool get requiresReauth => _requiresReauth;
 
