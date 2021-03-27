@@ -40,6 +40,7 @@ class _AccountsSectionState extends State<AccountsSection> {
   final File _file;
   final _accounts = <Account>[];
   bool _loading = true;
+  bool _loadingFailed = false;
 
   _AccountsSectionState({required File file}) : _file = file {
     if (file.existsSync()) {
@@ -60,7 +61,12 @@ class _AccountsSectionState extends State<AccountsSection> {
         continue;
       }
       Account acc = Account.accountFactories[account['type']]!(account);
-      await acc.refresh();
+      try {
+        await acc.refresh();
+      } catch (e) {
+        setState(() => _loadingFailed = true);
+        break;
+      }
       setState(() => _accounts.add(acc));
     }
     setState(() => _loading = false);
@@ -90,16 +96,27 @@ class _AccountsSectionState extends State<AccountsSection> {
           child: Divider(height: 1, thickness: 1, color: theme.dividerColor))
     ];
 
+    if (_loadingFailed) {
+      widgets.add(ListTile(
+        leading: Icon(Icons.error, color: theme.errorColor),
+        title:
+            Text('Failed to load', style: TextStyle(color: theme.errorColor)),
+        minLeadingWidth: 20,
+      ));
+    }
+
     if (_loading) {
-      widgets.add(Padding(
-          padding: EdgeInsets.only(left: 4),
-          child: ListTile(
-              leading: Container(
-                  width: 15,
-                  height: 15,
-                  child: CircularProgressIndicator(strokeWidth: 2)),
-              title: Text('Loading'),
-              minLeadingWidth: 17)));
+      if (!_loadingFailed) {
+        widgets.add(Padding(
+            padding: EdgeInsets.only(left: 4),
+            child: ListTile(
+                leading: Container(
+                    width: 15,
+                    height: 15,
+                    child: CircularProgressIndicator(strokeWidth: 2)),
+                title: Text('Loading'),
+                minLeadingWidth: 17)));
+      }
     } else {
       // TODO Add a dedicated screen for all the accounts.
       for (Account account in _accounts) {
