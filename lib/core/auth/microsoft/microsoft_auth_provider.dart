@@ -44,6 +44,7 @@ class MicrosoftAuthProvider extends AuthProvider {
 
     // Make the auth server use the callback we have from the user.
     _authServer.accountCallback = callback;
+    _authServer.errorCallback = error;
   }
 
   @override

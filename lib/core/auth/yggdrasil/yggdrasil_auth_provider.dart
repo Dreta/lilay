@@ -50,7 +50,7 @@ class YggdrasilAuthProvider extends AuthProvider {
       }
 
       callback(YggdrasilAccount(json: resp));
-    });
+    }).catchError((err) => error(err.toString()));
   }
 
   @override
