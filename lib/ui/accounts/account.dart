@@ -50,15 +50,19 @@ class _AccountWidgetState extends State<AccountWidget> {
     _cachedSkinPath = File(
         '${cacheDirectory.absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
 
-    logger.info('Attempting to get skin from ${_account.uuid}.');
-    get(
-        Uri.parse(
-            'https://crafatar.com/avatars/${_account.uuid}?size=24&overlay=nevergonnaletyoudown'),
-        headers: {'User-Agent': 'lilay-minecraft-launcher'}).then((resp) async {
-      logger.info('Received skin response.');
-      await _cachedSkinPath.writeAsBytes(List.from(resp.bodyBytes));
-      setState(() {}); // Force refresh of widget
-    });
+    if (account.paid && account.authProvider.requiresPayment()) {
+      logger.info('Attempting to get skin from ${_account.uuid}.');
+      get(
+          Uri.parse(
+              'https://crafatar.com/avatars/${_account.uuid}?size=24&overlay=nevergonnaletyoudown'),
+          headers: {
+            'User-Agent': 'lilay-minecraft-launcher'
+          }).then((resp) async {
+        logger.info('Received skin response.');
+        await _cachedSkinPath.writeAsBytes(List.from(resp.bodyBytes));
+        setState(() {}); // Force refresh of widget
+      });
+    }
   }
 
   @override
