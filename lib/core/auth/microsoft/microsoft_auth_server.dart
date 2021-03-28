@@ -158,8 +158,8 @@ class MicrosoftAuthServer {
       account.xstsToken = xstsBody['Token'];
 
       // Authenticate with Minecraft
-      await account.requestMinecraftToken();
-      await account.requestProfile();
+      await account.requestMinecraftToken(errorCallback);
+      await account.requestProfile(errorCallback);
       accountCallback(account);
 
       request.response

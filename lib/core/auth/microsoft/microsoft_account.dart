@@ -119,39 +119,51 @@ class MicrosoftAccount extends Account {
   String get uuid => _uuid;
 
   /// Request a Minecraft access token from Minecraft Xbox services.
-  requestMinecraftToken() async {
-    Response resp = await post(
-        Uri.parse(
-            'https://api.minecraftservices.com/authentication/login_with_xbox'),
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'lilay-minecraft-launcher'
-        },
-        body: jsonEncode({'identityToken': 'XBL3.0 x=$xblUHS;$xstsToken'}));
+  requestMinecraftToken(Function(String) error) async {
+    try {
+      Response resp = await post(
+          Uri.parse(
+              'https://api.minecraftservices.com/authentication/login_with_xbox'),
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'lilay-minecraft-launcher'
+          },
+          body: jsonEncode({'identityToken': 'XBL3.0 x=$xblUHS;$xstsToken'}));
 
-    if (resp.statusCode != 200) {
-      throw 'Minecraft authentication failed.';
+      if (resp.statusCode != 200) {
+        error('Minecraft authentication failed.');
+        return;
+      }
+
+      Map<String, dynamic> respJson = jsonDecode(resp.body);
+      accessToken = respJson['access_token'];
+    } catch (e) {
+      error(e.toString());
+      return;
     }
-
-    Map<String, dynamic> respJson = jsonDecode(resp.body);
-    accessToken = respJson['access_token'];
   }
 
-  requestProfile() async {
-    Response resp = await get(
-        Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
-        headers: {
-          'User-Agent': 'lilay-minecraft-launcher',
-          'Authorization': 'Bearer $accessToken'
-        });
+  requestProfile(Function(String) error) async {
+    try {
+      Response resp = await get(
+          Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
+          headers: {
+            'User-Agent': 'lilay-minecraft-launcher',
+            'Authorization': 'Bearer $accessToken'
+          });
 
-    if (resp.statusCode != 200) {
-      throw 'Minecraft profile request failed.';
+      if (resp.statusCode != 200) {
+        error('This Microsoft account does not own Minecraft.');
+        return;
+      }
+
+      Map<String, dynamic> respJson = jsonDecode(resp.body);
+      _profileName = respJson['name'];
+      _uuid = respJson['id'];
+    } catch (e) {
+      error(e.toString());
+      return;
     }
-
-    Map<String, dynamic> respJson = jsonDecode(resp.body);
-    _profileName = respJson['name'];
-    _uuid = respJson['id'];
   }
 
   /// Manually convert this class to JSON.
