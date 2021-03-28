@@ -114,6 +114,7 @@ class YggdrasilAccount extends Account {
 
     // Check if we have paid
 
+    // FIXME Mojang returns "Bad request" for some reason
     Response respPaid = await get(
         Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
         headers: {
