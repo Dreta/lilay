@@ -137,6 +137,23 @@ class MicrosoftAccount extends Account {
     accessToken = respJson['access_token'];
   }
 
+  requestProfile() async {
+    Response resp = await get(
+        Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
+        headers: {
+          'User-Agent': 'lilay-minecraft-launcher',
+          'Authorization': 'Bearer $accessToken'
+        });
+
+    if (resp.statusCode != 200) {
+      throw 'Minecraft profile request failed.';
+    }
+
+    Map<String, dynamic> respJson = jsonDecode(resp.body);
+    _profileName = respJson['name'];
+    _uuid = respJson['id'];
+  }
+
   /// Manually convert this class to JSON.
   @override
   Map<String, dynamic> toJson() {
