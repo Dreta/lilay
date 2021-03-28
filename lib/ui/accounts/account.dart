@@ -32,11 +32,13 @@ class AccountWidget extends StatefulWidget {
   /// navigation drawer.
   final bool showMenuIcon;
 
-  const AccountWidget({required this.account, this.showMenuIcon = false});
+  AccountWidget({required this.account, this.showMenuIcon = false})
+      : super(key: Key(account.uuid));
 
   @override
-  _AccountWidgetState createState() =>
-      _AccountWidgetState(account: account, showMenuIcon: showMenuIcon);
+  _AccountWidgetState createState() {
+    return _AccountWidgetState(account: account, showMenuIcon: showMenuIcon);
+  }
 }
 
 class _AccountWidgetState extends State<AccountWidget> {
@@ -50,6 +52,7 @@ class _AccountWidgetState extends State<AccountWidget> {
     _cachedSkinPath = File(
         '${cacheDirectory.absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
 
+    // FIXME Paid not working
     if (account.paid && account.authProvider.requiresPayment) {
       logger.info('Attempting to get skin from ${_account.uuid}.');
       get(

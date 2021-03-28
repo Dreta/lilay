@@ -41,6 +41,7 @@ class _AccountsSectionState extends State<AccountsSection> {
   final _accounts = <Account>[];
   bool _loading = true;
   bool _loadingFailed = false;
+  Account? _selectedAccount;
 
   _AccountsSectionState({required File file}) : _file = file {
     if (file.existsSync()) {
@@ -67,7 +68,12 @@ class _AccountsSectionState extends State<AccountsSection> {
         setState(() => _loadingFailed = true);
         break;
       }
-      setState(() => _accounts.add(acc));
+      setState(() {
+        if (acc.selected) {
+          _selectedAccount = acc;
+        }
+        _accounts.add(acc);
+      });
     }
     setState(() => _loading = false);
   }
@@ -117,11 +123,9 @@ class _AccountsSectionState extends State<AccountsSection> {
               minLeadingWidth: 17)));
     } else if (!_loadingFailed) {
       // TODO Add a dedicated screen for all the accounts.
-      for (Account account in _accounts) {
-        if (account.selected) {
-          widgets.add(AccountWidget(account: account, showMenuIcon: true));
-          break;
-        }
+      if (_selectedAccount != null) {
+        widgets
+            .add(AccountWidget(account: _selectedAccount!, showMenuIcon: true));
       }
 
       widgets.add(LoginButton(onAddAccount: (account) {
@@ -140,6 +144,7 @@ class _AccountsSectionState extends State<AccountsSection> {
           }
           account.selected =
               true; // The latest account should always be selected
+          _selectedAccount = account;
           _save();
         });
       }));
