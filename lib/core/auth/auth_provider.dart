@@ -24,20 +24,20 @@ abstract class AuthProvider {
   /// Whether this authentication method requires a password.
   /// e.g. Logging in to an offline account does not require
   ///      a password.
-  bool requiresPassword() => true;
+  bool get requiresPassword => true;
 
   /// Whether this authentication method does not use the standard
   /// username-password prompts that's built-in.
   /// e.g. Microsoft account requires a webview.
-  bool useManualAuthentication() => false;
+  bool get useManualAuthentication => false;
 
   /// Whether this authentication method allows you to use an email
   /// to authenticate.
-  bool canUseEmail() => true;
+  bool get canUseEmail => true;
 
   /// Whether you must pay for a Minecraft license with this
   /// authentication method.
-  bool requiresPayment() => true;
+  bool get requiresPayment => true;
 
   /// Get the human-friendly name of this [AuthProvider].
   String get name;

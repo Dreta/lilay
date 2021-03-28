@@ -31,13 +31,13 @@ class OfflineAuthProvider extends AuthProvider {
   }
 
   @override
-  bool requiresPassword() => false;
+  bool get requiresPassword => false;
 
   @override
-  bool canUseEmail() => false;
+  bool get canUseEmail => false;
 
   @override
-  bool requiresPayment() => false;
+  bool get requiresPayment => false;
 
   @override
   String get name => 'Offline';

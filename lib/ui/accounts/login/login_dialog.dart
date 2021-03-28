@@ -68,9 +68,9 @@ class _LoginDialogState extends State<LoginDialog> {
     if (_form.currentState!.validate()) {
       setState(() => _loggingIn = true);
       final String? username =
-          selected.useManualAuthentication() ? null : _username.value.text;
+          selected.useManualAuthentication ? null : _username.value.text;
       final String? password =
-          (selected.useManualAuthentication() || !selected.requiresPassword())
+          (selected.useManualAuthentication || !selected.requiresPassword)
               ? null
               : _password.value.text;
       final AuthProvider provider =
@@ -104,18 +104,18 @@ class _LoginDialogState extends State<LoginDialog> {
         controller: _username,
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return '${selected.canUseEmail() ? 'Email / Username' : 'Username'} is required.';
+            return '${selected.canUseEmail ? 'Email / Username' : 'Username'} is required.';
           }
           return null;
         },
         textInputAction: TextInputAction.next,
         onFieldSubmitted: (value) {
-          if (selected.requiresPassword()) {
+          if (selected.requiresPassword) {
             FocusScope.of(context).requestFocus(_passwordFocus);
           }
         },
         decoration: InputDecoration(
-            labelText: selected.canUseEmail() ? 'Email / Username' : 'Username',
+            labelText: selected.canUseEmail ? 'Email / Username' : 'Username',
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: theme.accentColor))));
   }
@@ -181,7 +181,7 @@ class _LoginDialogState extends State<LoginDialog> {
                   child: Padding(
                       padding: EdgeInsets.only(
                           left: 15, right: 15, top: 10, bottom: 10),
-                      child: Text(selected.useManualAuthentication()
+                      child: Text(selected.useManualAuthentication
                           ? 'Continue'
                           : 'Login')))
             ]));
@@ -196,10 +196,10 @@ class _LoginDialogState extends State<LoginDialog> {
     final AuthProvider selected = Account.authProviders[_selectedAuthProvider]!;
 
     final List<Widget> fields = [];
-    if (!selected.useManualAuthentication()) {
+    if (!selected.useManualAuthentication) {
       fields.add(_buildUsernameField(context, selected));
 
-      if (selected.requiresPassword()) {
+      if (selected.requiresPassword) {
         fields.add(_buildPasswordField(context, selected));
       }
     }

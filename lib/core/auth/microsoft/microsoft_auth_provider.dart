@@ -47,10 +47,10 @@ class MicrosoftAuthProvider extends AuthProvider {
   }
 
   @override
-  bool requiresPassword() => false;
+  bool get requiresPassword => false;
 
   @override
-  bool useManualAuthentication() => true;
+  bool get useManualAuthentication => true;
 
   @override
   String get name => 'Microsoft';
