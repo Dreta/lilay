@@ -43,8 +43,7 @@ class MicrosoftAccount extends Account {
     return account;
   };
 
-  static const CLIENT_ID = '';
-  static const CLIENT_SECRET = '';
+  static const CLIENT_ID = 'e70bfbaa-5967-4dca-8a36-d26cbfc8863f';
 
   late String accessToken; // Minecraft access token
   late String msAccessToken; // Microsoft access token
@@ -73,7 +72,6 @@ class MicrosoftAccount extends Account {
               'User-Agent': 'lilay-minecraft-launcher'
             },
             body: 'client_id=$CLIENT_ID'
-                '&client_secret=$CLIENT_SECRET'
                 '&refresh_token=$refreshToken'
                 '&grant_type=refresh_token'
                 '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth');

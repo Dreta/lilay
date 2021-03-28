@@ -70,7 +70,6 @@ class MicrosoftAuthServer {
             'User-Agent': 'lilay-minecraft-launcher'
           },
           body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
-              '&client_secret=${MicrosoftAccount.CLIENT_SECRET}'
               '&code=$code'
               '&grant_type=authorization_code'
               '&redirect_uri=http%3A%2F%2Flocalhost%3A${_server.port}%2Fmsauth');

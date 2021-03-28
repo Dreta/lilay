@@ -118,7 +118,6 @@ class YggdrasilAccount extends Account {
     Response respPaid = await get(
         Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
         headers: {
-          'Content-Type': 'application/json',
           'User-Agent': 'lilay-minecraft-launcher',
           'Authorization': 'Bearer $accessToken'
         });
