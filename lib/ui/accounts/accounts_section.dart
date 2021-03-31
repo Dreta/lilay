@@ -20,10 +20,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
-import 'package:lilay/main.dart';
 import 'package:lilay/ui/accounts/account.dart';
 import 'package:lilay/ui/accounts/login/login_button.dart';
+import 'package:logging/logging.dart';
 
 /// This is where the account database will be loaded from.
 File defaultAccountDB = File('accounts.json');
@@ -58,7 +59,7 @@ class _AccountsSectionState extends State<AccountsSection> {
             as List<dynamic>)) {
       String? type = account['type'];
       if (type == null) {
-        logger.severe('Found invalid account without type');
+        GetIt.I.get<Logger>().severe('Found invalid account without type');
         continue;
       }
       Account acc = Account.accountFactories[account['type']]!(account);

@@ -19,6 +19,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_auth_provider.dart';
@@ -31,16 +32,15 @@ import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/launcher.dart';
 import 'package:logging/logging.dart';
 
-Logger logger = Logger('Lilay');
-CoreConfig? coreConfig;
-Directory cacheDirectory = Directory('cache');
-
 main() {
+  Logger logger = Logger('Lilay');
   logger.onRecord.listen((record) {
     print('[${record.level.name}] [${record.time}]: ${record.message}');
   });
+  GetIt.I.registerSingleton<Logger>(logger);
 
   logger.info('Registering authentication methods.');
+
   // Yggdrasil
   Account.authProviders['yggdrasil'] = YggdrasilAuthProvider();
   Account.accountFactories['yggdrasil'] = YggdrasilAccount.fromJson;
@@ -55,8 +55,12 @@ main() {
   Account.accountFactories['microsoft'] = MicrosoftAccount.fromJson;
 
   logger.info('Setting up core config.');
-  coreConfig = CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
+  CoreConfig coreConfig = CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
+  GetIt.I.registerSingleton<CoreConfig>(coreConfig);
 
+  logger.info('Setting up cache directory.');
+  Directory cacheDirectory = Directory('cache');
+  GetIt.I.registerSingleton<Directory>(cacheDirectory, instanceName: 'cache');
   if (!cacheDirectory.existsSync()) {
     cacheDirectory.createSync();
   }

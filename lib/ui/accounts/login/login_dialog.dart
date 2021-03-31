@@ -18,9 +18,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
-import 'package:lilay/main.dart';
+import 'package:logging/logging.dart';
 
 class LoginDialog extends StatefulWidget {
   final Function(Account) _addAccount;
@@ -85,7 +86,7 @@ class _LoginDialogState extends State<LoginDialog> {
           _selectedAuthProvider = Account.defaultAuthProvider;
         });
       }, (error) {
-        logger.severe(error);
+        GetIt.I.get<Logger>().severe(error);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Error: $error'), duration: Duration(seconds: 3)));
         Navigator.pop(context);

@@ -19,10 +19,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
-import 'package:lilay/main.dart';
+import 'package:logging/logging.dart';
 
 /// This class listens on localhost: for a Microsoft authentication
 /// response and acts accordingly.
@@ -36,7 +37,9 @@ class MicrosoftAuthServer {
       _server = server;
       _handle();
     });
-    logger.info('Microsoft auth server listening on localhost:$port.');
+    GetIt.I
+        .get<Logger>()
+        .info('Microsoft auth server listening on localhost:$port.');
   }
 
   _handle() async {

@@ -57,6 +57,5 @@ class MicrosoftAuthProvider extends AuthProvider {
   String get name => 'Microsoft';
 
   @override
-  // TODO: implement type
   String get type => 'microsoft';
 }

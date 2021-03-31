@@ -19,9 +19,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
-import 'package:lilay/main.dart';
+import 'package:logging/logging.dart';
 
 /// This widget represents an account in Lilay.
 class AccountWidget extends StatefulWidget {
@@ -50,17 +51,19 @@ class _AccountWidgetState extends State<AccountWidget> {
       : _account = account,
         _showMenuIcon = showMenuIcon {
     _cachedSkinPath = File(
-        '${cacheDirectory.absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
+        '${GetIt.I.get<Directory>(instanceName: 'cache').absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
 
     if (account.authProvider.requiresPayment) {
-      logger.info('Attempting to get skin from ${_account.uuid}.');
+      GetIt.I
+          .get<Logger>()
+          .info('Attempting to get skin from ${_account.uuid}.');
       get(
           Uri.parse(
               'https://crafatar.com/avatars/${_account.uuid}?size=24&overlay=nevergonnaletyoudown'),
           headers: {
             'User-Agent': 'lilay-minecraft-launcher'
           }).then((resp) async {
-        logger.info('Received skin response.');
+        GetIt.I.get<Logger>().info('Received skin response.');
         await _cachedSkinPath.writeAsBytes(List.from(resp.bodyBytes));
         setState(() {}); // Force refresh of widget
       });
