@@ -39,7 +39,7 @@ class AccountsSection extends StatefulWidget {
 
 class _AccountsSectionState extends State<AccountsSection> {
   final File _file;
-  final _accounts = <Account>[];
+  final List<Account> _accounts = [];
   bool _loading = true;
   bool _loadingFailed = false;
   Account? _selectedAccount;
@@ -126,7 +126,7 @@ class _AccountsSectionState extends State<AccountsSection> {
       // TODO Add a dedicated screen for all the accounts.
       if (_selectedAccount != null) {
         widgets
-            .add(AccountWidget(account: _selectedAccount!, showMenuIcon: true));
+            .add(AccountWidget(account: _selectedAccount!, openScreen: true));
       }
 
       widgets.add(LoginButton(onAddAccount: (account) {

@@ -22,34 +22,62 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
+import 'package:lilay/ui/home/home.dart';
 import 'package:logging/logging.dart';
 
 /// This widget represents an account in Lilay.
 class AccountWidget extends StatefulWidget {
   final Account account;
 
-  /// Whether the menu icon will be shown.
-  /// The menu icon should be shown for the selected account in the
-  /// navigation drawer.
-  final bool showMenuIcon;
+  /// Whether clicking on this [AccountWidget] will open
+  /// the [AccountsScreen].
+  ///
+  /// If true, a trailing "menu" icon will be shown and
+  /// when clicked, the [AccountsScreen] in the parent
+  /// [Homepage] will be opened.
+  final bool openScreen;
 
-  AccountWidget({required this.account, this.showMenuIcon = false})
+  /// Whether the trailing "refresh" and "delete" actions
+  /// will be shown for this widget.
+  final bool showActions;
+
+  /// This function will be called when the user attempts
+  /// to delete the [account].
+  ///
+  /// Must be specified if [showActions] is true.
+  final Function(Account)? onAccountDelete;
+
+  AccountWidget(
+      {required this.account,
+      this.openScreen = false,
+      this.showActions = false,
+      this.onAccountDelete})
       : super(key: Key(account.uuid));
 
   @override
   _AccountWidgetState createState() {
-    return _AccountWidgetState(account: account, showMenuIcon: showMenuIcon);
+    return _AccountWidgetState(
+        account: account, openScreen: openScreen, showActions: showActions);
   }
 }
 
 class _AccountWidgetState extends State<AccountWidget> {
   final Account _account;
-  final bool _showMenuIcon;
+  final bool _openScreen;
+  final bool _showActions;
+  final Function(Account)? _onAccountDelete;
   late File _cachedSkinPath;
 
-  _AccountWidgetState({required Account account, required bool showMenuIcon})
+  _AccountWidgetState(
+      {required Account account,
+      required bool openScreen,
+      required bool showActions,
+      Function(Account)? onAccountDelete})
       : _account = account,
-        _showMenuIcon = showMenuIcon {
+        _openScreen = openScreen,
+        _showActions = showActions,
+        _onAccountDelete = onAccountDelete {
     _cachedSkinPath = File(
         '${GetIt.I.get<Directory>(instanceName: 'cache').absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
 
@@ -73,14 +101,28 @@ class _AccountWidgetState extends State<AccountWidget> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    Widget? trailingWidget;
+
+    if (_openScreen) {
+      trailingWidget = Icon(Icons.menu);
+    } else if (_showActions) {
+      trailingWidget = Row(children: [
+        IconButton(icon: Icon(Icons.refresh), onPressed: () => {}),
+        IconButton(
+            icon: Icon(Icons.delete),
+            color: theme.errorColor,
+            onPressed: () => {})
+      ]);
+    }
 
     return ListTile(
         leading: _cachedSkinPath.existsSync()
             ? ClipRRect(
+                // Fully rounded skin display
                 borderRadius: BorderRadius.circular(24 / 2),
                 child: Image.file(_cachedSkinPath, width: 24, height: 24))
             : Icon(Icons.account_circle, color: theme.accentColor),
-        trailing: (_showMenuIcon ? Icon(Icons.menu) : null),
+        trailing: trailingWidget,
         title: Text(_account.profileName,
             style: _account.requiresReauth
                 ? TextStyle(color: theme.errorColor)

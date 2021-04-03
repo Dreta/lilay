@@ -32,7 +32,7 @@ class Homepage extends StatelessWidget {
     return Scaffold(
         body: Row(children: [
       Drawer(
-          child: ListView(padding: EdgeInsets.zero, children: <Widget>[
+          child: ListView(padding: EdgeInsets.zero, children: [
         Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text('Lilay', style: textTheme.headline5)),
