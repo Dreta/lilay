@@ -63,7 +63,7 @@ class AccountsScreen extends StatelessWidget {
                       child: AccountWidget(
                           account: account,
                           showActions: true,
-                          onAccountDelete: onAccountDelete))
+                          onAccountDelete: () => onAccountDelete(account)))
               ])
             ]));
   }

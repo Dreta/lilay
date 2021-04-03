@@ -23,6 +23,7 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
+import 'package:lilay/ui/accounts/screen/delete_dialog.dart';
 import 'package:lilay/ui/home/home.dart';
 import 'package:logging/logging.dart';
 
@@ -46,7 +47,7 @@ class AccountWidget extends StatefulWidget {
   /// to delete the [account].
   ///
   /// Must be specified if [showActions] is true.
-  final Function(Account)? onAccountDelete;
+  final Function? onAccountDelete;
 
   AccountWidget(
       {required this.account,
@@ -66,15 +67,16 @@ class _AccountWidgetState extends State<AccountWidget> {
   final Account _account;
   final bool _openScreen;
   final bool _showActions;
+
   // This will be called after a confirmation dialog is shown.
-  final Function(Account)? _onAccountDelete;
+  final Function? _onAccountDelete;
   late File _cachedSkinPath;
 
   _AccountWidgetState(
       {required Account account,
       required bool openScreen,
       required bool showActions,
-      Function(Account)? onAccountDelete})
+      Function? onAccountDelete})
       : _account = account,
         _openScreen = openScreen,
         _showActions = showActions,
@@ -112,7 +114,10 @@ class _AccountWidgetState extends State<AccountWidget> {
         IconButton(
             icon: Icon(Icons.delete),
             color: theme.errorColor,
-            onPressed: () => {})
+            onPressed: () => DeleteDialog.display(context, () {
+                  _onAccountDelete!();
+                  _account.invalidate();
+                }))
       ]);
     }
 
