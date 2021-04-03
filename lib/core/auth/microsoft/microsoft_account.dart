@@ -185,4 +185,9 @@ class MicrosoftAccount extends Account {
 
   @override
   bool get paid => _paid;
+
+  @override
+  Future<void> invalidate() async {
+    // TODO
+  }
 }

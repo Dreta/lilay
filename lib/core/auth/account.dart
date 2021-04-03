@@ -81,6 +81,9 @@ abstract class Account {
   /// This method will be called when the account is loaded.
   Future<void> refresh();
 
+  /// Invalidates the access token of this account and log out.
+  Future<void> invalidate();
+
   /// Manually convert this class to JSON.
   /// Individual subclasses might want to override this method
   /// for extra control over how to serialize.

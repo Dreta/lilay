@@ -148,4 +148,14 @@ class YggdrasilAccount extends Account {
       'selected': selected
     };
   }
+
+  @override
+  Future<void> invalidate() async {
+    await post(Uri.parse('https://authserver.mojang.com/invalidate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'lilay-minecraft-launcher'
+        },
+        body: jsonEncode({'accessToken': accessToken}));
+  }
 }

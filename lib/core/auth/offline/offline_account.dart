@@ -64,4 +64,7 @@ class OfflineAccount extends Account {
 
   @override
   bool get paid => true;
+
+  @override
+  Future<void> invalidate() async {}
 }
