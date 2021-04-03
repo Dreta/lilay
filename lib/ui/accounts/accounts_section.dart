@@ -24,6 +24,7 @@ import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/account.dart';
 import 'package:lilay/ui/accounts/login/login_button.dart';
+import 'package:lilay/ui/home/home.dart';
 import 'package:logging/logging.dart';
 
 /// This is where the account database will be loaded from.
@@ -39,7 +40,6 @@ class AccountsSection extends StatefulWidget {
 
 class _AccountsSectionState extends State<AccountsSection> {
   final File _file;
-  final List<Account> _accounts = [];
   bool _loading = true;
   bool _loadingFailed = false;
   Account? _selectedAccount;
@@ -73,7 +73,7 @@ class _AccountsSectionState extends State<AccountsSection> {
         if (acc.selected) {
           _selectedAccount = acc;
         }
-        _accounts.add(acc);
+        Homepage.of(context)!.accounts.add(acc);
       });
     }
     setState(() => _loading = false);
@@ -82,7 +82,7 @@ class _AccountsSectionState extends State<AccountsSection> {
   /// Save the accounts to the data file.
   _save() async {
     List<Map<String, dynamic>> json = [];
-    for (Account account in _accounts) {
+    for (Account account in Homepage.of(context)!.accounts) {
       json.add(account.toJson());
     }
     await _file.writeAsString(jsonEncode({'accounts': json}));
@@ -130,7 +130,7 @@ class _AccountsSectionState extends State<AccountsSection> {
       }
 
       widgets.add(LoginButton(onAddAccount: (account) {
-        for (Account acc in _accounts) {
+        for (Account acc in Homepage.of(context)!.accounts) {
           if (acc.uuid == account.uuid && !acc.requiresReauth) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('This account already exist!'),
@@ -139,8 +139,8 @@ class _AccountsSectionState extends State<AccountsSection> {
           }
         }
         setState(() {
-          _accounts.add(account);
-          for (Account acc in _accounts) {
+          Homepage.of(context)!.accounts.add(account);
+          for (Account acc in Homepage.of(context)!.accounts) {
             acc.selected = false;
           }
           account.selected =

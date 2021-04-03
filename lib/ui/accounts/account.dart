@@ -66,6 +66,7 @@ class _AccountWidgetState extends State<AccountWidget> {
   final Account _account;
   final bool _openScreen;
   final bool _showActions;
+  // This will be called after a confirmation dialog is shown.
   final Function(Account)? _onAccountDelete;
   late File _cachedSkinPath;
 

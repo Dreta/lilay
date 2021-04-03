@@ -17,13 +17,36 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
+import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/home/profile.dart';
 
 /// This widget represents the main page of Lilay,
 /// consisting of the accounts, the game profiles
 /// and the play button.
-class Homepage extends StatelessWidget {
+class Homepage extends InheritedWidget {
+  final List<Account> accounts = [];
+
+  Homepage() : super(child: _HomepageWidget());
+
+  static Homepage? of(BuildContext context) =>
+      context.findAncestorWidgetOfExactType<Homepage>();
+
+  @override
+  bool updateShouldNotify(covariant Homepage old) {
+    return old.accounts == accounts;
+  }
+}
+
+class _HomepageWidget extends StatefulWidget {
+  @override
+  _HomepageWidgetState createState() => _HomepageWidgetState();
+}
+
+class _HomepageWidgetState extends State<_HomepageWidget> {
+  String? _selectedScreen;
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -51,7 +74,12 @@ class Homepage extends StatelessWidget {
             child: Divider(height: 1, thickness: 1, color: theme.dividerColor)),
         Profile(name: 'Fabric 1.16.5', modded: true),
         Profile(name: 'Vanilla 1.16.5')
-      ]))
+      ])),
+      if (_selectedScreen == 'accounts')
+        AccountsScreen(
+            accounts: Homepage.of(context)!.accounts,
+            onAccountDelete: (account) =>
+                Homepage.of(context)!.accounts.remove(account))
     ]));
   }
 }
