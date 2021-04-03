@@ -53,7 +53,7 @@ class _AccountWidgetState extends State<AccountWidget> {
     _cachedSkinPath = File(
         '${GetIt.I.get<Directory>(instanceName: 'cache').absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
 
-    if (account.authProvider.requiresPayment) {
+    if (account.authProvider.requiresPayment && account.paid) {
       GetIt.I
           .get<Logger>()
           .info('Attempting to get skin from ${_account.uuid}.');

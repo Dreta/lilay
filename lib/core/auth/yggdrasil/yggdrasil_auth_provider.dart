@@ -49,7 +49,18 @@ class YggdrasilAuthProvider extends AuthProvider {
         return;
       }
 
-      callback(YggdrasilAccount(json: resp));
+      // Check if the player paid
+      get(
+          Uri.parse(
+              'https://api.mojang.com/users/profiles/minecraft/${resp['selectedProfile']['name']}'),
+          headers: {
+            'User-Agent': 'lilay-minecraft-launcher'
+          }).then((respPaid) => callback(YggdrasilAccount(
+          accessToken: resp['accessToken'],
+          profileName: resp['selectedProfile']['name'],
+          username: resp['user']['username'],
+          uuid: resp['selectedProfile']['id'],
+          paid: respPaid.statusCode == 200)));
     }).catchError((err) => error(err.toString()));
   }
 

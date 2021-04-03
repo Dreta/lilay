@@ -42,8 +42,8 @@ class YggdrasilAccount extends Account {
   late String _profileName;
   late String _username;
   late String _uuid;
-  late bool selected = false;
-  late bool _paid = false;
+  bool selected = false;
+  bool _paid = false;
 
   // This happens when the user manually revokes the
   // access token.
@@ -53,12 +53,17 @@ class YggdrasilAccount extends Account {
 
   /// Create a [YggdrasilAccount] from a Mojang /authenticate
   /// response body.
-  YggdrasilAccount({required Map<String, dynamic> json}) {
-    _accessToken = json['accessToken'];
-    _profileName = json['selectedProfile']['name'];
-    _username = json['user']['username'];
-    _uuid = dashifyUUID(json['selectedProfile']['id']);
-  }
+  YggdrasilAccount(
+      {required String accessToken,
+      required String profileName,
+      required String username,
+      required String uuid,
+      required bool paid})
+      : _accessToken = accessToken,
+        _profileName = profileName,
+        _username = username,
+        _uuid = dashifyUUID(uuid),
+        _paid = paid;
 
   @override
   String get accessToken => _accessToken;
@@ -113,26 +118,15 @@ class YggdrasilAccount extends Account {
     }
 
     // Check if we have paid
-
-    // FIXME Mojang returns "Bad request" for some reason
     Response respPaid = await get(
-        Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
+        Uri.parse(
+            'https://api.mojang.com/users/profiles/minecraft/$_profileName'),
         headers: {
           'User-Agent': 'lilay-minecraft-launcher',
           'Authorization': 'Bearer $accessToken'
         });
 
-    if (respPaid.statusCode != 200) {
-      return;
-    }
-
-    Map<String, dynamic> respPaidJson = jsonDecode(respPaid.body);
-    for (Map<String, dynamic> product in respPaidJson['items']) {
-      if (product['name'] == 'product_minecraft' ||
-          product['name'] == 'game_minecraft') {
-        _paid = true;
-      }
-    }
+    _paid = respPaid.statusCode == 200;
   }
 
   // TODO Make requires reauth actually work
