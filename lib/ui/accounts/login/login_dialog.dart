@@ -190,8 +190,6 @@ class _LoginDialogState extends State<LoginDialog> {
 
   @override
   Widget build(BuildContext context) {
-    // FIXME The animation is not fluid on first open
-
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
     final AuthProvider selected = Account.authProviders[_selectedAuthProvider]!;
