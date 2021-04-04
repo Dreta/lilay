@@ -20,12 +20,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/account.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/login/login_button.dart';
-import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 /// This is where the account database will be loaded from.
@@ -41,47 +39,10 @@ class AccountsSection extends StatefulWidget {
 
 class _AccountsSectionState extends State<AccountsSection> {
   final File _file;
-  bool _loading = true;
-  bool _loadingFailed = false;
-  Account? _selectedAccount;
 
   _AccountsSectionState({required File file}) : _file = file {
-    if (file.existsSync()) {
-      _load(file);
-    } else {
-      _loading = false;
-    }
-  }
-
-  /// Load the saved accounts from a file.
-  _load(File file) async {
-    // TODO Move this to AccountsProvider
-
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
-
-    for (Map<String, dynamic> account
-        in (jsonDecode(await file.readAsString())['accounts']
-            as List<dynamic>)) {
-      String? type = account['type'];
-      if (type == null) {
-        GetIt.I.get<Logger>().severe('Found invalid account without type');
-        continue;
-      }
-      Account acc = Account.accountFactories[account['type']]!(account);
-      try {
-        await acc.refresh();
-      } catch (e) {
-        setState(() => _loadingFailed = true);
-        break;
-      }
-      setState(() {
-        if (acc.selected) {
-          _selectedAccount = acc;
-        }
-        accounts.addAccount(acc);
-      });
-    }
-    setState(() => _loading = false);
+    accounts.loadFrom(file);
   }
 
   /// Save the accounts to the data file.
@@ -112,7 +73,7 @@ class _AccountsSectionState extends State<AccountsSection> {
           child: Divider(height: 1, thickness: 1, color: theme.dividerColor))
     ];
 
-    if (_loadingFailed) {
+    if (accounts.loadingStatus == LoadingStatus.failed) {
       widgets.add(ListTile(
         leading: Icon(Icons.error, color: theme.errorColor),
         title:
@@ -121,7 +82,7 @@ class _AccountsSectionState extends State<AccountsSection> {
       ));
     }
 
-    if (_loading && !_loadingFailed) {
+    if (accounts.loadingStatus == LoadingStatus.loading) {
       widgets.add(Padding(
           padding: EdgeInsets.only(left: 4),
           child: ListTile(
@@ -131,11 +92,10 @@ class _AccountsSectionState extends State<AccountsSection> {
                   child: CircularProgressIndicator(strokeWidth: 2)),
               title: Text('Loading'),
               minLeadingWidth: 17)));
-    } else if (!_loadingFailed) {
-      // TODO Add a dedicated screen for all the accounts.
-      if (_selectedAccount != null) {
-        widgets
-            .add(AccountWidget(account: _selectedAccount!, openScreen: true));
+    } else if (accounts.loadingStatus == LoadingStatus.loaded) {
+      if (accounts.selectedAccountUUID != null) {
+        widgets.add(AccountWidget(
+            account: accounts.selectedAccount!, openScreen: true));
       }
 
       widgets.add(LoginButton(onAddAccount: (account) {
@@ -154,7 +114,7 @@ class _AccountsSectionState extends State<AccountsSection> {
           }
           account.selected =
               true; // The latest account should always be selected
-          _selectedAccount = account;
+          accounts.selectedAccountUUID = account.uuid;
           _save();
         });
       }));

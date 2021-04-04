@@ -16,24 +16,78 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
+import 'package:logging/logging.dart';
 
 class AccountsProvider extends ChangeNotifier {
   final Map<String, Account> _accounts = {};
+  LoadingStatus _loadingStatus = LoadingStatus.none;
+  String? selectedAccountUUID;
 
-  /// Get the stored accounts.
+  LoadingStatus get loadingStatus => _loadingStatus;
+
   Iterable<Account> get accounts => _accounts.values;
 
-  /// Adds an account to this accounts provider.
-  void addAccount(Account account) {
+  Account? get selectedAccount {
+    if (selectedAccountUUID == null) {
+      return null;
+    }
+    return getAccountByUUID(selectedAccountUUID!)!;
+  }
+
+  Account? getAccountByUUID(String uuid) => _accounts[uuid];
+
+  loadFrom(File file) async {
+    if (!await file.exists()) {
+      // Do not load for non-existent files, however
+      // set the loaded state.
+      _loadingStatus = LoadingStatus.loaded;
+      notifyListeners();
+    }
+
+    _loadingStatus = LoadingStatus.loading;
+    notifyListeners();
+
+    for (Map<String, dynamic> account
+        in (jsonDecode(await file.readAsString())['accounts']
+            as List<dynamic>)) {
+      String? type = account['type'];
+      if (type == null) {
+        GetIt.I.get<Logger>().severe('Found invalid account without type');
+        continue;
+      }
+      Account acc = Account.accountFactories[account['type']]!(account);
+      try {
+        await acc.refresh();
+      } catch (e) {
+        _loadingStatus = LoadingStatus.failed;
+        notifyListeners();
+        break;
+      }
+
+      if (acc.selected) {
+        selectedAccountUUID = acc.uuid;
+      }
+      addAccount(acc); // This implicitly runs notifyListeners().
+    }
+    _loadingStatus = LoadingStatus.loaded;
+    notifyListeners();
+  }
+
+  addAccount(Account account) {
     _accounts[account.uuid] = account;
     notifyListeners();
   }
 
-  /// Removes an account from this accounts provider.
-  void removeAccount(String uuid) {
+  removeAccount(String uuid) {
     _accounts.remove(uuid);
     notifyListeners();
   }
 }
+
+enum LoadingStatus { none, loading, failed, loaded }
