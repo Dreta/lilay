@@ -16,7 +16,6 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -43,17 +42,6 @@ class _AccountsSectionState extends State<AccountsSection> {
   _AccountsSectionState({required File file}) : _file = file {
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
     accounts.loadFrom(file);
-  }
-
-  /// Save the accounts to the data file.
-  _save() async {
-    // TODO Move this to AccountsProvider
-    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
-    List<Map<String, dynamic>> json = [];
-    for (Account account in accounts.accounts) {
-      json.add(account.toJson());
-    }
-    await _file.writeAsString(jsonEncode({'accounts': json}));
   }
 
   @override
@@ -93,7 +81,7 @@ class _AccountsSectionState extends State<AccountsSection> {
               title: Text('Loading'),
               minLeadingWidth: 17)));
     } else if (accounts.loadingStatus == LoadingStatus.loaded) {
-      if (accounts.selectedAccountUUID != null) {
+      if (accounts.selectedAccount != null) {
         widgets.add(AccountWidget(
             account: accounts.selectedAccount!, openScreen: true));
       }
@@ -107,16 +95,13 @@ class _AccountsSectionState extends State<AccountsSection> {
             return;
           }
         }
-        setState(() {
-          accounts.addAccount(account);
-          for (Account acc in accounts.accounts) {
-            acc.selected = false;
-          }
-          account.selected =
-              true; // The latest account should always be selected
-          accounts.selectedAccountUUID = account.uuid;
-          _save();
-        });
+        accounts.addAccount(account);
+        for (Account acc in accounts.accounts) {
+          acc.selected = false;
+        }
+        account.selected = true; // The latest account should always be selected
+        accounts.selectedAccount = account;
+        accounts.saveTo(_file);
       }));
     }
 

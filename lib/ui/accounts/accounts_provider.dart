@@ -27,17 +27,23 @@ import 'package:logging/logging.dart';
 class AccountsProvider extends ChangeNotifier {
   final Map<String, Account> _accounts = {};
   LoadingStatus _loadingStatus = LoadingStatus.none;
-  String? selectedAccountUUID;
+  String? _selectedAccountUUID;
 
   LoadingStatus get loadingStatus => _loadingStatus;
 
   Iterable<Account> get accounts => _accounts.values;
 
   Account? get selectedAccount {
-    if (selectedAccountUUID == null) {
+    if (_selectedAccountUUID == null) {
       return null;
     }
-    return getAccountByUUID(selectedAccountUUID!)!;
+    return getAccountByUUID(_selectedAccountUUID!)!;
+  }
+
+  set selectedAccount(Account? account) {
+    // It's weird how Dart forces this.
+    _selectedAccountUUID = account!.uuid;
+    notifyListeners();
   }
 
   Account? getAccountByUUID(String uuid) => _accounts[uuid];
@@ -71,12 +77,20 @@ class AccountsProvider extends ChangeNotifier {
       }
 
       if (acc.selected) {
-        selectedAccountUUID = acc.uuid;
+        _selectedAccountUUID = acc.uuid;
       }
       addAccount(acc); // This implicitly runs notifyListeners().
     }
     _loadingStatus = LoadingStatus.loaded;
     notifyListeners();
+  }
+
+  saveTo(File file) async {
+    List<Map<String, dynamic>> json = [];
+    for (Account account in accounts) {
+      json.add(account.toJson());
+    }
+    await file.writeAsString(jsonEncode({'accounts': json}));
   }
 
   addAccount(Account account) {
