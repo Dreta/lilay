@@ -67,6 +67,7 @@ class _AccountWidgetState extends State<AccountWidget> {
   final Account _account;
   final bool _openScreen;
   final bool _showActions;
+  bool _isRefreshing = false;
 
   // This will be called after a confirmation dialog is shown.
   final Function? _onAccountDelete;
@@ -110,14 +111,27 @@ class _AccountWidgetState extends State<AccountWidget> {
       trailingWidget = Icon(Icons.menu);
     } else if (_showActions) {
       trailingWidget = Row(children: [
-        IconButton(icon: Icon(Icons.refresh), onPressed: () => {}),
-        IconButton(
-            icon: Icon(Icons.delete),
-            color: theme.errorColor,
-            onPressed: () => DeleteDialog.display(context, () {
-                  _onAccountDelete!();
-                  _account.invalidate();
-                }))
+        _isRefreshing
+            ? Container(
+                width: 15,
+                height: 15,
+                child: CircularProgressIndicator(strokeWidth: 2))
+            : IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: () async {
+                  setState(() => _isRefreshing = true);
+                  await _account.refresh();
+                  setState(() => _isRefreshing = false);
+                }),
+        _isRefreshing
+            ? Icon(Icons.delete, color: theme.errorColor)
+            : IconButton(
+                icon: Icon(Icons.delete),
+                color: theme.errorColor,
+                onPressed: () => DeleteDialog.display(context, () {
+                      _onAccountDelete!();
+                      _account.invalidate();
+                    }))
       ]);
     }
 
