@@ -19,7 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:lilay/ui/home/home.dart';
 
-class Launcher extends StatelessWidget {
+class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
