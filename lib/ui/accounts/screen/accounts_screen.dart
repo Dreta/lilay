@@ -29,7 +29,6 @@ import 'package:lilay/ui/home/home.dart';
 /// and they always reside in the [Homepage].
 class AccountsScreen extends StatelessWidget {
   final List<Account> accounts;
-  // This will be called after a confirmation dialog is shown.
   final Function(Account) onAccountDelete;
 
   const AccountsScreen({required this.accounts, required this.onAccountDelete});

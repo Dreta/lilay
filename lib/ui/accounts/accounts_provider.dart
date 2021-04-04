@@ -17,19 +17,23 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:lilay/ui/accounts/accounts_provider.dart';
-import 'package:lilay/ui/home/home.dart';
-import 'package:provider/provider.dart';
+import 'package:lilay/core/auth/account.dart';
 
-class App extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [ChangeNotifierProvider.value(value: AccountsProvider())],
-        child: MaterialApp(
-          title: 'Lilay',
-          theme: ThemeData.light(),
-          home: Homepage(),
-        ));
+class AccountsProvider extends ChangeNotifier {
+  final Map<String, Account> _accounts = {};
+
+  /// Get the stored accounts.
+  Iterable<Account> get accounts => _accounts.values;
+
+  /// Adds an account to this accounts provider.
+  void addAccount(Account account) {
+    _accounts[account.uuid] = account;
+    notifyListeners();
+  }
+
+  /// Removes an account from this accounts provider.
+  void removeAccount(String uuid) {
+    _accounts.remove(uuid);
+    notifyListeners();
   }
 }

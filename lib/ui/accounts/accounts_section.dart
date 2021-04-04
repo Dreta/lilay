@@ -23,9 +23,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/account.dart';
+import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/login/login_button.dart';
-import 'package:lilay/ui/home/home.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
 /// This is where the account database will be loaded from.
 File defaultAccountDB = File('accounts.json');
@@ -54,6 +55,10 @@ class _AccountsSectionState extends State<AccountsSection> {
 
   /// Load the saved accounts from a file.
   _load(File file) async {
+    // TODO Move this to AccountsProvider
+
+    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
+
     for (Map<String, dynamic> account
         in (jsonDecode(await file.readAsString())['accounts']
             as List<dynamic>)) {
@@ -73,7 +78,7 @@ class _AccountsSectionState extends State<AccountsSection> {
         if (acc.selected) {
           _selectedAccount = acc;
         }
-        Homepage.of(context)!.accounts.add(acc);
+        accounts.addAccount(acc);
       });
     }
     setState(() => _loading = false);
@@ -81,8 +86,10 @@ class _AccountsSectionState extends State<AccountsSection> {
 
   /// Save the accounts to the data file.
   _save() async {
+    // TODO Move this to AccountsProvider
+    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
     List<Map<String, dynamic>> json = [];
-    for (Account account in Homepage.of(context)!.accounts) {
+    for (Account account in accounts.accounts) {
       json.add(account.toJson());
     }
     await _file.writeAsString(jsonEncode({'accounts': json}));
@@ -90,6 +97,8 @@ class _AccountsSectionState extends State<AccountsSection> {
 
   @override
   Widget build(BuildContext context) {
+    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
+
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
 
@@ -107,7 +116,7 @@ class _AccountsSectionState extends State<AccountsSection> {
       widgets.add(ListTile(
         leading: Icon(Icons.error, color: theme.errorColor),
         title:
-            Text('Failed to load', style: TextStyle(color: theme.errorColor)),
+        Text('Failed to load', style: TextStyle(color: theme.errorColor)),
         minLeadingWidth: 20,
       ));
     }
@@ -130,7 +139,7 @@ class _AccountsSectionState extends State<AccountsSection> {
       }
 
       widgets.add(LoginButton(onAddAccount: (account) {
-        for (Account acc in Homepage.of(context)!.accounts) {
+        for (Account acc in accounts.accounts) {
           if (acc.uuid == account.uuid && !acc.requiresReauth) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('This account already exist!'),
@@ -139,8 +148,8 @@ class _AccountsSectionState extends State<AccountsSection> {
           }
         }
         setState(() {
-          Homepage.of(context)!.accounts.add(account);
-          for (Account acc in Homepage.of(context)!.accounts) {
+          accounts.addAccount(account);
+          for (Account acc in accounts.accounts) {
             acc.selected = false;
           }
           account.selected =
