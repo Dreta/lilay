@@ -116,7 +116,7 @@ class _AccountsSectionState extends State<AccountsSection> {
       widgets.add(ListTile(
         leading: Icon(Icons.error, color: theme.errorColor),
         title:
-        Text('Failed to load', style: TextStyle(color: theme.errorColor)),
+            Text('Failed to load', style: TextStyle(color: theme.errorColor)),
         minLeadingWidth: 20,
       ));
     }
