@@ -54,6 +54,7 @@ class AccountsProvider extends ChangeNotifier {
       // set the loaded state.
       _loadingStatus = LoadingStatus.loaded;
       notifyListeners();
+      return;
     }
 
     _loadingStatus = LoadingStatus.loading;
