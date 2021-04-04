@@ -118,16 +118,18 @@ class _AccountWidgetState extends State<AccountWidget> {
                 child: CircularProgressIndicator(strokeWidth: 2))
             : IconButton(
                 icon: Icon(Icons.refresh),
+                tooltip: 'Refresh',
                 onPressed: () async {
                   setState(() => _isRefreshing = true);
                   await _account.refresh();
                   setState(() => _isRefreshing = false);
                 }),
         _isRefreshing
-            ? Icon(Icons.delete, color: theme.errorColor)
+            ? Icon(Icons.delete, color: theme.dividerColor)
             : IconButton(
                 icon: Icon(Icons.delete),
                 color: theme.errorColor,
+                tooltip: 'Delete',
                 onPressed: () => DeleteDialog.display(context, () {
                       _onAccountDelete!();
                       _account.invalidate();
