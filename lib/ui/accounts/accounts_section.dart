@@ -19,31 +19,21 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/account.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/login/login_button.dart';
 import 'package:provider/provider.dart';
 
-/// This is where the account database will be loaded from.
-File defaultAccountDB = File('accounts.json');
-
 /// This widget represents the entire accounts section
 /// in Lilay.
 class AccountsSection extends StatefulWidget {
   @override
-  _AccountsSectionState createState() =>
-      _AccountsSectionState(file: defaultAccountDB);
+  _AccountsSectionState createState() => _AccountsSectionState();
 }
 
 class _AccountsSectionState extends State<AccountsSection> {
-  final File _file;
-
-  _AccountsSectionState({required File file}) : _file = file {
-    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
-    accounts.loadFrom(file);
-  }
-
   @override
   Widget build(BuildContext context) {
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
@@ -101,7 +91,7 @@ class _AccountsSectionState extends State<AccountsSection> {
         }
         account.selected = true; // The latest account should always be selected
         accounts.selectedAccount = account;
-        accounts.saveTo(_file);
+        accounts.saveTo(GetIt.I.get<File>(instanceName: 'accountsDB'));
       }));
     }
 

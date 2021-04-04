@@ -16,7 +16,10 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/home/home.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +27,11 @@ import 'package:provider/provider.dart';
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    AccountsProvider provider = AccountsProvider();
+    provider.loadFrom(GetIt.I.get<File>(instanceName: 'accountsDB'));
+
     return MultiProvider(
-        providers: [ChangeNotifierProvider.value(value: AccountsProvider())],
+        providers: [ChangeNotifierProvider.value(value: provider)],
         child: MaterialApp(
           title: 'Lilay',
           theme: ThemeData.light(),

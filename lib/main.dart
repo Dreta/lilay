@@ -65,5 +65,8 @@ main() {
     cacheDirectory.createSync();
   }
 
+  GetIt.I.registerSingleton<File>(File('accounts.json'),
+      instanceName: 'accountsDB');
+
   runApp(App());
 }
