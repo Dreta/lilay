@@ -39,6 +39,9 @@ abstract class AuthProvider {
   /// authentication method.
   bool get requiresPayment => true;
 
+  /// Whether this authentication method uses online authentication.
+  bool get onlineAuth => true;
+
   /// Get the human-friendly name of this [AuthProvider].
   String get name;
 

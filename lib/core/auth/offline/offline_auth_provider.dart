@@ -40,6 +40,9 @@ class OfflineAuthProvider extends AuthProvider {
   bool get requiresPayment => false;
 
   @override
+  bool get onlineAuth => false;
+
+  @override
   String get name => 'Offline';
 
   @override
