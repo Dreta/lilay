@@ -120,14 +120,15 @@ class _AccountWidgetState extends State<AccountWidget> {
               height: 15,
               margin: EdgeInsets.only(right: 12))
           : Row(mainAxisSize: MainAxisSize.min, children: [
-              IconButton(
-                  icon: Icon(Icons.refresh),
-                  tooltip: 'Refresh',
-                  onPressed: () async {
-                    setState(() => _isRefreshing = true);
-                    await _account.refresh();
-                    setState(() => _isRefreshing = false);
-                  }),
+              if (_account.authProvider.onlineAuth)
+                IconButton(
+                    icon: Icon(Icons.refresh),
+                    tooltip: 'Refresh',
+                    onPressed: () async {
+                      setState(() => _isRefreshing = true);
+                      await _account.refresh();
+                      setState(() => _isRefreshing = false);
+                    }),
               IconButton(
                   icon: Icon(Icons.delete),
                   color: theme.errorColor,
