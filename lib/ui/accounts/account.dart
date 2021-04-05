@@ -113,31 +113,30 @@ class _AccountWidgetState extends State<AccountWidget> {
     if (_openScreen) {
       trailingWidget = Icon(Icons.menu);
     } else if (_showActions) {
-      trailingWidget = Row(mainAxisSize: MainAxisSize.min, children: [
-        _isRefreshing
-            ? Container(
-                width: 15,
-                height: 15,
-                child: CircularProgressIndicator(strokeWidth: 2))
-            : IconButton(
-                icon: Icon(Icons.refresh),
-                tooltip: 'Refresh',
-                onPressed: () async {
-                  setState(() => _isRefreshing = true);
-                  await _account.refresh();
-                  setState(() => _isRefreshing = false);
-                }),
-        _isRefreshing
-            ? Icon(Icons.delete, color: theme.dividerColor)
-            : IconButton(
-                icon: Icon(Icons.delete),
-                color: theme.errorColor,
-                tooltip: 'Delete',
-                onPressed: () => DeleteDialog.display(context, () {
-                      _onAccountDelete!();
-                      _account.invalidate();
-                    }))
-      ]);
+      trailingWidget = _isRefreshing
+          ? Container(
+              child: CircularProgressIndicator(strokeWidth: 2),
+              width: 15,
+              height: 15,
+              margin: EdgeInsets.only(right: 12))
+          : Row(mainAxisSize: MainAxisSize.min, children: [
+              IconButton(
+                  icon: Icon(Icons.refresh),
+                  tooltip: 'Refresh',
+                  onPressed: () async {
+                    setState(() => _isRefreshing = true);
+                    await _account.refresh();
+                    setState(() => _isRefreshing = false);
+                  }),
+              IconButton(
+                  icon: Icon(Icons.delete),
+                  color: theme.errorColor,
+                  tooltip: 'Delete',
+                  onPressed: () => DeleteDialog.display(context, () {
+                        _onAccountDelete!();
+                        _account.invalidate();
+                      }))
+            ]);
     }
 
     return ListTile(
