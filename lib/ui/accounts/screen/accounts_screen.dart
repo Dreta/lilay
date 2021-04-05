@@ -56,6 +56,7 @@ class AccountsScreen extends StatelessWidget {
                           height: 1, thickness: 1, color: theme.dividerColor)),
                   for (Account account in accounts.accounts)
                     Container(
+                        margin: EdgeInsets.only(bottom: 14),
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(5),

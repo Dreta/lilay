@@ -125,27 +125,27 @@ class _AccountWidgetState extends State<AccountWidget> {
                 onPressed: () async {
                   setState(() => _isRefreshing = true);
                   await _account.refresh();
-              setState(() => _isRefreshing = false);
-            }),
+                  setState(() => _isRefreshing = false);
+                }),
         _isRefreshing
             ? Icon(Icons.delete, color: theme.dividerColor)
             : IconButton(
-            icon: Icon(Icons.delete),
-            color: theme.errorColor,
-            tooltip: 'Delete',
-            onPressed: () => DeleteDialog.display(context, () {
-              _onAccountDelete!();
-              _account.invalidate();
-            }))
+                icon: Icon(Icons.delete),
+                color: theme.errorColor,
+                tooltip: 'Delete',
+                onPressed: () => DeleteDialog.display(context, () {
+                      _onAccountDelete!();
+                      _account.invalidate();
+                    }))
       ]);
     }
 
     return ListTile(
         leading: _cachedSkinPath.existsSync()
             ? ClipRRect(
-          // Fully rounded skin display
-            borderRadius: BorderRadius.circular(24 / 2),
-            child: Image.file(_cachedSkinPath, width: 24, height: 24))
+                // Fully rounded skin display
+                borderRadius: BorderRadius.circular(24 / 2),
+                child: Image.file(_cachedSkinPath, width: 24, height: 24))
             : Icon(Icons.account_circle, color: theme.accentColor),
         trailing: trailingWidget,
         title: Text(_account.profileName,

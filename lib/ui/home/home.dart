@@ -53,21 +53,21 @@ class Homepage extends StatelessWidget {
                                   ListView(padding: EdgeInsets.zero, children: [
                             Padding(
                                 padding: const EdgeInsets.all(16.0),
-                                    child:
+                                child:
                                     Text('Lilay', style: textTheme.headline5)),
-                                Divider(
-                                    height: 1,
-                                    thickness: 1,
-                                    color: theme.dividerColor),
+                            Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: theme.dividerColor),
 
-                                // Accounts
-                                AccountsSection(),
+                            // Accounts
+                            AccountsSection(),
 
-                                // Profiles
-                                Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 16, right: 16, top: 16, bottom: 5),
-                                    child: Text('PROFILES',
+                            // Profiles
+                            Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16, right: 16, top: 16, bottom: 5),
+                                child: Text('PROFILES',
                                     style: textTheme.subtitle2)),
                             Padding(
                                 padding:
