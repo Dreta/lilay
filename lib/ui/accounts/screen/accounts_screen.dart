@@ -44,14 +44,14 @@ class AccountsScreen extends StatelessWidget {
         color: theme.scaffoldBackgroundColor,
         height: MediaQuery.of(context).size.height,
         child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Accounts', style: textTheme.headline5),
                   Padding(
-                      padding: EdgeInsets.only(top: 10, bottom: 16),
+                      padding: EdgeInsets.only(top: 16, bottom: 16),
                       child: Divider(
                           height: 1, thickness: 1, color: theme.dividerColor)),
                   for (Account account in accounts.accounts)
