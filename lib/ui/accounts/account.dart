@@ -25,7 +25,9 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/accounts/screen/delete_dialog.dart';
 import 'package:lilay/ui/home/home.dart';
+import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
 /// This widget represents an account in Lilay.
 class AccountWidget extends StatefulWidget {
@@ -104,13 +106,14 @@ class _AccountWidgetState extends State<AccountWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
     final ThemeData theme = Theme.of(context);
     Widget? trailingWidget;
 
     if (_openScreen) {
       trailingWidget = Icon(Icons.menu);
     } else if (_showActions) {
-      trailingWidget = Row(children: [
+      trailingWidget = Row(mainAxisSize: MainAxisSize.min, children: [
         _isRefreshing
             ? Container(
                 width: 15,
@@ -122,27 +125,27 @@ class _AccountWidgetState extends State<AccountWidget> {
                 onPressed: () async {
                   setState(() => _isRefreshing = true);
                   await _account.refresh();
-                  setState(() => _isRefreshing = false);
-                }),
+              setState(() => _isRefreshing = false);
+            }),
         _isRefreshing
             ? Icon(Icons.delete, color: theme.dividerColor)
             : IconButton(
-                icon: Icon(Icons.delete),
-                color: theme.errorColor,
-                tooltip: 'Delete',
-                onPressed: () => DeleteDialog.display(context, () {
-                      _onAccountDelete!();
-                      _account.invalidate();
-                    }))
+            icon: Icon(Icons.delete),
+            color: theme.errorColor,
+            tooltip: 'Delete',
+            onPressed: () => DeleteDialog.display(context, () {
+              _onAccountDelete!();
+              _account.invalidate();
+            }))
       ]);
     }
 
     return ListTile(
         leading: _cachedSkinPath.existsSync()
             ? ClipRRect(
-                // Fully rounded skin display
-                borderRadius: BorderRadius.circular(24 / 2),
-                child: Image.file(_cachedSkinPath, width: 24, height: 24))
+          // Fully rounded skin display
+            borderRadius: BorderRadius.circular(24 / 2),
+            child: Image.file(_cachedSkinPath, width: 24, height: 24))
             : Icon(Icons.account_circle, color: theme.accentColor),
         trailing: trailingWidget,
         title: Text(_account.profileName,
@@ -153,6 +156,15 @@ class _AccountWidgetState extends State<AccountWidget> {
             ? Text('Re-login required', // Show the message
                 style: TextStyle(color: theme.errorColor))
             : Text(_account.authProvider.name),
-        minLeadingWidth: 20);
+        minLeadingWidth: 20,
+        onTap: _openScreen
+            ? () {
+                if (screen.current == Screen.accounts) {
+                  screen.current = Screen.home;
+                } else {
+                  screen.current = Screen.accounts;
+                }
+              }
+            : null);
   }
 }

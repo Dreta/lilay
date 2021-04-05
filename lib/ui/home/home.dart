@@ -20,7 +20,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
+import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/home/profile.dart';
+import 'package:lilay/ui/home/screen_provider.dart';
+import 'package:provider/provider.dart';
 
 /// This widget represents the main page of Lilay,
 /// consisting of the accounts, the game profiles
@@ -28,6 +31,7 @@ import 'package:lilay/ui/home/profile.dart';
 class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
 
@@ -37,7 +41,7 @@ class Homepage extends StatelessWidget {
                 image: DecorationImage(
                     image: AssetImage('assets/background.png'),
                     fit: BoxFit.cover)),
-            child: Row(children: [
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Theme(
                   data: theme.copyWith(
                       canvasColor: Colors.white.withOpacity(0.8)),
@@ -49,21 +53,21 @@ class Homepage extends StatelessWidget {
                                   ListView(padding: EdgeInsets.zero, children: [
                             Padding(
                                 padding: const EdgeInsets.all(16.0),
-                                child:
+                                    child:
                                     Text('Lilay', style: textTheme.headline5)),
-                            Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: theme.dividerColor),
+                                Divider(
+                                    height: 1,
+                                    thickness: 1,
+                                    color: theme.dividerColor),
 
-                            // Accounts
-                            AccountsSection(),
+                                // Accounts
+                                AccountsSection(),
 
-                            // Profiles
-                            Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 16, right: 16, top: 16, bottom: 5),
-                                child: Text('PROFILES',
+                                // Profiles
+                                Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 16, right: 16, top: 16, bottom: 5),
+                                    child: Text('PROFILES',
                                     style: textTheme.subtitle2)),
                             Padding(
                                 padding:
@@ -74,7 +78,11 @@ class Homepage extends StatelessWidget {
                                     color: theme.dividerColor)),
                             Profile(name: 'Fabric 1.16.5', modded: true),
                             Profile(name: 'Vanilla 1.16.5')
-                          ])))))
+                          ]))))),
+              if (screen.current == Screen.accounts)
+                Expanded(
+                    child: AccountsScreen(
+                        onAccountDelete: (account) => account.invalidate()))
             ])));
   }
 }

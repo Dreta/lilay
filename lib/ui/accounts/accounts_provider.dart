@@ -24,6 +24,8 @@ import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:logging/logging.dart';
 
+/// Provides the currently loaded accounts as a
+/// globally accessible state.
 class AccountsProvider extends ChangeNotifier {
   final Map<String, Account> _accounts = {};
   LoadingStatus _loadingStatus = LoadingStatus.none;

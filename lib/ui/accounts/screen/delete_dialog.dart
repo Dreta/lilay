@@ -41,14 +41,20 @@ class DeleteDialog extends StatelessWidget {
 
     return AlertDialog(
         title: const Text('Are you sure?'),
+        contentPadding:
+            EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 12),
+        actionsPadding: EdgeInsets.only(bottom: 24, right: 12),
         content:
             const Text('You will have to re-login to use this account again!'),
         actions: [
           TextButton(
-              child: const Text('CANCEL'),
+              child: Text('CANCEL',
+                  style: TextStyle(color: theme.primaryColorDark)),
               onPressed: () => Navigator.of(context).pop()),
           ElevatedButton(
-              child: Text('DELETE', style: TextStyle(color: theme.errorColor)),
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(theme.errorColor)),
+              child: Text('DELETE', style: TextStyle(color: Colors.white)),
               onPressed: () {
                 onConfirm();
                 Navigator.of(context).pop();
