@@ -43,7 +43,7 @@ class Homepage extends StatelessWidget {
                       canvasColor: Colors.white.withOpacity(0.8)),
                   child: ClipRRect(
                       child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                           child: Drawer(
                               child:
                                   ListView(padding: EdgeInsets.zero, children: [
