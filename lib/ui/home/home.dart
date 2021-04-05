@@ -16,6 +16,8 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
 import 'package:lilay/ui/home/profile.dart';
@@ -30,28 +32,49 @@ class Homepage extends StatelessWidget {
     final TextTheme textTheme = theme.textTheme;
 
     return Scaffold(
-        body: Row(children: [
-      Drawer(
-          child: ListView(padding: EdgeInsets.zero, children: [
-        Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('Lilay', style: textTheme.headline5)),
-        Divider(height: 1, thickness: 1, color: theme.dividerColor),
+        body: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/background.png'),
+                    fit: BoxFit.cover)),
+            child: Row(children: [
+              Theme(
+                  data: theme.copyWith(
+                      canvasColor: Colors.white.withOpacity(0.8)),
+                  child: ClipRRect(
+                      child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                          child: Drawer(
+                              child:
+                                  ListView(padding: EdgeInsets.zero, children: [
+                            Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child:
+                                    Text('Lilay', style: textTheme.headline5)),
+                            Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: theme.dividerColor),
 
-        // Accounts
-        AccountsSection(),
+                            // Accounts
+                            AccountsSection(),
 
-        // Profiles
-        Padding(
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 5),
-            child: Text('PROFILES', style: textTheme.subtitle2)),
-        Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Divider(height: 1, thickness: 1, color: theme.dividerColor)),
-        Profile(name: 'Fabric 1.16.5', modded: true),
-        Profile(name: 'Vanilla 1.16.5')
-      ]))
-    ]));
+                            // Profiles
+                            Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 16, right: 16, top: 16, bottom: 5),
+                                child: Text('PROFILES',
+                                    style: textTheme.subtitle2)),
+                            Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 16, right: 16),
+                                child: Divider(
+                                    height: 1,
+                                    thickness: 1,
+                                    color: theme.dividerColor)),
+                            Profile(name: 'Fabric 1.16.5', modded: true),
+                            Profile(name: 'Vanilla 1.16.5')
+                          ])))))
+            ])));
   }
 }
