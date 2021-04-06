@@ -61,7 +61,10 @@ class AccountWidget extends StatefulWidget {
   @override
   _AccountWidgetState createState() {
     return _AccountWidgetState(
-        account: account, openScreen: openScreen, showActions: showActions);
+        account: account,
+        openScreen: openScreen,
+        showActions: showActions,
+        onAccountDelete: onAccountDelete);
   }
 }
 
