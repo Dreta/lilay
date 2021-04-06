@@ -146,19 +146,23 @@ class _LoginDialogState extends State<LoginDialog> {
 
   /// Create the account type dropdown
   Widget _buildAccountTypeDropdown() {
-    return DropdownButtonFormField(
-        value: _selectedAuthProvider,
-        items: [
-          for (final AuthProvider provider in Account.authProviders.values)
-            DropdownMenuItem(value: provider.type, child: Text(provider.name))
-        ],
-        onChanged: _loggingIn // Disable the dropdown menu if we are logging in
-            ? null
-            : (value) {
-                setState(() {
-                  _selectedAuthProvider = value as String;
-                });
-              });
+    return Theme(
+        child: DropdownButtonFormField(
+            value: _selectedAuthProvider,
+            items: [
+              for (final AuthProvider provider in Account.authProviders.values)
+                DropdownMenuItem(
+                    value: provider.type, child: Text(provider.name))
+            ],
+            onChanged:
+                _loggingIn // Disable the dropdown menu if we are logging in
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _selectedAuthProvider = value as String;
+                        });
+                      }),
+        data: Theme.of(context).copyWith(canvasColor: Colors.white));
   }
 
   /// Create the submit button
