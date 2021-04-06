@@ -139,11 +139,16 @@ class _AccountWidgetState extends State<AccountWidget> {
                   color: theme.errorColor,
                   tooltip: 'Delete',
                   onPressed: () => DeleteDialog.display(context, () {
-                    _onAccountDelete!();
+                        _onAccountDelete!();
                         _account.invalidate();
                         if (_account.selected) {
                           _account.selected = false;
-                          accounts.accounts.first.selected = true;
+                          for (Account account in accounts.accounts) {
+                            if (account.uuid != _account.uuid) {
+                              account.selected = true;
+                              break;
+                            }
+                          }
                         }
                         accounts.removeAccount(_account.uuid);
                         accounts.saveTo(
