@@ -141,7 +141,9 @@ class _AccountWidgetState extends State<AccountWidget> {
                   onPressed: () => DeleteDialog.display(context, () {
                         _onAccountDelete!();
                         _account.invalidate();
-                        if (_account.selected) {
+                        if (accounts.accounts.length == 1) {
+                          accounts.selectedAccount = null;
+                        } else if (_account.selected) {
                           _account.selected = false;
                           for (Account account in accounts.accounts) {
                             if (account.uuid != _account.uuid) {

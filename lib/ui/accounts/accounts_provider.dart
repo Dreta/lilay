@@ -39,12 +39,15 @@ class AccountsProvider extends ChangeNotifier {
     if (_selectedAccountUUID == null) {
       return null;
     }
-    return getAccountByUUID(_selectedAccountUUID!)!;
+    return getAccountByUUID(_selectedAccountUUID!);
   }
 
   set selectedAccount(Account? account) {
-    // It's weird how Dart forces this.
-    _selectedAccountUUID = account!.uuid;
+    if (account == null) {
+      _selectedAccountUUID = null;
+      return;
+    }
+    _selectedAccountUUID = account.uuid;
     notifyListeners();
   }
 
