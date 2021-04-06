@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/accounts/screen/delete_dialog.dart';
 import 'package:lilay/ui/home/home.dart';
@@ -110,6 +111,7 @@ class _AccountWidgetState extends State<AccountWidget> {
   @override
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
+    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
     final ThemeData theme = Theme.of(context);
     Widget? trailingWidget;
 
@@ -137,8 +139,15 @@ class _AccountWidgetState extends State<AccountWidget> {
                   color: theme.errorColor,
                   tooltip: 'Delete',
                   onPressed: () => DeleteDialog.display(context, () {
-                        _onAccountDelete!();
+                    _onAccountDelete!();
                         _account.invalidate();
+                        if (_account.selected) {
+                          _account.selected = false;
+                          accounts.accounts.first.selected = true;
+                        }
+                        accounts.removeAccount(_account.uuid);
+                        accounts.saveTo(
+                            GetIt.I.get<File>(instanceName: 'accountsDB'));
                       }))
             ]);
     }
