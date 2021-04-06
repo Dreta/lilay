@@ -138,25 +138,8 @@ class _AccountWidgetState extends State<AccountWidget> {
                   icon: Icon(Icons.delete),
                   color: theme.errorColor,
                   tooltip: 'Delete',
-                  onPressed: () => DeleteDialog.display(context, () {
-                        _onAccountDelete!();
-                        _account.invalidate();
-                        if (accounts.accounts.length == 1) {
-                          accounts.selectedAccount = null;
-                          screen.current = Screen.home;
-                        } else if (_account.selected) {
-                          _account.selected = false;
-                          for (Account account in accounts.accounts) {
-                            if (account.uuid != _account.uuid) {
-                              accounts.selectedAccount = account;
-                              break;
-                            }
-                          }
-                        }
-                        accounts.removeAccount(_account.uuid);
-                        accounts.saveTo(
-                            GetIt.I.get<File>(instanceName: 'accountsDB'));
-                      }))
+                  onPressed: () =>
+                      DeleteDialog.display(context, () => _onAccountDelete!()))
             ]);
     }
 

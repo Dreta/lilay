@@ -16,9 +16,13 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/home/profile.dart';
@@ -32,6 +36,7 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
+    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
     final ThemeData theme = Theme.of(context);
     final TextTheme textTheme = theme.textTheme;
 
@@ -80,9 +85,23 @@ class Homepage extends StatelessWidget {
                             Profile(name: 'Vanilla 1.16.5')
                           ]))))),
               if (screen.current == Screen.accounts)
-                Expanded(
-                    child: AccountsScreen(
-                        onAccountDelete: (account) => account.invalidate()))
+                Expanded(child: AccountsScreen(onAccountDelete: (account) {
+                  if (accounts.accounts.length == 1) {
+                    accounts.selectedAccount = null;
+                    screen.current = Screen.home;
+                  } else if (account.selected) {
+                    account.selected = false;
+                    for (Account account in accounts.accounts) {
+                      if (account.uuid != account.uuid) {
+                        accounts.selectedAccount = account;
+                        break;
+                      }
+                    }
+                  }
+                  accounts.removeAccount(account.uuid);
+                  accounts
+                      .saveTo(GetIt.I.get<File>(instanceName: 'accountsDB'));
+                }))
             ])));
   }
 }
