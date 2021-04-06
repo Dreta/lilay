@@ -143,6 +143,7 @@ class _AccountWidgetState extends State<AccountWidget> {
                         _account.invalidate();
                         if (accounts.accounts.length == 1) {
                           accounts.selectedAccount = null;
+                          screen.current = Screen.home;
                         } else if (_account.selected) {
                           _account.selected = false;
                           for (Account account in accounts.accounts) {
