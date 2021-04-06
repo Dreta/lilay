@@ -145,7 +145,7 @@ class _AccountWidgetState extends State<AccountWidget> {
                           _account.selected = false;
                           for (Account account in accounts.accounts) {
                             if (account.uuid != _account.uuid) {
-                              account.selected = true;
+                              accounts.selectedAccount = account;
                               break;
                             }
                           }
