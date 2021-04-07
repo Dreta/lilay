@@ -21,6 +21,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:lilay/core/configuration/core/types.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/home/navigation_drawer.dart';
@@ -58,12 +60,16 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
+    final CoreConfig config = GetIt.I.get<CoreConfig>();
 
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/background.png'),
+                    image: (config.backgroundType == BackgroundType.asset
+                            ? AssetImage('assets/background.png')
+                            : FileImage(File(config.backgroundImage!)))
+                        as ImageProvider,
                     fit: BoxFit.cover)),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               NavigationDrawer(),

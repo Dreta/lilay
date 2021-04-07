@@ -21,6 +21,7 @@ import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
+import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:logging/logging.dart';
 
 class LoginDialog extends StatefulWidget {
@@ -47,7 +48,7 @@ class LoginDialog extends StatefulWidget {
 class _LoginDialogState extends State<LoginDialog> {
   final Function(Account) _addAccount;
 
-  String _selectedAuthProvider = Account.defaultAuthProvider;
+  late String _selectedAuthProvider;
   final GlobalKey<FormState> _form = GlobalKey();
   final TextEditingController _username = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -55,7 +56,9 @@ class _LoginDialogState extends State<LoginDialog> {
   bool _loggingIn = false;
 
   _LoginDialogState({required Function(Account) onAddAccount})
-      : _addAccount = onAddAccount;
+      : _addAccount = onAddAccount {
+    _selectedAuthProvider = GetIt.I.get<CoreConfig>().preferredLoginType;
+  }
 
   @override
   dispose() {
@@ -83,7 +86,6 @@ class _LoginDialogState extends State<LoginDialog> {
         _addAccount(account); // Allow the account to be added
         setState(() {
           _loggingIn = false;
-          _selectedAuthProvider = Account.defaultAuthProvider;
         });
       }, (error) {
         GetIt.I.get<Logger>().severe(error);
