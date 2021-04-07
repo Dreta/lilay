@@ -60,7 +60,7 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
-    final CoreConfig config = GetIt.I.get<CoreConfig>();
+    final CoreConfig config = Provider.of<CoreConfig>(context);
 
     return Scaffold(
         body: Container(

@@ -20,6 +20,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/home/home.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
@@ -28,13 +29,17 @@ import 'package:provider/provider.dart';
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    AccountsProvider provider = AccountsProvider();
+    final AccountsProvider provider = AccountsProvider();
     provider.loadFrom(GetIt.I.get<File>(instanceName: 'accountsDB'));
+
+    final CoreConfig coreConfig =
+        CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
 
     return MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: provider),
-          ChangeNotifierProvider.value(value: ScreenProvider())
+          ChangeNotifierProvider.value(value: ScreenProvider()),
+          ChangeNotifierProvider.value(value: coreConfig)
         ],
         child: MaterialApp(
           title: 'Lilay',

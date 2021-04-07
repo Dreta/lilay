@@ -23,6 +23,7 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
 class LoginDialog extends StatefulWidget {
   final Function(Account) _addAccount;
@@ -57,7 +58,7 @@ class _LoginDialogState extends State<LoginDialog> {
 
   _LoginDialogState({required Function(Account) onAddAccount})
       : _addAccount = onAddAccount {
-    _selectedAuthProvider = GetIt.I.get<CoreConfig>().preferredLoginType;
+    _selectedAuthProvider = Provider.of<CoreConfig>(context).preferredLoginType;
   }
 
   @override

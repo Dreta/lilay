@@ -19,6 +19,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/configuration/core/types.dart';
 import 'package:lilay/utils.dart';
@@ -27,7 +28,7 @@ part 'core_config.g.dart';
 
 /// Contains core launcher configurations.
 @JsonSerializable(explicitToJson: true)
-class CoreConfig {
+class CoreConfig extends ChangeNotifier {
   /// This is where the core config will be loaded from.
   static final File defaultCoreConfig = File('config.json');
 
