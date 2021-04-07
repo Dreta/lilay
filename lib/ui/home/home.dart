@@ -31,6 +31,8 @@ import 'package:provider/provider.dart';
 /// consisting of the accounts, the game profiles
 /// and the play button.
 class Homepage extends StatelessWidget {
+  static const int FADE_DURATION = 150;
+
   deleteAccount(BuildContext context, Account account) {
     final ScreenProvider screen =
         Provider.of<ScreenProvider>(context, listen: false);
@@ -68,7 +70,7 @@ class Homepage extends StatelessWidget {
               Expanded(
                   child: AnimatedOpacity(
                       opacity: screen.current == Screen.accounts ? 1 : 0,
-                      duration: Duration(milliseconds: 100),
+                      duration: Duration(milliseconds: FADE_DURATION),
                       child: AccountsScreen(
                           onAccountDelete: (account) =>
                               deleteAccount(context, account))))
