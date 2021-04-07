@@ -63,11 +63,13 @@ class Homepage extends StatelessWidget {
                     fit: BoxFit.cover)),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               NavigationDrawer(),
-              if (screen.current == Screen.accounts)
-                Expanded(
-                    child: AccountsScreen(
-                        onAccountDelete: (account) =>
-                            deleteAccount(context, account)))
+              Expanded(
+                  child: AnimatedOpacity(
+                      opacity: screen.current == Screen.accounts ? 1 : 0,
+                      duration: Duration(milliseconds: 100),
+                      child: AccountsScreen(
+                          onAccountDelete: (account) =>
+                              deleteAccount(context, account))))
             ])));
   }
 }
