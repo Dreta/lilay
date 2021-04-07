@@ -32,8 +32,10 @@ import 'package:provider/provider.dart';
 /// and the play button.
 class Homepage extends StatelessWidget {
   deleteAccount(BuildContext context, Account account) {
-    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
-    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
+    final ScreenProvider screen =
+        Provider.of<ScreenProvider>(context, listen: false);
+    final AccountsProvider accounts =
+        Provider.of<AccountsProvider>(context, listen: false);
 
     if (accounts.accounts.length == 1) {
       accounts.selectedAccount = null;
