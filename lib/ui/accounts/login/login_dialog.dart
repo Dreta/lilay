@@ -56,10 +56,14 @@ class _LoginDialogState extends State<LoginDialog> {
   final FocusNode _passwordFocus = FocusNode();
   bool _loggingIn = false;
 
-  _LoginDialogState({required Function(Account) onAddAccount})
-      : _addAccount = onAddAccount {
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
     _selectedAuthProvider = Provider.of<CoreConfig>(context).preferredLoginType;
   }
+
+  _LoginDialogState({required Function(Account) onAddAccount})
+      : _addAccount = onAddAccount;
 
   @override
   dispose() {
