@@ -49,6 +49,7 @@ class _PreferredLoginTypeState extends State<PreferredLoginType> {
         onChanged: (value) {
           setState(() => _selected = value as String);
           config.preferredLoginType = value as String;
+          config.notify();
           config.write(CoreConfig.defaultCoreConfig);
         });
   }
