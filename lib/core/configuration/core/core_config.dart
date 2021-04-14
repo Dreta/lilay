@@ -75,4 +75,6 @@ class CoreConfig extends ChangeNotifier {
   }
 
   Map<String, dynamic> toJson() => _$CoreConfigToJson(this);
+
+  notify() => notifyListeners();
 }
