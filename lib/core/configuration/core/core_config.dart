@@ -62,8 +62,6 @@ class CoreConfig extends ChangeNotifier {
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
-    // Because this will only be called on startup,
-    // using readAsStringSYNC is perfectly fine.
     if (!file.existsSync()) {
       return CoreConfig(null, null, null, null);
     }
