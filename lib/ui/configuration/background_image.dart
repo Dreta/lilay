@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:provider/provider.dart';
@@ -39,15 +40,28 @@ class _BackgroundImageState extends State<BackgroundImage> {
     final ThemeData theme = Theme.of(context);
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
-    return TextField(
-        controller: _selected,
-        onChanged: (bgImage) {
-          config.backgroundImage = bgImage;
-          config.notify();
-        },
-        decoration: InputDecoration(
-            labelText: 'Background image',
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: theme.accentColor))));
+    return Row(children: [
+      TextField(
+          controller: _selected,
+          onChanged: (bgImage) {
+            config.backgroundImage = bgImage;
+            config.notify();
+          },
+          decoration: InputDecoration(
+              labelText: 'Background image',
+              enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: theme.accentColor)))),
+      Padding(
+          padding: EdgeInsets.only(left: 6),
+          child: ElevatedButton(
+              onPressed: () async {
+                FilePickerCross file = await FilePickerCross.importFromStorage(
+                    type: FileTypeCross.image);
+                config.backgroundImage = file.path;
+                config.notify();
+                _selected.text = file.path;
+              },
+              child: Text('BROWSE', style: TextStyle(color: Colors.white))))
+    ]);
   }
 }
