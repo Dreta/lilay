@@ -1,3 +1,7 @@
+// @dart=2.9
+// Unfortunately the file_picker_cross library is not null-safe,
+// and I don't think there's an alternative for it.
+
 /*
  * Lilay is a custom Minecraft launcher.
  * Copyright (c) 2021 Dreta

@@ -26,6 +26,7 @@ import 'package:lilay/core/configuration/core/types.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/animated_screen.dart';
+import 'package:lilay/ui/configuration/screen/configuration_screen.dart';
 import 'package:lilay/ui/home/navigation_drawer.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +59,6 @@ class Homepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
     return Scaffold(
@@ -76,7 +76,10 @@ class Homepage extends StatelessWidget {
                   screenType: ScreenType.accounts,
                   child: AccountsScreen(
                       onAccountDelete: (account) =>
-                          deleteAccount(context, account)))
+                          deleteAccount(context, account))),
+              AnimatedScreen(
+                  screenType: ScreenType.configuration,
+                  child: ConfigurationScreen())
             ])));
   }
 }

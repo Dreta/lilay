@@ -35,10 +35,12 @@ class AnimatedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
 
+    // FIXME Screen not expanded as there's another screen beside it
     return Expanded(
         child: AnimatedOpacity(
             opacity: screen.current == screenType ? 1 : 0,
             duration: Duration(milliseconds: FADE_DURATION),
+            curve: Curves.easeIn,
             child: child));
   }
 }
