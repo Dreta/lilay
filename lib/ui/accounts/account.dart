@@ -162,10 +162,10 @@ class _AccountWidgetState extends State<AccountWidget> {
         minLeadingWidth: 20,
         onTap: _openScreen
             ? () {
-                if (screen.current == Screen.accounts) {
-                  screen.current = Screen.home;
+                if (screen.current == ScreenType.accounts) {
+                  screen.current = ScreenType.home;
                 } else {
-                  screen.current = Screen.accounts;
+                  screen.current = ScreenType.accounts;
                 }
               }
             : null);

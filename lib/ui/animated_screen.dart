@@ -17,19 +17,28 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:lilay/ui/home/screen_provider.dart';
+import 'package:provider/provider.dart';
 
-/// Provides the currently selected screen as a globally
-/// accessible state.
-class ScreenProvider extends ChangeNotifier {
-  ScreenType _currentScreen = ScreenType.home;
+/// Wrapping a screen in this widget creates
+/// a fade animation between the screen's
+/// shown/hidden state.
+class AnimatedScreen extends StatelessWidget {
+  static const int FADE_DURATION = 150;
 
-  ScreenType get current => _currentScreen;
+  final ScreenType screenType;
+  final Widget child;
 
-  set current(ScreenType s) {
-    _currentScreen = s;
-    notifyListeners();
+  const AnimatedScreen({required this.screenType, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
+
+    return Expanded(
+        child: AnimatedOpacity(
+            opacity: screen.current == screenType ? 1 : 0,
+            duration: Duration(milliseconds: FADE_DURATION),
+            child: child));
   }
 }
-
-/// Implemented screens in Lilay.
-enum ScreenType { home, accounts }

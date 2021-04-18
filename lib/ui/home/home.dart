@@ -25,6 +25,7 @@ import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/configuration/core/types.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
+import 'package:lilay/ui/animated_screen.dart';
 import 'package:lilay/ui/home/navigation_drawer.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:provider/provider.dart';
@@ -33,8 +34,6 @@ import 'package:provider/provider.dart';
 /// consisting of the accounts, the game profiles
 /// and the play button.
 class Homepage extends StatelessWidget {
-  static const int FADE_DURATION = 150;
-
   deleteAccount(BuildContext context, Account account) {
     final ScreenProvider screen =
         Provider.of<ScreenProvider>(context, listen: false);
@@ -43,7 +42,7 @@ class Homepage extends StatelessWidget {
 
     if (accounts.accounts.length == 1) {
       accounts.selectedAccount = null;
-      screen.current = Screen.home;
+      screen.current = ScreenType.home;
     } else if (account.selected) {
       account.selected = false;
       for (Account account in accounts.accounts) {
@@ -73,13 +72,11 @@ class Homepage extends StatelessWidget {
                     fit: BoxFit.cover)),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               NavigationDrawer(),
-              Expanded(
-                  child: AnimatedOpacity(
-                      opacity: screen.current == Screen.accounts ? 1 : 0,
-                      duration: Duration(milliseconds: FADE_DURATION),
-                      child: AccountsScreen(
-                          onAccountDelete: (account) =>
-                              deleteAccount(context, account))))
+              AnimatedScreen(
+                  screenType: ScreenType.accounts,
+                  child: AccountsScreen(
+                      onAccountDelete: (account) =>
+                          deleteAccount(context, account)))
             ])));
   }
 }
