@@ -19,6 +19,7 @@
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:lilay/core/configuration/core/types.dart';
 import 'package:provider/provider.dart';
 
 /// This widget handles the modification of
@@ -45,6 +46,11 @@ class _BackgroundImageState extends State<BackgroundImage> {
           controller: _selected,
           onChanged: (bgImage) {
             config.backgroundImage = bgImage;
+            if (bgImage == '') {
+              config.backgroundType = BackgroundType.asset;
+              return;
+            }
+            config.backgroundType = BackgroundType.custom;
             config.notify();
           },
           decoration: InputDecoration(
@@ -54,7 +60,6 @@ class _BackgroundImageState extends State<BackgroundImage> {
       Padding(
           padding: EdgeInsets.only(left: 6),
           child: ElevatedButton(
-              // FIXME Possible problem: non-null-safe in null-safe
               onPressed: () async {
                 FilePickerCross file = await FilePickerCross.importFromStorage(
                     type: FileTypeCross.image);
