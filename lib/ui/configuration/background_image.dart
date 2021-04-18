@@ -51,7 +51,7 @@ class _BackgroundImageState extends State<BackgroundImage> {
               return;
             }
             config.backgroundType = BackgroundType.custom;
-            config.notify();
+            config.save();
           },
           decoration: InputDecoration(
               labelText: 'Background image',
@@ -64,7 +64,7 @@ class _BackgroundImageState extends State<BackgroundImage> {
                 FilePickerCross file = await FilePickerCross.importFromStorage(
                     type: FileTypeCross.image);
                 config.backgroundImage = file.path;
-                config.notify();
+                config.save();
                 _selected.text = file.path;
               },
               child: Text('BROWSE', style: TextStyle(color: Colors.white))))
