@@ -21,6 +21,7 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/ui/accounts/account.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/home/home.dart';
+import 'package:lilay/ui/screen.dart';
 import 'package:provider/provider.dart';
 
 /// This is the screen for a list of available
@@ -37,36 +38,25 @@ class AccountsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
-    final ThemeData theme = Theme.of(context);
-    final TextTheme textTheme = theme.textTheme;
 
-    return Container(
-        color: theme.scaffoldBackgroundColor,
-        height: MediaQuery.of(context).size.height,
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Accounts', style: textTheme.headline5),
-          Padding(
-              padding: EdgeInsets.only(top: 16, bottom: 16),
-              child:
-                  Divider(height: 1, thickness: 1, color: theme.dividerColor)),
-          for (Account account in accounts.accounts)
-            Container(
-                margin: EdgeInsets.only(bottom: 14),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black45,
-                          blurRadius: 25,
-                          spreadRadius: 3,
-                          offset: Offset(5, 5))
-                    ]),
-                child: AccountWidget(
-                    account: account,
-                    showActions: true,
-                    onAccountDelete: () => onAccountDelete(account)))
-        ]));
+    return Screen(title: 'Accounts', children: [
+      for (Account account in accounts.accounts)
+        Container(
+            margin: EdgeInsets.only(bottom: 14),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black45,
+                      blurRadius: 25,
+                      spreadRadius: 3,
+                      offset: Offset(5, 5))
+                ]),
+            child: AccountWidget(
+                account: account,
+                showActions: true,
+                onAccountDelete: () => onAccountDelete(account)))
+    ]);
   }
 }
