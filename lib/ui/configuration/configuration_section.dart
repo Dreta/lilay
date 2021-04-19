@@ -33,7 +33,7 @@ class ConfigurationSection extends StatelessWidget {
       Padding(
           padding:
               const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 5),
-          child: Text('ACCOUNTS', style: textTheme.subtitle2)),
+          child: Text('OTHER', style: textTheme.subtitle2)),
       Padding(
           padding: const EdgeInsets.only(left: 16, right: 16),
           child: Divider(height: 1, thickness: 1, color: theme.dividerColor)),
