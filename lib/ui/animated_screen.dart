@@ -24,7 +24,7 @@ import 'package:provider/provider.dart';
 /// a fade animation between the screen's
 /// shown/hidden state.
 class AnimatedScreen extends StatelessWidget {
-  static const int FADE_DURATION = 150;
+  static const int FADE_DURATION = 100;
 
   final ScreenType screenType;
   final Widget child;
@@ -35,12 +35,10 @@ class AnimatedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
 
-    // FIXME Screen not expanded as there's another screen beside it
-    return Expanded(
-        child: AnimatedOpacity(
-            opacity: screen.current == screenType ? 1 : 0,
-            duration: Duration(milliseconds: FADE_DURATION),
-            curve: Curves.easeIn,
-            child: child));
+    return AnimatedOpacity(
+        opacity: screen.current == screenType ? 1 : 0,
+        duration: Duration(milliseconds: FADE_DURATION),
+        curve: Curves.easeIn,
+        child: child);
   }
 }
