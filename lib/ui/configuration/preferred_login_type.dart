@@ -32,7 +32,9 @@ class PreferredLoginType extends StatefulWidget {
 class _PreferredLoginTypeState extends State<PreferredLoginType> {
   late String _selected;
 
-  _PreferredLoginTypeState() {
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
     _selected = Provider.of<CoreConfig>(context).preferredLoginType;
   }
 

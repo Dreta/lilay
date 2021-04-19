@@ -73,6 +73,7 @@ class Homepage extends StatelessWidget {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               NavigationDrawer(),
               Expanded(
+                  // fixme stack size still can't be recognized
                   child: Stack(children: [
                 AnimatedScreen(
                     screenType: ScreenType.accounts,

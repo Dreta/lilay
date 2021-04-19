@@ -32,7 +32,9 @@ class BackgroundImage extends StatefulWidget {
 class _BackgroundImageState extends State<BackgroundImage> {
   final TextEditingController _selected = TextEditingController();
 
-  _BackgroundImageState() {
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
     _selected.text = Provider.of<CoreConfig>(context).backgroundImage ?? '';
   }
 

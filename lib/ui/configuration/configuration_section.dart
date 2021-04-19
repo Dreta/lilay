@@ -39,7 +39,7 @@ class ConfigurationSection extends StatelessWidget {
           child: Divider(height: 1, thickness: 1, color: theme.dividerColor)),
       ListTile(
           leading: Icon(Icons.settings, color: theme.accentColor),
-          title: Text('Settings'), // FIXME Screen not opening, see console log
+          title: Text('Settings'),
           minLeadingWidth: 20,
           onTap: () => screen.current = ScreenType.configuration)
     ]);
