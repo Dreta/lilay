@@ -71,7 +71,20 @@ class _BackgroundImageState extends State<BackgroundImage> {
                 config.save();
                 _selected.text = file.path;
               },
-              child: Text('BROWSE', style: TextStyle(color: Colors.white))))
+              child: Text('BROWSE', style: TextStyle(color: Colors.white)))),
+      Padding(
+          padding: EdgeInsets.only(left: 6),
+          child: ElevatedButton(
+              // todo make these icon buttons and integrate them into the input field
+              onPressed: () async {
+                config.backgroundImage = '';
+                config.backgroundType = BackgroundType.asset;
+                config.save();
+                _selected.text = '';
+              },
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(theme.errorColor)),
+              child: Text('RESET', style: TextStyle(color: Colors.white))))
     ]);
   }
 }
