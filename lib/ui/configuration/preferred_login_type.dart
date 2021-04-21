@@ -44,18 +44,21 @@ class _PreferredLoginTypeState extends State<PreferredLoginType> {
 
     return Row(children: [
       Text('Preferred Login Type'),
-      DropdownButtonFormField(
-          value: _selected,
-          items: [
-            for (final AuthProvider provider in Account.authProviders.values)
-              DropdownMenuItem(value: provider.type, child: Text(provider.name))
-          ],
-          onChanged: (value) {
-            setState(() => _selected = value as String);
-            config.preferredLoginType = value as String;
-            config.save();
-            config.write(CoreConfig.defaultCoreConfig);
-          })
+      Expanded(
+          child: DropdownButtonFormField(
+              value: _selected,
+              items: [
+                for (final AuthProvider provider
+                    in Account.authProviders.values)
+                  DropdownMenuItem(
+                      value: provider.type, child: Text(provider.name))
+              ],
+              onChanged: (value) {
+                setState(() => _selected = value as String);
+                config.preferredLoginType = value as String;
+                config.save();
+                config.write(CoreConfig.defaultCoreConfig);
+              }))
     ]);
   }
 }

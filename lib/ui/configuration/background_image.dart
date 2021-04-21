@@ -44,21 +44,22 @@ class _BackgroundImageState extends State<BackgroundImage> {
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
     return Row(children: [
-      TextField(
-          controller: _selected,
-          onChanged: (bgImage) {
-            config.backgroundImage = bgImage;
-            if (bgImage == '') {
-              config.backgroundType = BackgroundType.asset;
-              return;
-            }
-            config.backgroundType = BackgroundType.custom;
-            config.save();
-          },
-          decoration: InputDecoration(
-              labelText: 'Background image',
-              enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: theme.accentColor)))),
+      Expanded(
+          child: TextField(
+              controller: _selected,
+              onChanged: (bgImage) {
+                config.backgroundImage = bgImage;
+                if (bgImage == '') {
+                  config.backgroundType = BackgroundType.asset;
+                  return;
+                }
+                config.backgroundType = BackgroundType.custom;
+                config.save();
+              },
+              decoration: InputDecoration(
+                  labelText: 'Background image',
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: theme.accentColor))))),
       Padding(
           padding: EdgeInsets.only(left: 6),
           child: ElevatedButton(
