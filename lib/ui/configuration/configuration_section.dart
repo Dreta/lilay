@@ -41,7 +41,10 @@ class ConfigurationSection extends StatelessWidget {
           leading: Icon(Icons.settings, color: theme.accentColor),
           title: Text('Settings'),
           minLeadingWidth: 20,
-          onTap: () => screen.current = ScreenType.configuration)
+          onTap: () => screen.current =
+              screen.current == ScreenType.configuration
+                  ? ScreenType.home
+                  : ScreenType.configuration)
     ]);
   }
 }
