@@ -161,13 +161,9 @@ class _AccountWidgetState extends State<AccountWidget> {
             : Text(_account.authProvider.name),
         minLeadingWidth: 20,
         onTap: _openScreen
-            ? () {
-                if (screen.current == ScreenType.accounts) {
-                  screen.current = ScreenType.home;
-                } else {
-                  screen.current = ScreenType.accounts;
-                }
-              }
+            ? () => screen.current = screen.current == ScreenType.accounts
+                ? ScreenType.home
+                : ScreenType.accounts
             : null);
   }
 }
