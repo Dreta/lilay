@@ -41,11 +41,15 @@ class _PreferredLoginTypeState extends State<PreferredLoginType> {
   @override
   Widget build(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
+    final ThemeData theme = Theme.of(context);
 
     return Row(children: [
-      Text('Preferred Login Type'),
       Expanded(
           child: DropdownButtonFormField(
+              decoration: InputDecoration(
+                  labelText: 'Preferred Login Type',
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: theme.accentColor))),
               value: _selected,
               items: [
                 for (final AuthProvider provider
