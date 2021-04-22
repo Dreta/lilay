@@ -18,7 +18,9 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
@@ -49,8 +51,22 @@ class MicrosoftAuthServer {
       // but for our use case it's perfectly fine.
       if (request.requestedUri.pathSegments.contains('msauth')) {
         _handleRequest(request);
+      } else if (request.requestedUri.pathSegments.contains('background.png')) {
+        // If we are requesting the background image
+        // This might look ugly, but I don't think it matters.
+        _handleBackgroundRequest(request);
       }
     }
+  }
+
+  _handleBackgroundRequest(HttpRequest request) async {
+    final ByteData background = await rootBundle.load('assets/background.png');
+
+    request.response
+      ..headers.contentType = ContentType('image', 'png')
+      ..add(List.from(background.buffer
+          .asUint8List(background.offsetInBytes, background.lengthInBytes)))
+      ..close();
   }
 
   _handleRequest(HttpRequest request) async {
@@ -59,8 +75,11 @@ class MicrosoftAuthServer {
       String? code = request.uri.queryParameters['code'];
       if (code == null) {
         request.response
+          ..headers.contentType = ContentType.html
           ..statusCode = HttpStatus.badRequest
-          ..write('Invalid request, authentication code is missing.')
+          ..write((await rootBundle.loadString('assets/msauthfailed.html'))
+              .replaceAll('{error}',
+                  'Invalid request, authentication code is missing.'))
           ..close();
         return;
       }
@@ -78,10 +97,14 @@ class MicrosoftAuthServer {
               '&redirect_uri=http%3A%2F%2Flocalhost%3A${_server.port}%2Fmsauth');
 
       if (rToken.statusCode != 200) {
+        // It might be better to use a proper HTML templating library,
+        // but I believe that is too overkill.
         request.response
+          ..headers.contentType = ContentType.html
           ..statusCode = HttpStatus.forbidden
-          ..write(
-              'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}')
+          ..write((await rootBundle.loadString('assets/msauthfailed.html'))
+              .replaceAll('{error}',
+                  'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}'))
           ..close();
         return;
       }
@@ -111,12 +134,14 @@ class MicrosoftAuthServer {
 
       if (rXBL.statusCode != 200) {
         request.response
+          ..headers.contentType = ContentType.html
           ..statusCode = HttpStatus.forbidden
-          ..write(
-              'Xbox Live returned non-200 status code. Code: ${rXBL.statusCode}, body: ${rXBL.body}')
+          ..write((await rootBundle.loadString('assets/msauthfailed.html'))
+              .replaceAll('{error}',
+                  'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.'))
           ..close();
         errorCallback(
-            'Xbox Live returned non-200 status code. Code: ${rXBL.statusCode}, body: ${rXBL.body}');
+            'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.');
         return;
       }
 
@@ -145,20 +170,24 @@ class MicrosoftAuthServer {
         Map<String, dynamic> xstsBody = jsonDecode(rXSTS.body);
         if (xstsBody['XErr'] == 2148916233) {
           request.response
+            ..headers.contentType = ContentType.html
             ..statusCode = HttpStatus.forbidden
-            ..write(
-                'You don\'t have an Xbox account. Please create one before continuing.')
+            ..write((await rootBundle.loadString('assets/msauthfailed.html'))
+                .replaceAll('{error}',
+                    'You don\'t have an Xbox Live account (which is separate from your Microsoft account). Please create one before continuing.'))
             ..close();
           errorCallback(
-              'You don\'t have an Xbox account. Please create one before continuing.');
+              'You don\'t have an Xbox Live account. Please create one before continuing.');
         } else if (xstsBody['XErr'] == 2148916238) {
           request.response
+            ..headers.contentType = ContentType.html
             ..statusCode = HttpStatus.forbidden
-            ..write(
-                'You are a children and you cannot proceed unless the account is added to a family by an adult.')
+            ..write((await rootBundle.loadString('assets/msauthfailed.html'))
+                .replaceAll('{error}',
+                    'You are a children and can not proceed unless this account is added to a family by an adult.'))
             ..close();
           errorCallback(
-              'You are a children and you cannot proceed unless the account is added to a family by an adult.');
+              'You are a children and can not proceed unless this account is added to a family by an adult.');
         }
         return;
       }
@@ -172,8 +201,9 @@ class MicrosoftAuthServer {
       accountCallback(account);
 
       request.response
+        ..headers.contentType = ContentType.html
         ..statusCode = HttpStatus.ok
-        ..write('Authentication successful. You can return to Lilay now.')
+        ..write(await rootBundle.loadString('assets/msauthsuccess.html'))
         ..close();
     } catch (e) {
       errorCallback(e.toString());
