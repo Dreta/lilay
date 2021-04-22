@@ -47,9 +47,9 @@ class _BackgroundImageState extends State<BackgroundImage> {
       Expanded(
           child: TextField(
               controller: _selected,
-              onChanged: (bgImage) {
-                config.backgroundImage = bgImage;
-                if (bgImage == '') {
+              onEditingComplete: () {
+                config.backgroundImage = _selected.text;
+                if (_selected.text == '') {
                   config.backgroundType = BackgroundType.asset;
                   return;
                 }
