@@ -115,6 +115,8 @@ class MicrosoftAuthServer {
           ..write(
               'Xbox Live returned non-200 status code. Code: ${rXBL.statusCode}, body: ${rXBL.body}')
           ..close();
+        errorCallback(
+            'Xbox Live returned non-200 status code. Code: ${rXBL.statusCode}, body: ${rXBL.body}');
         return;
       }
 
@@ -147,12 +149,16 @@ class MicrosoftAuthServer {
             ..write(
                 'You don\'t have an Xbox account. Please create one before continuing.')
             ..close();
+          errorCallback(
+              'You don\'t have an Xbox account. Please create one before continuing.');
         } else if (xstsBody['XErr'] == 2148916238) {
           request.response
             ..statusCode = HttpStatus.forbidden
             ..write(
-                'You are a minority and you cannot proceed unless the account is added to a family by an adult.')
+                'You are a children and you cannot proceed unless the account is added to a family by an adult.')
             ..close();
+          errorCallback(
+              'You are a children and you cannot proceed unless the account is added to a family by an adult.');
         }
         return;
       }
