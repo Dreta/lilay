@@ -62,7 +62,7 @@ class _BackgroundImageState extends State<BackgroundImage> {
                       borderSide: BorderSide(color: theme.accentColor))))),
       Padding(
           padding: EdgeInsets.only(left: 6),
-          child: ElevatedButton(
+          child: IconButton(
               onPressed: () async {
                 FilePickerCross file = await FilePickerCross.importFromStorage(
                     type: FileTypeCross.image);
@@ -71,20 +71,20 @@ class _BackgroundImageState extends State<BackgroundImage> {
                 config.save();
                 _selected.text = file.path;
               },
-              child: Text('BROWSE', style: TextStyle(color: Colors.white)))),
+              tooltip: 'Browse',
+              icon: Icon(Icons.folder))),
       Padding(
           padding: EdgeInsets.only(left: 6),
-          child: ElevatedButton(
-              // todo make these icon buttons and integrate them into the input field
+          child: IconButton(
+              // todo integrate these into the input field
               onPressed: () async {
                 config.backgroundImage = '';
                 config.backgroundType = BackgroundType.asset;
                 config.save();
                 _selected.text = '';
               },
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(theme.errorColor)),
-              child: Text('RESET', style: TextStyle(color: Colors.white))))
+              tooltip: 'Reset',
+              icon: Icon(Icons.refresh, color: theme.errorColor)))
     ]);
   }
 }

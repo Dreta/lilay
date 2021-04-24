@@ -172,9 +172,9 @@ class _LoginDialogState extends State<LoginDialog> {
                     ? null
                     : (value) {
                         setState(() {
-                _selectedAuthProvider = value as String;
-              });
-            }),
+                          _selectedAuthProvider = value as String;
+                        });
+                      }),
         data: Theme.of(context).copyWith(canvasColor: Colors.white));
   }
 
