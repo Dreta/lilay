@@ -43,48 +43,45 @@ class _BackgroundImageState extends State<BackgroundImage> {
     final ThemeData theme = Theme.of(context);
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
-    return Row(children: [
-      Expanded(
-          child: TextField(
-              controller: _selected,
-              onEditingComplete: () {
-                config.backgroundImage = _selected.text;
-                if (_selected.text == '') {
-                  config.backgroundType = BackgroundType.asset;
-                  return;
-                }
-                config.backgroundType = BackgroundType.custom;
-                config.save();
-              },
-              decoration: InputDecoration(
-                  labelText: 'Background image',
-                  enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: theme.accentColor))))),
-      Padding(
-          padding: EdgeInsets.only(left: 6),
-          child: IconButton(
-              onPressed: () async {
-                FilePickerCross file = await FilePickerCross.importFromStorage(
-                    type: FileTypeCross.image);
-                config.backgroundImage = file.path;
-                config.backgroundType = BackgroundType.custom;
-                config.save();
-                _selected.text = file.path;
-              },
-              tooltip: 'Browse',
-              icon: Icon(Icons.folder))),
-      Padding(
-          padding: EdgeInsets.only(left: 6),
-          child: IconButton(
-              // todo integrate these into the input field
-              onPressed: () async {
-                config.backgroundImage = '';
-                config.backgroundType = BackgroundType.asset;
-                config.save();
-                _selected.text = '';
-              },
-              tooltip: 'Reset',
-              icon: Icon(Icons.refresh, color: theme.errorColor)))
-    ]);
+    return TextField(
+        controller: _selected,
+        onEditingComplete: () {
+          config.backgroundImage = _selected.text;
+          if (_selected.text == '') {
+            config.backgroundType = BackgroundType.asset;
+            return;
+          }
+          config.backgroundType = BackgroundType.custom;
+          config.save();
+        },
+        decoration: InputDecoration(
+            labelText: 'Background image',
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: theme.accentColor)),
+            suffixIcon: Row(mainAxisSize: MainAxisSize.min, children: [
+              IconButton(
+                  onPressed: () async {
+                    FilePickerCross file =
+                        await FilePickerCross.importFromStorage(
+                            type: FileTypeCross.image);
+                    config.backgroundImage = file.path;
+                    config.backgroundType = BackgroundType.custom;
+                    config.save();
+                    _selected.text = file.path;
+                  },
+                  tooltip: 'Browse',
+                  icon: Icon(Icons.folder)),
+              Padding(
+                  padding: EdgeInsets.only(left: 6),
+                  child: IconButton(
+                      onPressed: () async {
+                        config.backgroundImage = '';
+                        config.backgroundType = BackgroundType.asset;
+                        config.save();
+                        _selected.text = '';
+                      },
+                      tooltip: 'Reset',
+                      icon: Icon(Icons.refresh, color: theme.errorColor)))
+            ])));
   }
 }
