@@ -31,7 +31,7 @@ class NavigationDrawer extends StatelessWidget {
     final TextTheme textTheme = theme.textTheme;
 
     return Theme(
-        data: theme.copyWith(canvasColor: Colors.white.withOpacity(0.8)),
+        data: theme.copyWith(canvasColor: theme.primaryColor.withOpacity(0.8)),
         child: ClipRRect(
             child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),

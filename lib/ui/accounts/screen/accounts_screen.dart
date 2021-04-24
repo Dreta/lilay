@@ -38,13 +38,14 @@ class AccountsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
+    final ThemeData theme = Theme.of(context);
 
     return Screen(title: 'Accounts', children: [
       for (Account account in accounts.accounts)
         Container(
             margin: EdgeInsets.only(bottom: 14),
             decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.primaryColor,
                 borderRadius: BorderRadius.circular(5),
                 boxShadow: [
                   BoxShadow(

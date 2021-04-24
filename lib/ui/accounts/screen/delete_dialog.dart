@@ -48,7 +48,7 @@ class DeleteDialog extends StatelessWidget {
             const Text('You will have to re-login to use this account again!'),
         actions: [
           TextButton(
-              child: Text('CANCEL', style: TextStyle(color: Colors.black45)),
+              child: Text('CANCEL'),
               onPressed: () => Navigator.of(context).pop()),
           ElevatedButton(
               style: ButtonStyle(

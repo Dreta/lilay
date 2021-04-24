@@ -30,7 +30,11 @@ class App extends StatelessWidget {
         title: 'Lilay',
         theme: ThemeData(
             brightness: Brightness.light,
-            primarySwatch: Colors.primaries[config.accent]),
+            primarySwatch: Colors.primaries[config.accent],
+            accentColor: Colors.primaries[config.accent],
+            primaryColor: Colors.white,
+            primaryColorDark: Colors.white70,
+            primaryColorBrightness: Brightness.light),
         home: Homepage());
   }
 }
