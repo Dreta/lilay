@@ -157,6 +157,7 @@ class _AccountWidgetState extends State<AccountWidget> {
         }
         _account.selected = true;
         accounts.selectedAccount = _account;
+        accounts.saveTo(GetIt.I.get<File>(instanceName: 'accountsDB'));
       };
     }
 
