@@ -176,6 +176,7 @@ class _AccountWidgetState extends State<AccountWidget> {
             ? Text('Re-login required', // Show the message
                 style: TextStyle(color: theme.errorColor))
             : Text(_account.authProvider.name),
+        selected: _showActions ? _account.selected : false,
         minLeadingWidth: 20,
         onTap: onTapAction);
   }
