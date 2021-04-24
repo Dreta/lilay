@@ -26,45 +26,58 @@ class AccentColor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
-    return ListTile(
-        title: Text('Accent color'),
-        onTap: () {
-          showAnimatedDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (context) => AlertDialog(
-                  title: Text('Set the accent color'),
-                  content: SingleChildScrollView(
-                      child: BlockPicker(
-                          pickerColor: Colors.primaries[config.accent],
-                          availableColors: [
-                            Colors.red,
-                            Colors.pink,
-                            Colors.purple,
-                            Colors.deepPurple,
-                            Colors.indigo,
-                            Colors.blue,
-                            Colors.lightBlue,
-                            Colors.cyan,
-                            Colors.teal,
-                            Colors.green,
-                            Colors.lightGreen,
-                            Colors.lime,
-                            Colors.yellow,
-                            Colors.amber,
-                            Colors.orange,
-                            Colors.deepOrange
-                          ],
-                          onColorChanged: (color) {
-                            config.accent = Colors.primaries
-                                .indexOf(color as MaterialColor);
-                            config.save();
-                            config.write(CoreConfig.defaultCoreConfig);
-                            Navigator.pop(context);
-                          }))),
-              animationType: DialogTransitionType.fadeScale,
-              curve: Curves.easeInOut,
-              duration: Duration(milliseconds: 400));
-        });
+
+    return InkWell(
+        onTap: () => showAnimatedDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (context) => AlertDialog(
+                title: Text('Set the accent color'),
+                content: SingleChildScrollView(
+                    child: BlockPicker(
+                        pickerColor: Colors.primaries[config.accent],
+                        availableColors: [
+                          Colors.red,
+                          Colors.pink,
+                          Colors.purple,
+                          Colors.deepPurple,
+                          Colors.indigo,
+                          Colors.blue,
+                          Colors.lightBlue,
+                          Colors.cyan,
+                          Colors.teal,
+                          Colors.green,
+                          Colors.lightGreen,
+                          Colors.lime,
+                          Colors.yellow,
+                          Colors.amber,
+                          Colors.orange,
+                          Colors.deepOrange
+                        ],
+                        onColorChanged: (color) {
+                          config.accent =
+                              Colors.primaries.indexOf(color as MaterialColor);
+                          config.save();
+                          config.write(CoreConfig.defaultCoreConfig);
+                          Navigator.pop(context);
+                        }))),
+            animationType: DialogTransitionType.fadeScale,
+            curve: Curves.easeInOut,
+            duration: Duration(milliseconds: 400)),
+        child: Row(
+          children: [
+            Expanded(
+                child: Row(children: [
+              Text('Accent Color', style: TextStyle(fontSize: 16))
+            ])),
+            Container(
+              height: 24,
+              width: 24,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.primaries[config.accent]),
+            )
+          ],
+        ));
   }
 }

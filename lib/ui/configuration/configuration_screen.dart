@@ -27,8 +27,10 @@ import 'package:lilay/ui/screen.dart';
 class ConfigurationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Screen(
-        title: 'Settings',
-        children: [BackgroundImage(), PreferredLoginType(), AccentColor()]);
+    return Screen(title: 'Settings', children: [
+      BackgroundImage(),
+      PreferredLoginType(),
+      Padding(padding: EdgeInsets.only(top: 12), child: AccentColor())
+    ]);
   }
 }
