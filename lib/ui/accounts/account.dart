@@ -113,8 +113,8 @@ class _AccountWidgetState extends State<AccountWidget> {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
     final ThemeData theme = Theme.of(context);
-    Widget? trailingWidget;
 
+    Widget? trailingWidget;
     if (_openScreen) {
       trailingWidget = Icon(Icons.menu);
     } else if (_showActions) {
@@ -143,6 +143,23 @@ class _AccountWidgetState extends State<AccountWidget> {
             ]);
     }
 
+    void Function()? onTapAction;
+    if (_openScreen) {
+      // toggle the accounts screen
+      onTapAction = () => screen.current = screen.current == ScreenType.accounts
+          ? ScreenType.home
+          : ScreenType.accounts;
+    } else if (_showActions) {
+      onTapAction = () {
+        // select the current account
+        for (Account acc in accounts.accounts) {
+          acc.selected = false;
+        }
+        _account.selected = true;
+        accounts.selectedAccount = _account;
+      };
+    }
+
     return ListTile(
         leading: _cachedSkinPath.existsSync()
             ? ClipRRect(
@@ -160,10 +177,6 @@ class _AccountWidgetState extends State<AccountWidget> {
                 style: TextStyle(color: theme.errorColor))
             : Text(_account.authProvider.name),
         minLeadingWidth: 20,
-        onTap: _openScreen
-            ? () => screen.current = screen.current == ScreenType.accounts
-                ? ScreenType.home
-                : ScreenType.accounts
-            : null);
+        onTap: onTapAction);
   }
 }
