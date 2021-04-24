@@ -152,9 +152,15 @@ class _LoginDialogState extends State<LoginDialog> {
   }
 
   /// Create the account type dropdown
-  Widget _buildAccountTypeDropdown() {
+  Widget _buildAccountTypeDropdown(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return Theme(
         child: DropdownButtonFormField(
+            decoration: InputDecoration(
+                labelText: 'Login Type',
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: theme.accentColor))),
             value: _selectedAuthProvider,
             items: [
               for (final AuthProvider provider in Account.authProviders.values)
@@ -166,9 +172,9 @@ class _LoginDialogState extends State<LoginDialog> {
                     ? null
                     : (value) {
                         setState(() {
-                          _selectedAuthProvider = value as String;
-                        });
-                      }),
+                _selectedAuthProvider = value as String;
+              });
+            }),
         data: Theme.of(context).copyWith(canvasColor: Colors.white));
   }
 
@@ -236,7 +242,7 @@ class _LoginDialogState extends State<LoginDialog> {
                                 key: _form,
                                 child: Column(children: [
                                   // This the the dropdown menu for account type selection
-                                  _buildAccountTypeDropdown(),
+                                  _buildAccountTypeDropdown(context),
                                   // These are the email/password fields.
                                   for (Widget widget in fields) widget,
                                   // This is the submit button.
