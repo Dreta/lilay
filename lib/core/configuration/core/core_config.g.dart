@@ -12,6 +12,7 @@ CoreConfig _$CoreConfigFromJson(Map<String, dynamic> json) {
     _$enumDecodeNullable(_$BackgroundTypeEnumMap, json['backgroundType']),
     json['backgroundImage'] as String?,
     json['preferredLoginType'] as String?,
+    json['accent'] as int?,
   );
 }
 
@@ -21,6 +22,7 @@ Map<String, dynamic> _$CoreConfigToJson(CoreConfig instance) =>
       'backgroundType': _$BackgroundTypeEnumMap[instance.backgroundType],
       'backgroundImage': instance.backgroundImage,
       'preferredLoginType': instance.preferredLoginType,
+      'accent': instance.accent,
     };
 
 K _$enumDecode<K, V>(

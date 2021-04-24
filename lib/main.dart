@@ -32,8 +32,12 @@ import 'package:lilay/core/auth/offline/offline_account.dart';
 import 'package:lilay/core/auth/offline/offline_auth_provider.dart';
 import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 import 'package:lilay/core/auth/yggdrasil/yggdrasil_auth_provider.dart';
+import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/app.dart';
+import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
 
 main() {
   Logger logger = Logger('Lilay');
@@ -64,8 +68,21 @@ main() {
     cacheDirectory.createSync();
   }
 
+  logger.info('Loading accounts.');
   GetIt.I.registerSingleton<File>(File('accounts.json'),
       instanceName: 'accountsDB');
 
-  runApp(App());
+  final AccountsProvider provider = AccountsProvider();
+  provider.loadFrom(GetIt.I.get<File>(instanceName: 'accountsDB'));
+
+  logger.info('Loading configuration.');
+  final CoreConfig coreConfig =
+      CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
+
+  logger.info('Starting app.');
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider.value(value: provider),
+    ChangeNotifierProvider.value(value: ScreenProvider()),
+    ChangeNotifierProvider.value(value: coreConfig)
+  ], child: App()));
 }

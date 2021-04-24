@@ -53,17 +53,24 @@ class CoreConfig extends ChangeNotifier {
   /// Defaults to 'yggdrasil'.
   String preferredLoginType;
 
+  /// The accent color for this app. This is the index for the list
+  /// [Colors.primaries].
+  ///
+  /// Defaults to the blue accent.
+  int accent;
+
   CoreConfig(String? workingDirectory, BackgroundType? backgroundType,
-      String? backgroundImage, String? preferredLoginType)
+      String? backgroundImage, String? preferredLoginType, int? accent)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft(),
         this.backgroundType = backgroundType ?? BackgroundType.asset,
         this.backgroundImage = backgroundImage,
-        this.preferredLoginType = preferredLoginType ?? 'yggdrasil';
+        this.preferredLoginType = preferredLoginType ?? 'yggdrasil',
+        this.accent = accent ?? 5;
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
     if (!file.existsSync()) {
-      return CoreConfig(null, null, null, null);
+      return CoreConfig(null, null, null, null, null);
     }
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }
