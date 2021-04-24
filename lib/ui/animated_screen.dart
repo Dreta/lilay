@@ -35,10 +35,12 @@ class AnimatedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
 
-    return AnimatedOpacity(
-        opacity: screen.current == screenType ? 1 : 0,
-        duration: Duration(milliseconds: FADE_DURATION),
-        curve: Curves.easeIn,
-        child: child);
+    return IgnorePointer(
+        ignoring: screen.current != screenType,
+        child: AnimatedOpacity(
+            opacity: screen.current == screenType ? 1 : 0,
+            duration: Duration(milliseconds: FADE_DURATION),
+            curve: Curves.easeIn,
+            child: child));
   }
 }
