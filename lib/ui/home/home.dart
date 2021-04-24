@@ -26,7 +26,7 @@ import 'package:lilay/core/configuration/core/types.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/animated_screen.dart';
-import 'package:lilay/ui/configuration/screen/configuration_screen.dart';
+import 'package:lilay/ui/configuration/configuration_screen.dart';
 import 'package:lilay/ui/home/navigation_drawer.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:provider/provider.dart';
