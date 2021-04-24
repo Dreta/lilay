@@ -17,8 +17,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:lilay/ui/configuration/background_image.dart';
-import 'package:lilay/ui/configuration/preferred_login_type.dart';
+import 'package:lilay/ui/configuration/options/background_image.dart';
+import 'package:lilay/ui/configuration/options/preferred_login_type.dart';
 import 'package:lilay/ui/screen.dart';
 
 /// This screen shows the list of configuration
