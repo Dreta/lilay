@@ -59,18 +59,29 @@ class CoreConfig extends ChangeNotifier {
   /// Defaults to the blue accent.
   int accent;
 
-  CoreConfig(String? workingDirectory, BackgroundType? backgroundType,
-      String? backgroundImage, String? preferredLoginType, int? accent)
+  /// Whether dark mode should be activated for this app.
+  ///
+  /// Defaults to false.
+  bool darkMode;
+
+  CoreConfig(
+      String? workingDirectory,
+      BackgroundType? backgroundType,
+      String? backgroundImage,
+      String? preferredLoginType,
+      int? accent,
+      bool? darkMode)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft(),
         this.backgroundType = backgroundType ?? BackgroundType.asset,
         this.backgroundImage = backgroundImage,
         this.preferredLoginType = preferredLoginType ?? 'yggdrasil',
-        this.accent = accent ?? 5;
+        this.accent = accent ?? 5,
+        this.darkMode = darkMode ?? false;
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
     if (!file.existsSync()) {
-      return CoreConfig(null, null, null, null, null);
+      return CoreConfig(null, null, null, null, null, null);
     }
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }

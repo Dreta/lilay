@@ -18,25 +18,26 @@
 
 import 'package:flutter/material.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
-import 'package:lilay/ui/home/home.dart';
 import 'package:provider/provider.dart';
 
-class App extends StatelessWidget {
+class DarkMode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
+    final ThemeData theme = Theme.of(context);
 
-    return MaterialApp(
-        title: 'Lilay',
-        theme: ThemeData(
-            brightness: config.darkMode ? Brightness.dark : Brightness.light,
-            primarySwatch: Colors.primaries[config.accent],
-            accentColor: Colors.primaries[config.accent],
-            primaryColor: config.darkMode ? Colors.black : Colors.white,
-            primaryColorDark: config.darkMode ? null : Colors.white70,
-            primaryColorLight: config.darkMode ? Colors.black87 : null,
-            primaryColorBrightness:
-                config.darkMode ? Brightness.dark : Brightness.light),
-        home: Homepage());
+    return Row(children: [
+      Expanded(
+          child: Row(
+              children: [Text('Dark Mode', style: TextStyle(fontSize: 16))])),
+      Switch(
+          value: config.darkMode,
+          activeColor: theme.accentColor,
+          onChanged: (dark) {
+            config.darkMode = dark;
+            config.save();
+            config.write(CoreConfig.defaultCoreConfig);
+          })
+    ]);
   }
 }

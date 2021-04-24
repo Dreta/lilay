@@ -153,6 +153,7 @@ class _LoginDialogState extends State<LoginDialog> {
 
   /// Create the account type dropdown
   Widget _buildAccountTypeDropdown(BuildContext context) {
+    final CoreConfig config = Provider.of<CoreConfig>(context);
     final ThemeData theme = Theme.of(context);
 
     return Theme(
@@ -175,7 +176,8 @@ class _LoginDialogState extends State<LoginDialog> {
                           _selectedAuthProvider = value as String;
                         });
                       }),
-        data: Theme.of(context).copyWith(canvasColor: Colors.white));
+        data: Theme.of(context)
+            .copyWith(canvasColor: theme.dialogBackgroundColor));
   }
 
   /// Create the submit button

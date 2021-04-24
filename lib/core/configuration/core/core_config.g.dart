@@ -13,6 +13,7 @@ CoreConfig _$CoreConfigFromJson(Map<String, dynamic> json) {
     json['backgroundImage'] as String?,
     json['preferredLoginType'] as String?,
     json['accent'] as int?,
+    json['darkMode'] as bool?,
   );
 }
 
@@ -23,6 +24,7 @@ Map<String, dynamic> _$CoreConfigToJson(CoreConfig instance) =>
       'backgroundImage': instance.backgroundImage,
       'preferredLoginType': instance.preferredLoginType,
       'accent': instance.accent,
+      'darkMode': instance.darkMode,
     };
 
 K _$enumDecode<K, V>(
