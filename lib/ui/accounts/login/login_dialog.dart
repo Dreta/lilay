@@ -70,6 +70,7 @@ class _LoginDialogState extends State<LoginDialog> {
     super.dispose();
     _username.dispose();
     _password.dispose();
+    _passwordFocus.dispose();
   }
 
   /// Log the user in with the input values.

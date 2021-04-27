@@ -39,6 +39,12 @@ class _BackgroundImageState extends State<BackgroundImage> {
   }
 
   @override
+  dispose() {
+    super.dispose();
+    _selected.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final CoreConfig config = Provider.of<CoreConfig>(context);
