@@ -46,9 +46,10 @@ class Homepage extends StatelessWidget {
       screen.current = ScreenType.home;
     } else if (account.selected) {
       account.selected = false;
-      for (Account account in accounts.accounts) {
-        if (account.uuid != account.uuid) {
-          accounts.selectedAccount = account;
+      for (Account acc in accounts.accounts) {
+        if (account.uuid != acc.uuid) {
+          acc.selected = true;
+          accounts.selectedAccount = acc;
           break;
         }
       }
