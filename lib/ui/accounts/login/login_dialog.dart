@@ -154,13 +154,12 @@ class _LoginDialogState extends State<LoginDialog> {
 
   /// Create the account type dropdown
   Widget _buildAccountTypeDropdown(BuildContext context) {
-    final CoreConfig config = Provider.of<CoreConfig>(context);
     final ThemeData theme = Theme.of(context);
 
     return Theme(
         child: DropdownButtonFormField(
             decoration: InputDecoration(
-                labelText: 'Login Type',
+                labelText: 'Account Type',
                 enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: theme.accentColor))),
             value: _selectedAuthProvider,

@@ -47,7 +47,7 @@ class _PreferredLoginTypeState extends State<PreferredLoginType> {
       Expanded(
           child: DropdownButtonFormField(
               decoration: InputDecoration(
-                  labelText: 'Preferred Login Type',
+                  labelText: 'Preferred Account Type',
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: theme.accentColor))),
               value: _selected,
