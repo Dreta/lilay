@@ -31,8 +31,8 @@ class ConfigurationScreen extends StatelessWidget {
     return Screen(title: 'Settings', children: [
       BackgroundImage(),
       PreferredLoginType(),
-      Padding(padding: EdgeInsets.only(top: 12), child: AccentColor()),
-      Padding(padding: EdgeInsets.only(top: 12), child: DarkMode())
+      DarkMode(),
+      Padding(padding: EdgeInsets.only(top: 12), child: AccentColor())
     ]);
   }
 }

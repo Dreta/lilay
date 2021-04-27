@@ -17,3 +17,5 @@
  */
 
 enum BackgroundType { asset, custom }
+
+enum DarkModeType { light, dark, system }

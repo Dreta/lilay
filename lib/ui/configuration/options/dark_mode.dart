@@ -18,9 +18,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:lilay/core/configuration/core/types.dart';
 import 'package:provider/provider.dart';
 
-class DarkMode extends StatelessWidget {
+class DarkMode extends StatefulWidget {
+  @override
+  _DarkModeState createState() => _DarkModeState();
+}
+
+class _DarkModeState extends State<DarkMode> {
+  late DarkModeType _selected;
+
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    _selected = Provider.of<CoreConfig>(context).darkMode;
+  }
+
   @override
   Widget build(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
@@ -28,16 +42,26 @@ class DarkMode extends StatelessWidget {
 
     return Row(children: [
       Expanded(
-          child: Row(
-              children: [Text('Dark Mode', style: TextStyle(fontSize: 16))])),
-      Switch(
-          value: config.darkMode,
-          activeColor: theme.accentColor,
-          onChanged: (dark) {
-            config.darkMode = dark;
-            config.save();
-            config.write(CoreConfig.defaultCoreConfig);
-          })
+          child: DropdownButtonFormField(
+              decoration: InputDecoration(
+                  labelText: 'Dark Mode',
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: theme.accentColor))),
+              value: _selected,
+              items: [
+                DropdownMenuItem(
+                    child: Text('Light'), value: DarkModeType.light),
+                DropdownMenuItem(child: Text('Dark'), value: DarkModeType.dark),
+                DropdownMenuItem(
+                    child: Text('Use system settings'),
+                    value: DarkModeType.system)
+              ],
+              onChanged: (value) {
+                setState(() => _selected = value as DarkModeType);
+                config.darkMode = value as DarkModeType;
+                config.save();
+                config.write(CoreConfig.defaultCoreConfig);
+              }))
     ]);
   }
 }

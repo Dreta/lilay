@@ -13,7 +13,7 @@ CoreConfig _$CoreConfigFromJson(Map<String, dynamic> json) {
     json['backgroundImage'] as String?,
     json['preferredLoginType'] as String?,
     json['accent'] as int?,
-    json['darkMode'] as bool?,
+    _$enumDecodeNullable(_$DarkModeTypeEnumMap, json['darkMode']),
   );
 }
 
@@ -24,7 +24,7 @@ Map<String, dynamic> _$CoreConfigToJson(CoreConfig instance) =>
       'backgroundImage': instance.backgroundImage,
       'preferredLoginType': instance.preferredLoginType,
       'accent': instance.accent,
-      'darkMode': instance.darkMode,
+      'darkMode': _$DarkModeTypeEnumMap[instance.darkMode],
     };
 
 K _$enumDecode<K, V>(
@@ -67,4 +67,10 @@ K? _$enumDecodeNullable<K, V>(
 const _$BackgroundTypeEnumMap = {
   BackgroundType.asset: 'asset',
   BackgroundType.custom: 'custom',
+};
+
+const _$DarkModeTypeEnumMap = {
+  DarkModeType.light: 'light',
+  DarkModeType.dark: 'dark',
+  DarkModeType.system: 'system',
 };

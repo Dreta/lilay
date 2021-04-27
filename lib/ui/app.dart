@@ -17,26 +17,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/home/home.dart';
-import 'package:provider/provider.dart';
+import 'package:lilay/ui/themed_ui.dart';
 
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final CoreConfig config = Provider.of<CoreConfig>(context);
-
-    return MaterialApp(
-        title: 'Lilay',
-        theme: ThemeData(
-            brightness: config.darkMode ? Brightness.dark : Brightness.light,
-            primarySwatch: Colors.primaries[config.accent],
-            accentColor: Colors.primaries[config.accent],
-            primaryColor: config.darkMode ? Colors.black : Colors.white,
-            primaryColorDark: config.darkMode ? null : Colors.white70,
-            primaryColorLight: config.darkMode ? Colors.black87 : null,
-            primaryColorBrightness:
-                config.darkMode ? Brightness.dark : Brightness.light),
-        home: Homepage());
+    return MaterialApp(title: 'Lilay', home: ThemedUI(child: Homepage()));
   }
 }

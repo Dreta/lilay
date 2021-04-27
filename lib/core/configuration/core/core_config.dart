@@ -44,7 +44,7 @@ class CoreConfig extends ChangeNotifier {
   /// The background image that will be shown.
   ///
   /// We will not manually copy the file - the user must maintain
-  /// it by himself.
+  /// it by themselves.
   String? backgroundImage;
 
   /// Which login type should be the default when the login dialog
@@ -61,8 +61,8 @@ class CoreConfig extends ChangeNotifier {
 
   /// Whether dark mode should be activated for this app.
   ///
-  /// Defaults to false.
-  bool darkMode;
+  /// Defaults to follow system settings.
+  DarkModeType darkMode;
 
   CoreConfig(
       String? workingDirectory,
@@ -70,13 +70,13 @@ class CoreConfig extends ChangeNotifier {
       String? backgroundImage,
       String? preferredLoginType,
       int? accent,
-      bool? darkMode)
+      DarkModeType? darkMode)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft(),
         this.backgroundType = backgroundType ?? BackgroundType.asset,
         this.backgroundImage = backgroundImage,
         this.preferredLoginType = preferredLoginType ?? 'yggdrasil',
         this.accent = accent ?? 5,
-        this.darkMode = darkMode ?? false;
+        this.darkMode = darkMode ?? DarkModeType.system;
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
