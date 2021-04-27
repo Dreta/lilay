@@ -53,7 +53,7 @@ class AccountsProvider extends ChangeNotifier {
 
   Account? getAccountByUUID(String uuid) => _accounts[uuid];
 
-  loadFrom(File file) async {
+  void loadFrom(File file) async {
     if (!await file.exists()) {
       // Do not load for non-existent files, however
       // set the loaded state.
@@ -91,7 +91,7 @@ class AccountsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  saveTo(File file) async {
+  void saveTo(File file) async {
     List<Map<String, dynamic>> json = [];
     for (Account account in accounts) {
       json.add(account.toJson());
@@ -99,12 +99,12 @@ class AccountsProvider extends ChangeNotifier {
     await file.writeAsString(jsonEncode({'accounts': json}));
   }
 
-  addAccount(Account account) {
+  void addAccount(Account account) {
     _accounts[account.uuid] = account;
     notifyListeners();
   }
 
-  removeAccount(String uuid) {
+  void removeAccount(String uuid) {
     _accounts.remove(uuid);
     notifyListeners();
   }

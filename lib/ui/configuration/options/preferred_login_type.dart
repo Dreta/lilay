@@ -33,7 +33,7 @@ class _PreferredLoginTypeState extends State<PreferredLoginType> {
   late String _selected;
 
   @override
-  didChangeDependencies() {
+  void didChangeDependencies() {
     super.didChangeDependencies();
     _selected = Provider.of<CoreConfig>(context).preferredLoginType;
   }

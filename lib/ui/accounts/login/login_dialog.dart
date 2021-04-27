@@ -31,7 +31,7 @@ class LoginDialog extends StatefulWidget {
   LoginDialog({required Function(Account) onAddAccount})
       : _addAccount = onAddAccount;
 
-  static display(BuildContext context, Function(Account) onAddAccount) {
+  static void display(BuildContext context, Function(Account) onAddAccount) {
     showAnimatedDialog(
         context: context,
         barrierDismissible: true,
@@ -57,7 +57,7 @@ class _LoginDialogState extends State<LoginDialog> {
   bool _loggingIn = false;
 
   @override
-  didChangeDependencies() {
+  void didChangeDependencies() {
     super.didChangeDependencies();
     _selectedAuthProvider = Provider.of<CoreConfig>(context).preferredLoginType;
   }
@@ -66,7 +66,7 @@ class _LoginDialogState extends State<LoginDialog> {
       : _addAccount = onAddAccount;
 
   @override
-  dispose() {
+  void dispose() {
     super.dispose();
     _username.dispose();
     _password.dispose();
@@ -74,7 +74,7 @@ class _LoginDialogState extends State<LoginDialog> {
   }
 
   /// Log the user in with the input values.
-  _login(AuthProvider selected) {
+  void _login(AuthProvider selected) {
     if (_form.currentState!.validate()) {
       setState(() => _loggingIn = true);
       final String? username =

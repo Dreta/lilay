@@ -39,7 +39,7 @@ import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-main() {
+void main() {
   Logger logger = Logger('Lilay');
   logger.onRecord.listen((record) {
     print('[${record.level.name}] [${record.time}]: ${record.message}');

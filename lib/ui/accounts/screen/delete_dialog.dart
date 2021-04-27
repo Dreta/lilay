@@ -25,7 +25,7 @@ class DeleteDialog extends StatelessWidget {
 
   const DeleteDialog({required this.onConfirm});
 
-  static display(BuildContext context, Function onConfirm) {
+  static void display(BuildContext context, Function onConfirm) {
     showAnimatedDialog(
         context: context,
         barrierDismissible: true,

@@ -35,7 +35,7 @@ import 'package:provider/provider.dart';
 /// consisting of the accounts, the game profiles
 /// and the play button.
 class Homepage extends StatelessWidget {
-  deleteAccount(BuildContext context, Account account) {
+  void deleteAccount(BuildContext context, Account account) {
     final ScreenProvider screen =
         Provider.of<ScreenProvider>(context, listen: false);
     final AccountsProvider accounts =

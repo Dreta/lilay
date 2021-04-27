@@ -30,7 +30,7 @@ class _DarkModeState extends State<DarkMode> {
   late DarkModeType _selected;
 
   @override
-  didChangeDependencies() {
+  void didChangeDependencies() {
     super.didChangeDependencies();
     _selected = Provider.of<CoreConfig>(context).darkMode;
   }

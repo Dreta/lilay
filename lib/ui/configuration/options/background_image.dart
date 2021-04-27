@@ -33,13 +33,13 @@ class _BackgroundImageState extends State<BackgroundImage> {
   final TextEditingController _selected = TextEditingController();
 
   @override
-  didChangeDependencies() {
+  void didChangeDependencies() {
     super.didChangeDependencies();
     _selected.text = Provider.of<CoreConfig>(context).backgroundImage ?? '';
   }
 
   @override
-  dispose() {
+  void dispose() {
     super.dispose();
     _selected.dispose();
   }
