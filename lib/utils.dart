@@ -28,8 +28,7 @@ String getDefaultMinecraft() {
     return '${Platform.environment['APPDATA']}\\.minecraft/';
   } else if (Platform.isMacOS) {
     return '${Platform.environment['HOME']}/Library/Application Support/minecraft/';
-  } else if (Platform.isLinux) {
+  } else {
     return '${Platform.environment['HOME']}/.minecraft/';
   }
-  throw 'Incompatible platform';
 }
