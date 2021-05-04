@@ -67,6 +67,14 @@ class _DownloadSourceState extends State<DownloadSource> {
         decoration: InputDecoration(
             labelText: 'Download Source',
             enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: theme.accentColor))));
+                borderSide: BorderSide(color: theme.accentColor)),
+            suffixIcon: IconButton(
+                onPressed: () async {
+                  config.downloadSource = 'https://launchermeta.mojang.com';
+                  config.save();
+                  _selected.text = 'https://launchermeta.mojang.com';
+                },
+                tooltip: 'Reset',
+                icon: Icon(Icons.refresh, color: theme.errorColor))));
   }
 }
