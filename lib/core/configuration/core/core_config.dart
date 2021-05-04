@@ -64,24 +64,33 @@ class CoreConfig extends ChangeNotifier {
   /// Defaults to follow system settings.
   DarkModeType darkMode;
 
+  /// The source to download all game files from.
+  ///
+  /// Do not include the slash (/) at the end of the URL.
+  /// Defaults to https://launchermeta.mojang.com.
+  String downloadSource;
+
   CoreConfig(
       String? workingDirectory,
       BackgroundType? backgroundType,
       String? backgroundImage,
       String? preferredLoginType,
       int? accent,
-      DarkModeType? darkMode)
+      DarkModeType? darkMode,
+      String? downloadSource)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft(),
         this.backgroundType = backgroundType ?? BackgroundType.asset,
         this.backgroundImage = backgroundImage,
         this.preferredLoginType = preferredLoginType ?? 'yggdrasil',
         this.accent = accent ?? 5,
-        this.darkMode = darkMode ?? DarkModeType.system;
+        this.darkMode = darkMode ?? DarkModeType.system,
+        this.downloadSource =
+            downloadSource ?? 'https://launchermeta.mojang.com';
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
     if (!file.existsSync()) {
-      return CoreConfig(null, null, null, null, null, null);
+      return CoreConfig(null, null, null, null, null, null, null);
     }
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }

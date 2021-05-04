@@ -14,6 +14,7 @@ CoreConfig _$CoreConfigFromJson(Map<String, dynamic> json) {
     json['preferredLoginType'] as String?,
     json['accent'] as int?,
     _$enumDecodeNullable(_$DarkModeTypeEnumMap, json['darkMode']),
+    json['downloadSource'] as String?,
   );
 }
 
@@ -25,6 +26,7 @@ Map<String, dynamic> _$CoreConfigToJson(CoreConfig instance) =>
       'preferredLoginType': instance.preferredLoginType,
       'accent': instance.accent,
       'darkMode': _$DarkModeTypeEnumMap[instance.darkMode],
+      'downloadSource': instance.downloadSource,
     };
 
 K _$enumDecode<K, V>(
