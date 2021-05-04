@@ -37,12 +37,7 @@ class ThemedUI extends StatelessWidget {
         data: ThemeData(
             brightness: darkMode ? Brightness.dark : Brightness.light,
             primarySwatch: Colors.primaries[config.accent],
-            accentColor: Colors.primaries[config.accent],
-            primaryColor: darkMode ? Colors.black : Colors.white,
-            primaryColorDark: darkMode ? null : Colors.white70,
-            primaryColorLight: darkMode ? Colors.black87 : null,
-            primaryColorBrightness:
-                darkMode ? Brightness.dark : Brightness.light),
+            accentColor: Colors.primaries[config.accent]),
         child: child);
   }
 }
