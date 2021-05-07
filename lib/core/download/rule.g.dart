@@ -64,8 +64,8 @@ FeatureSet _$FeatureSetFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$FeatureSetToJson(FeatureSet instance) =>
     <String, dynamic>{
-      'is_demo_user': instance.is_demo_user,
-      'has_custom_resolution': instance.has_custom_resolution,
+      'is_demo_user': instance.isDemoUser,
+      'has_custom_resolution': instance.hasCustomResolution,
     };
 
 OSInfo _$OSInfoFromJson(Map<String, dynamic> json) {

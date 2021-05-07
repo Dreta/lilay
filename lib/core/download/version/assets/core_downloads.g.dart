@@ -18,7 +18,7 @@ CoreDownloads _$CoreDownloadsFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$CoreDownloadsToJson(CoreDownloads instance) =>
     <String, dynamic>{
       'client': instance.client.toJson(),
-      'client_mappings': instance.client_mappings.toJson(),
+      'client_mappings': instance.clientMappings.toJson(),
       'server': instance.server.toJson(),
-      'server_mappings': instance.server_mappings.toJson(),
+      'server_mappings': instance.serverMappings.toJson(),
     };

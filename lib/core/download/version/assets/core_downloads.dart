@@ -24,25 +24,18 @@ part 'core_downloads.g.dart';
 @JsonSerializable(explicitToJson: true)
 class CoreDownloads {
   FriendlyDownload client;
-
-  // ignore: non_constant_identifier_names
-  FriendlyDownload client_mappings;
+  @JsonKey(name: 'client_mappings')
+  FriendlyDownload clientMappings;
   FriendlyDownload server;
+  @JsonKey(name: 'server_mappings')
+  FriendlyDownload serverMappings;
 
-  // ignore: non_constant_identifier_names
-  FriendlyDownload server_mappings;
-
-  CoreDownloads(
-      FriendlyDownload client,
-      // ignore: non_constant_identifier_names
-      FriendlyDownload client_mappings,
-      FriendlyDownload server,
-      // ignore: non_constant_identifier_names
-      FriendlyDownload server_mappings)
+  CoreDownloads(FriendlyDownload client, FriendlyDownload clientMappings,
+      FriendlyDownload server, FriendlyDownload serverMappings)
       : this.client = client,
-        this.client_mappings = client_mappings,
+        this.clientMappings = clientMappings,
         this.server = server,
-        this.server_mappings = server_mappings;
+        this.serverMappings = serverMappings;
 
   Map<String, dynamic> toJson() => _$CoreDownloadsToJson(this);
 

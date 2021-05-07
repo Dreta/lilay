@@ -49,20 +49,19 @@ class Rule {
 
 @JsonSerializable(explicitToJson: true)
 class FeatureSet {
-  // ignore: non_constant_identifier_names
-  bool? is_demo_user;
+  @JsonKey(name: 'is_demo_user')
+  bool? isDemoUser;
 
-  // ignore: non_constant_identifier_names
-  bool? has_custom_resolution;
+  @JsonKey(name: 'has_custom_resolution')
+  bool? hasCustomResolution;
 
-  // ignore: non_constant_identifier_names
-  FeatureSet(bool? is_demo_user, bool? has_custom_resolution)
-      : this.is_demo_user = is_demo_user,
-        this.has_custom_resolution = has_custom_resolution;
+  FeatureSet(bool? isDemoUser, bool? hasCustomResolution)
+      : this.isDemoUser = isDemoUser,
+        this.hasCustomResolution = hasCustomResolution;
 
   bool applicable(Account account) {
-    if (is_demo_user != null && !is_demo_user! && account.paid) {
-      // If is_demo_user is false and account is paid
+    if (isDemoUser != null && !isDemoUser! && account.paid) {
+      // If isDemoUser is false and account is paid
       return false;
     }
     // TODO Check for custom resolution within game profiles here
