@@ -17,6 +17,8 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:lilay/core/download/version/assets/assets_index.dart';
+import 'package:lilay/core/download/version/assets/core_downloads.dart';
 
 import 'arguments/arguments_data.dart';
 
@@ -25,8 +27,20 @@ part 'version_data.g.dart';
 @JsonSerializable(explicitToJson: true)
 class VersionData {
   ArgumentsData arguments;
+  AssetsIndex assetsIndex;
+  String assets;
+  int complianceLevel;
+  CoreDownloads downloads;
+  String id;
 
-  VersionData(ArgumentsData arguments) : this.arguments = arguments;
+  VersionData(ArgumentsData arguments, AssetsIndex assetsIndex, String assets,
+      int complianceLevel, CoreDownloads downloads, String id)
+      : this.arguments = arguments,
+        this.assetsIndex = assetsIndex,
+        this.assets = assets,
+        this.complianceLevel = complianceLevel,
+        this.downloads = downloads,
+        this.id = id;
 
   Map<String, dynamic> toJson() => _$VersionDataToJson(this);
 
