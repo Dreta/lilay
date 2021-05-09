@@ -19,6 +19,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/download/version/assets/assets_index.dart';
 import 'package:lilay/core/download/version/assets/core_downloads.dart';
+import 'package:lilay/core/download/version/library/library.dart';
 
 import 'arguments/arguments_data.dart';
 
@@ -32,15 +33,23 @@ class VersionData {
   int complianceLevel;
   CoreDownloads downloads;
   String id;
+  List<Library> libraries;
 
-  VersionData(ArgumentsData arguments, AssetsIndex assetsIndex, String assets,
-      int complianceLevel, CoreDownloads downloads, String id)
+  VersionData(
+      ArgumentsData arguments,
+      AssetsIndex assetsIndex,
+      String assets,
+      int complianceLevel,
+      CoreDownloads downloads,
+      String id,
+      List<Library> libraries)
       : this.arguments = arguments,
         this.assetsIndex = assetsIndex,
         this.assets = assets,
         this.complianceLevel = complianceLevel,
         this.downloads = downloads,
-        this.id = id;
+        this.id = id,
+        this.libraries = libraries;
 
   Map<String, dynamic> toJson() => _$VersionDataToJson(this);
 

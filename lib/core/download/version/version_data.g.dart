@@ -14,6 +14,9 @@ VersionData _$VersionDataFromJson(Map<String, dynamic> json) {
     json['complianceLevel'] as int,
     CoreDownloads.fromJson(json['downloads'] as Map<String, dynamic>),
     json['id'] as String,
+    (json['libraries'] as List<dynamic>)
+        .map((e) => Library.fromJson(e as Map<String, dynamic>))
+        .toList(),
   );
 }
 
@@ -25,4 +28,5 @@ Map<String, dynamic> _$VersionDataToJson(VersionData instance) =>
       'complianceLevel': instance.complianceLevel,
       'downloads': instance.downloads.toJson(),
       'id': instance.id,
+      'libraries': instance.libraries.map((e) => e.toJson()).toList(),
     };
