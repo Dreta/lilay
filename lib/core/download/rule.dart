@@ -20,6 +20,7 @@ import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/utils.dart';
 import 'package:system_info/system_info.dart';
 
 part 'rule.g.dart';
@@ -87,9 +88,7 @@ class OSInfo {
 
   bool applicable() {
     // Check for OS name applicability
-    bool nameApplicable = (name == 'linux' && Platform.isLinux) ||
-        (name == 'osx' && Platform.isMacOS) ||
-        (name == 'windows' && Platform.isWindows);
+    bool nameApplicable = name == getOSName();
 
     // Check for architecture compatibility
     bool architectureCompatible = true;

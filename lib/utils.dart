@@ -22,7 +22,7 @@ import 'dart:io';
 String dashifyUUID(String uuid) =>
     '${uuid.substring(0, 8)}-${uuid.substring(8, 12)}-${uuid.substring(12, 16)}-${uuid.substring(16, 20)}-${uuid.substring(20)}';
 
-// Get the default platform-dependent .minecraft directory location.
+/// Get the default platform-dependent .minecraft directory location.
 String getDefaultMinecraft() {
   if (Platform.isWindows) {
     return '${Platform.environment['APPDATA']}\\.minecraft/';
@@ -31,4 +31,20 @@ String getDefaultMinecraft() {
   } else {
     return '${Platform.environment['HOME']}/.minecraft/';
   }
+}
+
+/// Get the operating system name, in Minecraft's fashion.
+///
+/// Windows: windows
+/// macOS: osx
+/// Linux: linux
+String getOSName() {
+  if (Platform.isWindows) {
+    return 'windows';
+  } else if (Platform.isMacOS) {
+    return 'osx';
+  } else if (Platform.isLinux) {
+    return 'linux';
+  }
+  throw 'Unsupported operating system';
 }
