@@ -36,6 +36,27 @@ class Rule {
         this.features = features,
         this.os = os;
 
+  static bool multiRulesApplicable(List<Rule> rules, Account account) {
+    bool applicability = rules.isEmpty;
+
+    for (Rule rule in rules) {
+      if (rule.action == RuleAction.allow) {
+        if (rule.applicable(account)) {
+          applicability = true;
+        } else {
+          return false;
+        }
+      } else {
+        if (rule.applicable(account)) {
+          return false;
+        }
+        applicability = true;
+      }
+    }
+
+    return applicability;
+  }
+
   applicable(Account account) {
     bool featuresCompatible =
         features != null ? features!.applicable(account) : true;
