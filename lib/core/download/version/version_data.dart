@@ -20,6 +20,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/download/version/assets/assets_index.dart';
 import 'package:lilay/core/download/version/assets/core_downloads.dart';
 import 'package:lilay/core/download/version/library/library.dart';
+import 'package:lilay/core/download/versions/version_info.dart';
 
 import 'arguments/arguments_data.dart';
 
@@ -35,6 +36,14 @@ class VersionData {
   String id;
   List<Library> libraries;
 
+  // TODO support logging
+  String mainClass;
+
+  //int minimumLauncherVersion
+  DateTime releaseTime;
+  DateTime time;
+  VersionType type;
+
   VersionData(
       ArgumentsData arguments,
       AssetsIndex assetsIndex,
@@ -42,14 +51,22 @@ class VersionData {
       int complianceLevel,
       CoreDownloads downloads,
       String id,
-      List<Library> libraries)
+      List<Library> libraries,
+      String mainClass,
+      DateTime releaseTime,
+      DateTime time,
+      VersionType type)
       : this.arguments = arguments,
         this.assetsIndex = assetsIndex,
         this.assets = assets,
         this.complianceLevel = complianceLevel,
         this.downloads = downloads,
         this.id = id,
-        this.libraries = libraries;
+        this.libraries = libraries,
+        this.mainClass = mainClass,
+        this.releaseTime = releaseTime,
+        this.time = time,
+        this.type = type;
 
   Map<String, dynamic> toJson() => _$VersionDataToJson(this);
 
