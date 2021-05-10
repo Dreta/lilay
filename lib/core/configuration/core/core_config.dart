@@ -76,6 +76,12 @@ class CoreConfig extends ChangeNotifier {
   /// Defaults to https://resources.download.minecraft.net.
   String assetsSource;
 
+  /// The source to download game libraries from.
+  ///
+  /// Do not include the slash (/) at the end of the URL.
+  /// Defaults to https://libraries.minecraft.net.
+  String librariesSource;
+
   CoreConfig(
       String? workingDirectory,
       BackgroundType? backgroundType,
@@ -84,7 +90,8 @@ class CoreConfig extends ChangeNotifier {
       int? accent,
       DarkModeType? darkMode,
       String? downloadSource,
-      String? assetsSource)
+      String? assetsSource,
+      String? librariesSource)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft(),
         this.backgroundType = backgroundType ?? BackgroundType.asset,
         this.backgroundImage = backgroundImage,
@@ -94,12 +101,14 @@ class CoreConfig extends ChangeNotifier {
         this.downloadSource =
             downloadSource ?? 'https://launchermeta.mojang.com',
         this.assetsSource =
-            assetsSource ?? 'https://resources.download.minecraft.net';
+            assetsSource ?? 'https://resources.download.minecraft.net',
+        this.librariesSource =
+            librariesSource ?? 'https://libraries.minecraft.net';
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
     if (!file.existsSync()) {
-      return CoreConfig(null, null, null, null, null, null, null, null);
+      return CoreConfig(null, null, null, null, null, null, null, null, null);
     }
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }

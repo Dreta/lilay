@@ -16,6 +16,7 @@ CoreConfig _$CoreConfigFromJson(Map<String, dynamic> json) {
     _$enumDecodeNullable(_$DarkModeTypeEnumMap, json['darkMode']),
     json['downloadSource'] as String?,
     json['assetsSource'] as String?,
+    json['librariesSource'] as String?,
   );
 }
 
@@ -29,6 +30,7 @@ Map<String, dynamic> _$CoreConfigToJson(CoreConfig instance) =>
       'darkMode': _$DarkModeTypeEnumMap[instance.darkMode],
       'downloadSource': instance.downloadSource,
       'assetsSource': instance.assetsSource,
+      'librariesSource': instance.librariesSource,
     };
 
 K _$enumDecode<K, V>(
