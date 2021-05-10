@@ -70,9 +70,9 @@ class _DownloadSourceState extends State<DownloadSource> {
                 borderSide: BorderSide(color: theme.accentColor)),
             suffixIcon: IconButton(
                 onPressed: () async {
-                  config.downloadSource = 'https://launchermeta.mojang.com';
+                  config.downloadSource = CoreConfig.DEFAULT_DOWNLOAD_SOURCE;
                   config.save();
-                  _selected.text = 'https://launchermeta.mojang.com';
+                  _selected.text = CoreConfig.DEFAULT_DOWNLOAD_SOURCE;
                 },
                 tooltip: 'Reset',
                 icon: Icon(Icons.refresh, color: theme.errorColor))));

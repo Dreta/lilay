@@ -70,9 +70,9 @@ class _LibrariesSourceState extends State<LibrariesSource> {
                 borderSide: BorderSide(color: theme.accentColor)),
             suffixIcon: IconButton(
                 onPressed: () async {
-                  config.librariesSource = 'https://libraries.minecraft.net';
+                  config.librariesSource = CoreConfig.DEFAULT_LIBRARIES_SOURCE;
                   config.save();
-                  _selected.text = 'https://libraries.minecraft.net';
+                  _selected.text = CoreConfig.DEFAULT_LIBRARIES_SOURCE;
                 },
                 tooltip: 'Reset',
                 icon: Icon(Icons.refresh, color: theme.errorColor))));

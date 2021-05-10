@@ -32,6 +32,13 @@ class CoreConfig extends ChangeNotifier {
   /// This is where the core config will be loaded from.
   static final File defaultCoreConfig = File('config.json');
 
+  static const String DEFAULT_DOWNLOAD_SOURCE =
+      'https://launchermeta.mojang.com';
+  static const String DEFAULT_ASSETS_SOURCE =
+      'https://resources.download.minecraft.net';
+  static const String DEFAULT_LIBRARIES_SOURCE =
+      'https://libraries.minecraft.net';
+
   /// The working directory of the launcher. Defaults to .minecraft.
   String workingDirectory;
 
@@ -98,12 +105,9 @@ class CoreConfig extends ChangeNotifier {
         this.preferredLoginType = preferredLoginType ?? 'yggdrasil',
         this.accent = accent ?? 5,
         this.darkMode = darkMode ?? DarkModeType.system,
-        this.downloadSource =
-            downloadSource ?? 'https://launchermeta.mojang.com',
-        this.assetsSource =
-            assetsSource ?? 'https://resources.download.minecraft.net',
-        this.librariesSource =
-            librariesSource ?? 'https://libraries.minecraft.net';
+        this.downloadSource = downloadSource ?? DEFAULT_DOWNLOAD_SOURCE,
+        this.assetsSource = assetsSource ?? DEFAULT_ASSETS_SOURCE,
+        this.librariesSource = librariesSource ?? DEFAULT_LIBRARIES_SOURCE;
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
