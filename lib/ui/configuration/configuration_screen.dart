@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lilay/ui/configuration/options/accent.dart';
+import 'package:lilay/ui/configuration/options/assets_source.dart';
 import 'package:lilay/ui/configuration/options/background_image.dart';
 import 'package:lilay/ui/configuration/options/dark_mode.dart';
 import 'package:lilay/ui/configuration/options/download_source.dart';
@@ -34,6 +35,7 @@ class ConfigurationScreen extends StatelessWidget {
       PreferredLoginType(),
       DarkMode(),
       DownloadSource(),
+      AssetsSource(),
       Padding(padding: EdgeInsets.only(top: 12), child: AccentColor())
     ]);
   }
