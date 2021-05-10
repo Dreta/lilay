@@ -57,11 +57,11 @@ class _AssetsSourceState extends State<AssetsSource> {
             return;
           }
 
-          config.downloadSource = // Remove the slash from the end of the URL
+          config.assetsSource = // Remove the slash from the end of the URL
               _selected.text.endsWith('/')
                   ? _selected.text.substring(0, _selected.text.length - 1)
                   : _selected.text;
-          _selected.text = config.downloadSource;
+          _selected.text = config.assetsSource;
           config.save();
         },
         decoration: InputDecoration(
@@ -70,7 +70,7 @@ class _AssetsSourceState extends State<AssetsSource> {
                 borderSide: BorderSide(color: theme.accentColor)),
             suffixIcon: IconButton(
                 onPressed: () async {
-                  config.downloadSource =
+                  config.assetsSource =
                       'https://resources.download.minecraft.net';
                   config.save();
                   _selected.text = 'https://resources.download.minecraft.net';
