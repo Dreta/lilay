@@ -51,15 +51,6 @@ class _AccountsSectionState extends State<AccountsSection> {
           child: Divider(height: 1, thickness: 1, color: theme.dividerColor))
     ];
 
-    if (accounts.loadingStatus == LoadingStatus.failed) {
-      widgets.add(ListTile(
-        leading: Icon(Icons.error, color: theme.errorColor),
-        title:
-            Text('Failed to load', style: TextStyle(color: theme.errorColor)),
-        minLeadingWidth: 20,
-      ));
-    }
-
     if (accounts.loadingStatus == LoadingStatus.loading) {
       widgets.add(Padding(
           padding: EdgeInsets.only(left: 4),
@@ -70,7 +61,8 @@ class _AccountsSectionState extends State<AccountsSection> {
                   child: CircularProgressIndicator(strokeWidth: 2)),
               title: Text('Loading'),
               minLeadingWidth: 17)));
-    } else if (accounts.loadingStatus == LoadingStatus.loaded) {
+    } else if (accounts.loadingStatus == LoadingStatus.loaded ||
+        accounts.loadingStatus == LoadingStatus.failed) {
       if (accounts.selectedAccount != null) {
         widgets.add(AccountWidget(
             account: accounts.selectedAccount!, openScreen: true));
