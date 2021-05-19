@@ -31,7 +31,7 @@ import 'version_data.dart';
 /// This is a SHALLOW download. The associated assets, client, libraries etc.
 /// are NOT downloaded within this task.
 class VersionDownloadTask {
-  static const String VERSION_PATH = "versions/{version}/{version}.json";
+  static const String VERSION_PATH = 'versions/{version}/{version}.json';
 
   Function(double) progressCallback;
   Function(String) errorCallback;
