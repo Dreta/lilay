@@ -83,7 +83,7 @@ class AssetsIndexDownloadTask {
       }
       receivedBytes.addAll(chunk);
 
-      if (received >= chunk.length) {
+      if (received >= resp.contentLength!) {
         String json = utf8.decode(receivedBytes);
         Map<String, dynamic> assetsJson = jsonDecode(json)['objects'];
         Map<String, Asset> assets = {};

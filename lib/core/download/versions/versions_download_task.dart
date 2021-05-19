@@ -61,7 +61,7 @@ class VersionsDownloadTask {
       }
       receivedBytes.addAll(chunk);
 
-      if (received >= chunk.length) {
+      if (received >= resp.contentLength!) {
         // We're done!
         String json = utf8.decode(receivedBytes);
         VersionManifest manifest = VersionManifest.fromJson(jsonDecode(json));

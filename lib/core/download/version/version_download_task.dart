@@ -75,7 +75,7 @@ class VersionDownloadTask {
       }
       receivedBytes.addAll(chunk);
 
-      if (received >= chunk.length) {
+      if (received >= resp.contentLength!) {
         String json = utf8.decode(receivedBytes);
         VersionData data = VersionData.fromJson(jsonDecode(json));
 
