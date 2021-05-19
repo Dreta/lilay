@@ -20,7 +20,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
 
 class VersionsDownloadTask {
@@ -64,9 +63,7 @@ class VersionsDownloadTask {
 
       if (received >= chunk.length) {
         // We're done!
-        String json = utf8
-            .decode(receivedBytes)
-            .replaceAll(CoreConfig.DEFAULT_DOWNLOAD_SOURCE, source);
+        String json = utf8.decode(receivedBytes);
         VersionManifest manifest = VersionManifest.fromJson(jsonDecode(json));
 
         // Cache the version manifest locally
