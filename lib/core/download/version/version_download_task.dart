@@ -26,7 +26,7 @@ import 'package:lilay/core/download/versions/version_info.dart';
 import 'version_data.dart';
 
 /// Download the metadata JSON file of the [version]. The downloaded file
-/// will automatically be saved.
+/// will be saved automatically.
 ///
 /// This is a SHALLOW download. The associated assets, client, libraries etc.
 /// are NOT downloaded within this task.
