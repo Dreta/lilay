@@ -18,6 +18,7 @@
 
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/download/version/assets/asset.dart';
 
@@ -69,6 +70,17 @@ class AssetsDownloadTask {
       receivedBytes.addAll(chunk);
 
       if (localReceived >= resp.contentLength!) {
+        if (sha1.convert(receivedBytes).toString().toLowerCase() !=
+            it.current.hash.toLowerCase()) {
+          errorCallback('File ${it.current.hash}\'s checksum is invalid.');
+          return;
+        }
+
+        if (receivedBytes.length != it.current.size) {
+          errorCallback('File ${it.current.hash}\'s size is incorrect.');
+          return;
+        }
+
         File('$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', it.current.hash.substring(0, 2)).replaceAll('{hash2}', it.current.hash)}')
             .writeAsBytes(receivedBytes);
       }
