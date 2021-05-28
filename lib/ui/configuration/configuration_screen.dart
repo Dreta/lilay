@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:lilay/ui/configuration/options/accent.dart';
 import 'package:lilay/ui/configuration/options/assets_source.dart';
 import 'package:lilay/ui/configuration/options/background_image.dart';
+import 'package:lilay/ui/configuration/options/core_source.dart';
 import 'package:lilay/ui/configuration/options/dark_mode.dart';
 import 'package:lilay/ui/configuration/options/download_source.dart';
 import 'package:lilay/ui/configuration/options/libraries_source.dart';
@@ -35,6 +36,7 @@ class ConfigurationScreen extends StatelessWidget {
       BackgroundImage(),
       PreferredLoginType(),
       DarkMode(),
+      CoreSource(),
       DownloadSource(),
       AssetsSource(),
       LibrariesSource(),
