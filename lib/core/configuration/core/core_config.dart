@@ -32,8 +32,7 @@ class CoreConfig extends ChangeNotifier {
   /// This is where the core config will be loaded from.
   static final File defaultCoreConfig = File('config.json');
 
-  static const String DEFAULT_DOWNLOAD_SOURCE =
-      'https://launchermeta.mojang.com';
+  static const String DEFAULT_META_SOURCE = 'https://launchermeta.mojang.com';
   static const String DEFAULT_ASSETS_SOURCE =
       'https://resources.download.minecraft.net';
   static const String DEFAULT_LIBRARIES_SOURCE =
@@ -76,7 +75,7 @@ class CoreConfig extends ChangeNotifier {
   ///
   /// Do not include the slash (/) at the end of the URL.
   /// Defaults to https://launchermeta.mojang.com.
-  String downloadSource;
+  String metaSource;
 
   /// The source to download game assets from.
   ///
@@ -113,7 +112,7 @@ class CoreConfig extends ChangeNotifier {
         this.preferredLoginType = preferredLoginType ?? 'yggdrasil',
         this.accent = accent ?? 5,
         this.darkMode = darkMode ?? DarkModeType.system,
-        this.downloadSource = downloadSource ?? DEFAULT_DOWNLOAD_SOURCE,
+        this.metaSource = downloadSource ?? DEFAULT_META_SOURCE,
         this.assetsSource = assetsSource ?? DEFAULT_ASSETS_SOURCE,
         this.librariesSource = librariesSource ?? DEFAULT_LIBRARIES_SOURCE,
         this.coreSource = coreSource ?? DEFAULT_CORE_SOURCE;

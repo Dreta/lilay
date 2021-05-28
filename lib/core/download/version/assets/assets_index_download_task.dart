@@ -66,7 +66,7 @@ class AssetsIndexDownloadTask {
     Request request = Request(
         'GET',
         Uri.parse(version.assetsIndex.url
-            .replaceAll(CoreConfig.DEFAULT_DOWNLOAD_SOURCE, source)));
+            .replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     StreamedResponse resp = await request.send();

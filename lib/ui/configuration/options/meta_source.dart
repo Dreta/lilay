@@ -20,18 +20,18 @@ import 'package:flutter/material.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:provider/provider.dart';
 
-class DownloadSource extends StatefulWidget {
+class MetaSource extends StatefulWidget {
   @override
-  _DownloadSourceState createState() => _DownloadSourceState();
+  _MetaSourceState createState() => _MetaSourceState();
 }
 
-class _DownloadSourceState extends State<DownloadSource> {
+class _MetaSourceState extends State<MetaSource> {
   final TextEditingController _selected = TextEditingController();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _selected.text = Provider.of<CoreConfig>(context).downloadSource;
+    _selected.text = Provider.of<CoreConfig>(context).metaSource;
   }
 
   @override
@@ -57,22 +57,22 @@ class _DownloadSourceState extends State<DownloadSource> {
             return;
           }
 
-          config.downloadSource = // Remove the slash from the end of the URL
+          config.metaSource = // Remove the slash from the end of the URL
               _selected.text.endsWith('/')
                   ? _selected.text.substring(0, _selected.text.length - 1)
                   : _selected.text;
-          _selected.text = config.downloadSource;
+          _selected.text = config.metaSource;
           config.save();
         },
         decoration: InputDecoration(
-            labelText: 'Download Source',
+            labelText: 'Meta Source',
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: theme.accentColor)),
             suffixIcon: IconButton(
                 onPressed: () async {
-                  config.downloadSource = CoreConfig.DEFAULT_DOWNLOAD_SOURCE;
+                  config.metaSource = CoreConfig.DEFAULT_META_SOURCE;
                   config.save();
-                  _selected.text = CoreConfig.DEFAULT_DOWNLOAD_SOURCE;
+                  _selected.text = CoreConfig.DEFAULT_META_SOURCE;
                 },
                 tooltip: 'Reset',
                 icon: Icon(Icons.refresh, color: theme.errorColor))));

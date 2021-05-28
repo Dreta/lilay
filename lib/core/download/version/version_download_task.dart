@@ -57,8 +57,8 @@ class VersionDownloadTask {
   void start(String source) async {
     Request request = Request(
         'GET',
-        Uri.parse(version.url
-            .replaceAll(CoreConfig.DEFAULT_DOWNLOAD_SOURCE, source)));
+        Uri.parse(
+            version.url.replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     StreamedResponse resp = await request.send();

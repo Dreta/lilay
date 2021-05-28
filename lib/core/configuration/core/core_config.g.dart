@@ -29,7 +29,7 @@ Map<String, dynamic> _$CoreConfigToJson(CoreConfig instance) =>
       'preferredLoginType': instance.preferredLoginType,
       'accent': instance.accent,
       'darkMode': _$DarkModeTypeEnumMap[instance.darkMode],
-      'downloadSource': instance.downloadSource,
+      'downloadSource': instance.metaSource,
       'assetsSource': instance.assetsSource,
       'librariesSource': instance.librariesSource,
       'coreSource': instance.coreSource,
