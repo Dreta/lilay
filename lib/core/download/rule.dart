@@ -43,14 +43,11 @@ class Rule {
       if (rule.action == RuleAction.allow) {
         if (rule.applicable(account)) {
           applicability = true;
-        } else {
-          return false;
         }
       } else {
         if (rule.applicable(account)) {
           return false;
         }
-        applicability = true;
       }
     }
 
