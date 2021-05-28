@@ -17,6 +17,7 @@ CoreConfig _$CoreConfigFromJson(Map<String, dynamic> json) {
     json['downloadSource'] as String?,
     json['assetsSource'] as String?,
     json['librariesSource'] as String?,
+    json['coreSource'] as String?,
   );
 }
 
@@ -31,6 +32,7 @@ Map<String, dynamic> _$CoreConfigToJson(CoreConfig instance) =>
       'downloadSource': instance.downloadSource,
       'assetsSource': instance.assetsSource,
       'librariesSource': instance.librariesSource,
+      'coreSource': instance.coreSource,
     };
 
 K _$enumDecode<K, V>(

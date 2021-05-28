@@ -38,6 +38,7 @@ class CoreConfig extends ChangeNotifier {
       'https://resources.download.minecraft.net';
   static const String DEFAULT_LIBRARIES_SOURCE =
       'https://libraries.minecraft.net';
+  static const String DEFAULT_CORE_SOURCE = 'https://launcher.mojang.com';
 
   /// The working directory of the launcher. Defaults to .minecraft.
   String workingDirectory;
@@ -89,6 +90,12 @@ class CoreConfig extends ChangeNotifier {
   /// Defaults to https://libraries.minecraft.net.
   String librariesSource;
 
+  /// The source to download the core game from.
+  ///
+  /// Do not include the slash (/) at the end of the URL.
+  /// Defaults to https://launcher.mojang.com.
+  String coreSource;
+
   CoreConfig(
       String? workingDirectory,
       BackgroundType? backgroundType,
@@ -98,7 +105,8 @@ class CoreConfig extends ChangeNotifier {
       DarkModeType? darkMode,
       String? downloadSource,
       String? assetsSource,
-      String? librariesSource)
+      String? librariesSource,
+      String? coreSource)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft(),
         this.backgroundType = backgroundType ?? BackgroundType.asset,
         this.backgroundImage = backgroundImage,
@@ -107,12 +115,14 @@ class CoreConfig extends ChangeNotifier {
         this.darkMode = darkMode ?? DarkModeType.system,
         this.downloadSource = downloadSource ?? DEFAULT_DOWNLOAD_SOURCE,
         this.assetsSource = assetsSource ?? DEFAULT_ASSETS_SOURCE,
-        this.librariesSource = librariesSource ?? DEFAULT_LIBRARIES_SOURCE;
+        this.librariesSource = librariesSource ?? DEFAULT_LIBRARIES_SOURCE,
+        this.coreSource = coreSource ?? DEFAULT_CORE_SOURCE;
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
     if (!file.existsSync()) {
-      return CoreConfig(null, null, null, null, null, null, null, null, null);
+      return CoreConfig(
+          null, null, null, null, null, null, null, null, null, null);
     }
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }
