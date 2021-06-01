@@ -36,6 +36,7 @@ import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/app.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
+import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -72,8 +73,15 @@ void main() {
   GetIt.I.registerSingleton<File>(File('accounts.json'),
       instanceName: 'accountsDB');
 
-  final AccountsProvider provider = AccountsProvider();
-  provider.loadFrom(GetIt.I.get<File>(instanceName: 'accountsDB'));
+  final AccountsProvider accounts = AccountsProvider();
+  accounts.loadFrom(GetIt.I.get<File>(instanceName: 'accountsDB'));
+
+  logger.info('Loading profiles.');
+  GetIt.I.registerSingleton<File>(File('profiles.json'),
+      instanceName: 'profilesDB');
+
+  final ProfilesProvider profiles = ProfilesProvider();
+  profiles.loadFrom(GetIt.I.get<File>(instanceName: 'profilesDB'));
 
   logger.info('Loading configuration.');
   final CoreConfig coreConfig =
@@ -81,7 +89,8 @@ void main() {
 
   logger.info('Starting app.');
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider.value(value: provider),
+    ChangeNotifierProvider.value(value: accounts),
+    ChangeNotifierProvider.value(value: profiles),
     ChangeNotifierProvider.value(value: ScreenProvider()),
     ChangeNotifierProvider.value(value: coreConfig)
   ], child: App()));
