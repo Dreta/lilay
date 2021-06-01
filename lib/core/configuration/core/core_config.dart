@@ -102,7 +102,7 @@ class CoreConfig extends ChangeNotifier {
       String? preferredLoginType,
       int? accent,
       DarkModeType? darkMode,
-      String? downloadSource,
+      String? metaSource,
       String? assetsSource,
       String? librariesSource,
       String? coreSource)
@@ -112,7 +112,7 @@ class CoreConfig extends ChangeNotifier {
         this.preferredLoginType = preferredLoginType ?? 'yggdrasil',
         this.accent = accent ?? 5,
         this.darkMode = darkMode ?? DarkModeType.system,
-        this.metaSource = downloadSource ?? DEFAULT_META_SOURCE,
+        this.metaSource = metaSource ?? DEFAULT_META_SOURCE,
         this.assetsSource = assetsSource ?? DEFAULT_ASSETS_SOURCE,
         this.librariesSource = librariesSource ?? DEFAULT_LIBRARIES_SOURCE,
         this.coreSource = coreSource ?? DEFAULT_CORE_SOURCE;
