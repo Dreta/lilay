@@ -26,9 +26,9 @@ part 'lib_download_info.g.dart';
 @JsonSerializable(explicitToJson: true)
 class LibDownloadInfo {
   FriendlyDownload artifact;
-  ClassifiersDownload classifiers;
+  ClassifiersDownload? classifiers;
 
-  LibDownloadInfo(FriendlyDownload artifact, ClassifiersDownload classifiers)
+  LibDownloadInfo(FriendlyDownload artifact, ClassifiersDownload? classifiers)
       : this.artifact = artifact,
         this.classifiers = classifiers;
 
