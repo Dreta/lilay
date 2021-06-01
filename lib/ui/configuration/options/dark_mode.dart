@@ -44,7 +44,7 @@ class _DarkModeState extends State<DarkMode> {
       Expanded(
           child: DropdownButtonFormField(
               decoration: InputDecoration(
-                  labelText: 'Dark Mode',
+                  labelText: 'Appearance',
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: theme.accentColor))),
               value: _selected,
