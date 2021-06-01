@@ -22,7 +22,7 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/download/version/assets/asset.dart';
 
-/// Download all assets from the specified [assetsIndex]. The downloaded files
+/// Download all [assets]. The downloaded files
 /// will be saved automatically.
 class AssetsDownloadTask {
   static const String ASSET_PATH = 'assets/objects/{hash1}/{hash2}';
