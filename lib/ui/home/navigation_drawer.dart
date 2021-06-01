@@ -22,7 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
 import 'package:lilay/ui/configuration/configuration_section.dart';
-import 'package:lilay/ui/home/profile.dart';
+import 'package:lilay/ui/profiles/profiles_section.dart';
 import 'package:provider/provider.dart';
 
 /// This is the navigation drawer always shown in Lilay.
@@ -49,23 +49,9 @@ class NavigationDrawer extends StatelessWidget {
                       Divider(
                           height: 1, thickness: 1, color: theme.dividerColor),
 
-                      // Accounts
+                      // Sections
                       AccountsSection(),
-
-                      // Profiles
-                      Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16, right: 16, top: 16, bottom: 5),
-                          child: Text('PROFILES', style: textTheme.subtitle2)),
-                      Padding(
-                          padding: const EdgeInsets.only(left: 16, right: 16),
-                          child: Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: theme.dividerColor)),
-                      Profile(name: 'Fabric 1.16.5', modded: true),
-                      Profile(name: 'Vanilla 1.16.5'),
-
+                      ProfilesSection(),
                       ConfigurationSection(),
 
                       if (accounts.loadingStatus == LoadingStatus.failed)

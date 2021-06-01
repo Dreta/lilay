@@ -17,24 +17,23 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:lilay/core/profile/profile.dart';
 
 /// This widget represents a game profile in Lilay.
-class Profile extends StatelessWidget {
-  final String name;
-  final bool modded;
+class ProfileWidget extends StatelessWidget {
+  final Profile profile;
+  final bool openScreen;
 
-  const Profile({
-    required this.name,
-    this.modded = false,
-  });
+  const ProfileWidget({required this.profile, required this.openScreen});
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return ListTile(
-        leading: Icon(modded ? Icons.hardware : Icons.sports_esports,
-            color: theme.accentColor),
-        title: Text(name),
+        leading: Icon(Icons.sports_esports, color: theme.accentColor),
+        trailing: openScreen ? Icon(Icons.menu) : null,
+        title: Text(profile.name),
+        subtitle: Text(profile.version),
         minLeadingWidth: 20);
   }
 }
