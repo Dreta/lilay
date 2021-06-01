@@ -62,15 +62,22 @@ class Homepage extends StatelessWidget {
   Widget build(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
+    ImageProvider background;
+    if (config.backgroundType == BackgroundType.custom) {
+      File file = File(config.backgroundImage!);
+      if (!file.existsSync()) {
+        background = AssetImage('assets/background.png');
+      } else {
+        background = FileImage(file);
+      }
+    } else {
+      background = AssetImage('assets/background.png');
+    }
+
     return Scaffold(
         body: Container(
             decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: (config.backgroundType == BackgroundType.asset
-                            ? AssetImage('assets/background.png')
-                            : FileImage(File(config.backgroundImage!)))
-                        as ImageProvider,
-                    fit: BoxFit.cover)),
+                image: DecorationImage(image: background, fit: BoxFit.cover)),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               NavigationDrawer(),
               Expanded(
