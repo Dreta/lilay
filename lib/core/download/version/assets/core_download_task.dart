@@ -56,7 +56,7 @@ class CoreDownloadTask {
         (await file.length() == version.downloads.client.size);
   }
 
-  /// Start downloading the client from the download source [source].
+  /// Start to download the client from the download source [source].
   void start(String source) async {
     Request request = Request(
         'GET',

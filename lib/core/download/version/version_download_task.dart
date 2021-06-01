@@ -53,7 +53,7 @@ class VersionDownloadTask {
         .exists();
   }
 
-  /// Start downloading the version metadata from the download source [source].
+  /// Start to download the version metadata from the download source [source].
   void start(String source) async {
     Request request = Request(
         'GET',

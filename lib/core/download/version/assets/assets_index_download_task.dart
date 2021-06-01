@@ -61,7 +61,7 @@ class AssetsIndexDownloadTask {
         (await file.length() == version.assetsIndex.size);
   }
 
-  /// Start downloading the assets index from the download source [source].
+  /// Start to download the assets index from the download source [source].
   void start(String source) async {
     Request request = Request(
         'GET',

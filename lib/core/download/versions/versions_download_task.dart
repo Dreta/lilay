@@ -41,7 +41,7 @@ class VersionsDownloadTask {
     return File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH').exists();
   }
 
-  /// Start downloading the version manifest from the download source [source].
+  /// Start to download the version manifest from the download source [source].
   void start(String source) async {
     Request request =
         Request('GET', Uri.parse(source + VersionManifest.LOCATION));

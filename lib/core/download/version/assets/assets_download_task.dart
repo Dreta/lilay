@@ -44,7 +44,7 @@ class AssetsDownloadTask {
       required this.assets,
       required this.workingDir});
 
-  /// Start downloading the version metadata from the download source [source].
+  /// Start to download the assets from the [source].
   void start(String source) async {
     Iterator<Asset> it = assets.iterator;
     it.moveNext();
