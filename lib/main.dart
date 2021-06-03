@@ -37,10 +37,11 @@ import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/app.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
+import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   Logger logger = Logger('Lilay');
   logger.onRecord.listen((record) {
     print('[${record.level.name}] [${record.time}]: ${record.message}');
@@ -86,6 +87,10 @@ void main() {
   logger.info('Loading configuration.');
   final CoreConfig coreConfig =
       CoreConfig.fromFile(CoreConfig.defaultCoreConfig);
+
+  logger.info('Detecting Java installation.');
+  String java = await detectJavaInstallation();
+  GetIt.I.registerSingleton<String>(java, instanceName: 'java');
 
   logger.info('Starting app.');
   runApp(MultiProvider(providers: [

@@ -19,6 +19,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
 import 'package:lilay/ui/configuration/configuration_section.dart';
@@ -62,6 +63,19 @@ class NavigationDrawer extends StatelessWidget {
                                   leading: Icon(Icons.error,
                                       color: theme.errorColor),
                                   title: Text('Failed to load',
+                                      style:
+                                          TextStyle(color: theme.errorColor)),
+                                  minLeadingWidth: 20,
+                                ))),
+                      if (GetIt.I.get<String>(instanceName: 'java') ==
+                          '') // FIXME Incorrect alignment
+                        Expanded(
+                            child: Align(
+                                alignment: Alignment.bottomLeft,
+                                child: ListTile(
+                                  leading: Icon(Icons.error,
+                                      color: theme.errorColor),
+                                  title: Text('Java not found',
                                       style:
                                           TextStyle(color: theme.errorColor)),
                                   minLeadingWidth: 20,
