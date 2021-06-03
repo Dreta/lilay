@@ -51,7 +51,9 @@ String getOSName() {
 
 /// Detect the path of the installed Java based on the
 /// operating system.
-Future<String?> detectJavaInstallation() async {
+///
+/// Returns an empty string if Java is unavailable.
+Future<String> detectJavaInstallation() async {
   if (Platform.environment.containsKey('JAVA_HOME')) {
     // Use the JAVA_HOME environment variable when available.
     String javaHome = Platform.environment['JAVA_HOME']!;
@@ -69,7 +71,7 @@ Future<String?> detectJavaInstallation() async {
   if (Platform.isLinux) {
     ProcessResult result = await Process.run('which', ['java']);
     if (result.exitCode == 0) return result.stdout.toString().trim();
-    return null;
+    return '';
   } else if (Platform.isMacOS) {
     ProcessResult result = await Process.run('/usr/libexec/java_home', []);
     if (result.exitCode == 0 &&
@@ -80,12 +82,12 @@ Future<String?> detectJavaInstallation() async {
       }
       return '$path${Platform.pathSeparator}bin${Platform.pathSeparator}java';
     }
-    return null;
+    return '';
   } else if (Platform.isWindows) {
     // Need testing
     ProcessResult result = await Process.run('where', ['java']);
     if (result.exitCode == 0) return result.stdout.toString().trim();
-    return null;
+    return '';
   }
-  return null;
+  return '';
 }
