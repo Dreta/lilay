@@ -48,3 +48,44 @@ String getOSName() {
   }
   throw 'Unsupported operating system';
 }
+
+/// Detect the path of the installed Java based on the
+/// operating system.
+Future<String?> detectJavaInstallation() async {
+  if (Platform.environment.containsKey('JAVA_HOME')) {
+    // Use the JAVA_HOME environment variable when available.
+    String javaHome = Platform.environment['JAVA_HOME']!;
+    File javaExec;
+    if (javaHome.endsWith('/') || javaHome.endsWith('\\')) {
+      javaExec = File(
+          '${javaHome}bin${Platform.pathSeparator}java${Platform.isWindows ? '.exe' : ''}');
+    } else {
+      javaExec = File(
+          '$javaHome${Platform.pathSeparator}bin${Platform.pathSeparator}java${Platform.isWindows ? '.exe' : ''}');
+    }
+    if (await javaExec.exists()) return javaExec.absolute.path;
+  }
+
+  if (Platform.isLinux) {
+    ProcessResult result = await Process.run('which', ['java']);
+    if (result.exitCode == 0) return result.stdout.toString().trim();
+    return null;
+  } else if (Platform.isMacOS) {
+    ProcessResult result = await Process.run('/usr/libexec/java_home', []);
+    if (result.exitCode == 0 &&
+        !result.stdout.toString().contains('Unable') /* Unable to locate */) {
+      String path = result.stdout.toString().trim();
+      if (path.endsWith(Platform.pathSeparator)) {
+        return '${path}bin${Platform.pathSeparator}java';
+      }
+      return '$path${Platform.pathSeparator}bin${Platform.pathSeparator}java';
+    }
+    return null;
+  } else if (Platform.isWindows) {
+    // Need testing
+    ProcessResult result = await Process.run('where', ['java']);
+    if (result.exitCode == 0) return result.stdout.toString().trim();
+    return null;
+  }
+  return null;
+}
