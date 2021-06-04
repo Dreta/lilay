@@ -29,7 +29,7 @@ class CreateDialog extends StatefulWidget {
 }
 
 class _CreateDialogState extends State<CreateDialog> {
-  late String _selectedVersion;
+  late String _selectedVersion = versions.latest.release;
   late VersionManifest versions;
 
   final TextEditingController _name = TextEditingController();
