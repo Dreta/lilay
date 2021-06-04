@@ -18,6 +18,7 @@
 
 import 'dart:io';
 
+import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
@@ -185,7 +186,16 @@ class _CreateDialogState extends State<CreateDialog> {
         decoration: InputDecoration(
             labelText: 'Java Executable',
             enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: theme.accentColor))));
+                borderSide: BorderSide(color: theme.accentColor)),
+            suffixIcon: IconButton(
+                onPressed: () async {
+                  FilePickerCross file =
+                      await FilePickerCross.importFromStorage(
+                          type: FileTypeCross.any);
+                  _javaExec.text = file.path;
+                },
+                tooltip: 'Browse',
+                icon: Icon(Icons.folder))));
   }
 
   /// Create the JVM arguments field
