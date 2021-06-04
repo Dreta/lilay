@@ -24,13 +24,19 @@ import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
 
 class CreateDialog extends StatefulWidget {
+  final VersionManifest versions;
+
+  CreateDialog({required this.versions});
+
   @override
-  _CreateDialogState createState() => _CreateDialogState();
+  _CreateDialogState createState() => _CreateDialogState(versions: versions);
 }
 
 class _CreateDialogState extends State<CreateDialog> {
   late String _selectedVersion = versions.latest.release;
-  late VersionManifest versions;
+  final VersionManifest versions;
+
+  _CreateDialogState({required this.versions});
 
   final TextEditingController _name = TextEditingController();
   final FocusNode _versionFocus = FocusNode();
