@@ -200,7 +200,10 @@ class _CreateDialogState extends State<CreateDialog> {
               for (VersionInfo version in versions.versions
                 ..sort((a, b) => a.releaseTime.compareTo(b.releaseTime))
                 ..reversed)
-                DropdownMenuItem(value: version.id, child: Text(version.id))
+                // Legacy versions are not supported ATM
+                if (version.type == VersionType.release ||
+                    version.type == VersionType.snapshot)
+                  DropdownMenuItem(value: version.id, child: Text(version.id))
             ],
             onChanged: (value) {
               setState(() {
