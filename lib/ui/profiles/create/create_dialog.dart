@@ -22,12 +22,15 @@ import 'dart:io';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/version/version_data.dart';
 import 'package:lilay/core/download/versions/latest_version.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
+import 'package:lilay/core/profile/profile.dart';
+import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
@@ -55,6 +58,7 @@ class _CreateDialogState extends State<CreateDialog> {
   bool loaded = false;
   double? progress = 0;
 
+  final GlobalKey<FormState> _form = GlobalKey();
   final TextEditingController _name = TextEditingController();
   final FocusNode _versionFocus = FocusNode();
   final FocusNode _gameDirFocus = FocusNode();
@@ -69,6 +73,12 @@ class _CreateDialogState extends State<CreateDialog> {
   final TextEditingController _javaExec = TextEditingController();
   final TextEditingController _jvmArgs = TextEditingController();
   final TextEditingController _gameArgs = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _jvmArgs.text = Profile.DEFAULT_JVM_ARGUMENTS;
+  }
 
   @override
   void didChangeDependencies() {
@@ -99,6 +109,7 @@ class _CreateDialogState extends State<CreateDialog> {
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
+    // TODO dispose this task once the dialog is disposed
     final VersionsDownloadTask task = VersionsDownloadTask(
         progressCallback: (progress) =>
             setState(() => this.progress = progress),
@@ -248,7 +259,7 @@ class _CreateDialogState extends State<CreateDialog> {
     return Row(children: [
       Expanded(
           child: Padding(
-              padding: EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.only(right: 16),
               child: TextFormField(
                   cursorColor: theme.textSelectionTheme.cursorColor,
                   focusNode: _resWidthFocus,
@@ -263,7 +274,7 @@ class _CreateDialogState extends State<CreateDialog> {
                   onFieldSubmitted: (value) =>
                       FocusScope.of(context).requestFocus(_resHeightFocus),
                   decoration: InputDecoration(
-                      labelText: 'Width',
+                      labelText: 'Game Width',
                       enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: theme.accentColor)))))),
       Expanded(
@@ -281,7 +292,7 @@ class _CreateDialogState extends State<CreateDialog> {
               onFieldSubmitted: (value) =>
                   FocusScope.of(context).requestFocus(_submitFocus),
               decoration: InputDecoration(
-                  labelText: 'Height',
+                  labelText: 'Game Height',
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: theme.accentColor)))))
     ]);
@@ -368,10 +379,12 @@ class _CreateDialogState extends State<CreateDialog> {
 
   /// Create the submit button
   Widget _buildSubmitButton(BuildContext context) {
+    final ProfilesProvider profiles = Provider.of<ProfilesProvider>(context);
     final ThemeData theme = Theme.of(context);
+
     return Container(
         alignment: AlignmentDirectional.centerEnd,
-        padding: EdgeInsets.fromLTRB(8, 24, 8, 8),
+        padding: const EdgeInsets.fromLTRB(8, 24, 8, 8),
         child: OverflowBar(
             spacing: 8,
             overflowAlignment: OverflowBarAlignment.end,
@@ -379,11 +392,43 @@ class _CreateDialogState extends State<CreateDialog> {
             overflowSpacing: 0,
             children: [
               ElevatedButton(
-                  onPressed: () => {}, // TODO
+                  onPressed: () {
+                    if (_form.currentState!.validate()) {
+                      Profile profile = Profile(
+                          _name.value.text,
+                          _selectedVersion,
+                          _gameDir.value.text.isEmpty
+                              ? null
+                              : _gameDir.value.text,
+                          _resWidth.value.text.isEmpty
+                              ? null
+                              : int.parse(_resWidth.value.text),
+                          _resHeight.value.text.isEmpty
+                              ? null
+                              : int.parse(_resHeight.value.text),
+                          _javaExec.value.text.isEmpty
+                              ? null
+                              : _javaExec.value.text,
+                          _jvmArgs.value.text.isEmpty
+                              ? null
+                              : _jvmArgs.value.text,
+                          _gameArgs.value.text.isEmpty
+                              ? null
+                              : _gameArgs.value.text);
+                      profiles.addProfile(profile);
+                      profiles.saveTo(
+                          GetIt.I.get<File>(instanceName: 'profilesDB'));
+                      if (profiles.profiles.length == 1) {
+                        // Select the newly created profile if we doesn't have any profiles
+                        profiles.selected = profile;
+                      }
+                      Navigator.pop(context);
+                    }
+                  },
                   focusNode: _submitFocus,
                   style: theme.elevatedButtonTheme.style,
                   child: Padding(
-                      padding: EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                           left: 15, right: 15, top: 10, bottom: 10),
                       child: Text('Create')))
             ]));
@@ -392,27 +437,43 @@ class _CreateDialogState extends State<CreateDialog> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final TextTheme textTheme = theme.textTheme;
 
-    return AlertDialog(
-      title: Text('Create a profile'),
-      content: loaded
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                  _buildNameField(context),
-                  _buildVersionDropdown(context),
-                  _buildGameDirectoryField(context),
-                  Padding(
-                      child: _buildResolutionFields(context),
-                      padding: EdgeInsets.only(bottom: 3)),
-                  _buildAdvancedTile(context)
-                ])
-          : Center(
-              child: CircularProgressIndicator(
-                  value: progress, backgroundColor: theme.backgroundColor),
-              heightFactor: 1),
-      actions: [_buildSubmitButton(context)],
-    );
+    return Dialog(
+        child: Container(
+            width: 512,
+            child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 5),
+                          child: Text('Create a profile',
+                              style: textTheme.headline6)),
+                      loaded
+                          ? Form(
+                              key: _form,
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildNameField(context),
+                                    _buildVersionDropdown(context),
+                                    _buildGameDirectoryField(context),
+                                    Padding(
+                                        child: _buildResolutionFields(context),
+                                        padding:
+                                            const EdgeInsets.only(bottom: 3)),
+                                    _buildAdvancedTile(context),
+                                    _buildSubmitButton(context)
+                                  ]))
+                          : Center(
+                              child: CircularProgressIndicator(
+                                  value: progress,
+                                  backgroundColor: theme.backgroundColor),
+                              heightFactor: 9)
+                    ]))));
   }
 }
