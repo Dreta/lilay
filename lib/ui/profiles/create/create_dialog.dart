@@ -245,12 +245,31 @@ class _CreateDialogState extends State<CreateDialog> {
 
     return Expanded(
         child: Row(children: [
-      Padding(
-          padding: EdgeInsets.only(right: 16),
+      Expanded(
+          child: Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: TextFormField(
+                  cursorColor: theme.textSelectionTheme.cursorColor,
+                  focusNode: _resWidthFocus,
+                  controller: _resWidth,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return null;
+                    if (double.tryParse(value) == null) {
+                      return 'Invalid number';
+                    }
+                  },
+                  textInputAction: TextInputAction.next,
+                  onFieldSubmitted: (value) =>
+                      FocusScope.of(context).requestFocus(_resHeightFocus),
+                  decoration: InputDecoration(
+                      labelText: 'Width',
+                      enabledBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: theme.accentColor)))))),
+      Expanded(
           child: TextFormField(
               cursorColor: theme.textSelectionTheme.cursorColor,
-              focusNode: _resWidthFocus,
-              controller: _resWidth,
+              focusNode: _resHeightFocus,
+              controller: _resHeight,
               validator: (value) {
                 if (value == null || value.isEmpty) return null;
                 if (double.tryParse(value) == null) {
@@ -259,28 +278,11 @@ class _CreateDialogState extends State<CreateDialog> {
               },
               textInputAction: TextInputAction.next,
               onFieldSubmitted: (value) =>
-                  FocusScope.of(context).requestFocus(_resHeightFocus),
+                  FocusScope.of(context).requestFocus(_submitFocus),
               decoration: InputDecoration(
-                  labelText: 'Width',
+                  labelText: 'Height',
                   enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: theme.accentColor))))),
-      TextFormField(
-          cursorColor: theme.textSelectionTheme.cursorColor,
-          focusNode: _resHeightFocus,
-          controller: _resHeight,
-          validator: (value) {
-            if (value == null || value.isEmpty) return null;
-            if (double.tryParse(value) == null) {
-              return 'Invalid number';
-            }
-          },
-          textInputAction: TextInputAction.next,
-          onFieldSubmitted: (value) =>
-              FocusScope.of(context).requestFocus(_submitFocus),
-          decoration: InputDecoration(
-              labelText: 'Height',
-              enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: theme.accentColor))))
+                      borderSide: BorderSide(color: theme.accentColor)))))
     ]));
   }
 
