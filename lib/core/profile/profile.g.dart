@@ -16,10 +16,12 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
     json['javaExecutable'] as String?,
     json['jvmArguments'] as String?,
     json['gameArguments'] as String?,
+    json['selected'] as bool?,
   );
 }
 
-Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
+Map<String, dynamic> _$ProfileToJson(Profile instance) =>
+    <String, dynamic>{
       'name': instance.name,
       'version': instance.version,
       'gameDirectory': instance.gameDirectory,
@@ -28,4 +30,5 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'javaExecutable': instance.javaExecutable,
       'jvmArguments': instance.jvmArguments,
       'gameArguments': instance.gameArguments,
+      'selected': instance.selected,
     };
