@@ -64,35 +64,39 @@ class CoreDownloadTask {
             .replaceAll(CoreConfig.DEFAULT_CORE_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
-    StreamedResponse resp = await request.send();
+    try {
+      StreamedResponse resp = await request.send();
 
-    resp.stream.handleError((error) => errorCallback(error.toString()));
+      resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    int received = 0;
-    List<int> receivedBytes = [];
+      int received = 0;
+      List<int> receivedBytes = [];
 
-    resp.stream.listen((chunk) {
-      received += chunk.length;
-      if (resp.contentLength != null) {
-        progressCallback(received / resp.contentLength!);
-      }
-      receivedBytes.addAll(chunk);
-
-      if (received >= resp.contentLength!) {
-        if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-            version.downloads.client.sha1.toLowerCase()) {
-          errorCallback('File ${version.id}.jar\'s checksum is invalid.');
-          return;
+      resp.stream.listen((chunk) {
+        received += chunk.length;
+        if (resp.contentLength != null) {
+          progressCallback(received / resp.contentLength!);
         }
+        receivedBytes.addAll(chunk);
 
-        if (receivedBytes.length != version.downloads.client.size) {
-          errorCallback('File ${version.id}.jar\'s size is incorrect.');
-          return;
+        if (received >= resp.contentLength!) {
+          if (sha1.convert(receivedBytes).toString().toLowerCase() !=
+              version.downloads.client.sha1.toLowerCase()) {
+            errorCallback('File ${version.id}.jar\'s checksum is invalid.');
+            return;
+          }
+
+          if (receivedBytes.length != version.downloads.client.size) {
+            errorCallback('File ${version.id}.jar\'s size is incorrect.');
+            return;
+          }
+
+          File('$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', version.id)}')
+              .writeAsBytes(receivedBytes);
         }
-
-        File('$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', version.id)}')
-            .writeAsBytes(receivedBytes);
-      }
-    });
+      });
+    } catch (e) {
+      errorCallback(e.toString());
+    }
   }
 }

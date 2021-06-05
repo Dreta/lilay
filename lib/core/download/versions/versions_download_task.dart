@@ -47,31 +47,36 @@ class VersionsDownloadTask {
         Request('GET', Uri.parse(source + VersionManifest.LOCATION));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
-    StreamedResponse resp = await request.send();
+    try {
+      StreamedResponse resp = await request.send();
 
-    resp.stream.handleError((error) => errorCallback(error.toString()));
+      resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    int received = 0;
-    List<int> receivedBytes = [];
+      int received = 0;
+      List<int> receivedBytes = [];
 
-    resp.stream.listen((chunk) {
-      received += chunk.length;
-      if (resp.contentLength != null) {
-        progressCallback(received / resp.contentLength!);
-      }
-      receivedBytes.addAll(chunk);
+      resp.stream.listen((chunk) {
+        received += chunk.length;
+        if (resp.contentLength != null) {
+          progressCallback(received / resp.contentLength!);
+        }
+        receivedBytes.addAll(chunk);
 
-      if (received >= resp.contentLength!) {
-        // We're done!
-        String json = utf8.decode(receivedBytes);
-        VersionManifest manifest = VersionManifest.fromJson(jsonDecode(json));
+        if (received >= resp.contentLength!) {
+          // We're done!
+          String json = utf8.decode(receivedBytes);
+          VersionManifest manifest = VersionManifest.fromJson(jsonDecode(json));
 
-        // Cache the version manifest locally
-        File local = File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
-        local.writeAsString(json);
+          // Cache the version manifest locally
+          File local =
+              File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
+          local.writeAsString(json);
 
-        resultCallback(manifest);
-      }
-    });
+          resultCallback(manifest);
+        }
+      });
+    } catch (e) {
+      errorCallback(e.toString());
+    }
   }
 }

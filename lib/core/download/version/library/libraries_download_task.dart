@@ -69,35 +69,40 @@ class LibrariesDownloadTask {
         Uri.parse(lib.downloads.artifact.url
             .replaceAll(CoreConfig.DEFAULT_LIBRARIES_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
-    StreamedResponse resp = await request.send();
-    resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    int localReceived = 0;
-    List<int> receivedBytes = [];
+    try {
+      StreamedResponse resp = await request.send();
+      resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    resp.stream.listen((chunk) {
-      localReceived += chunk.length;
-      receivedBytes.addAll(chunk);
+      int localReceived = 0;
+      List<int> receivedBytes = [];
 
-      if (localReceived >= resp.contentLength!) {
-        if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-            lib.downloads.artifact.sha1.toLowerCase()) {
-          errorCallback(
-              'The artifact of library ${lib.name}\'s checksum is invalid.');
-          return;
+      resp.stream.listen((chunk) {
+        localReceived += chunk.length;
+        receivedBytes.addAll(chunk);
+
+        if (localReceived >= resp.contentLength!) {
+          if (sha1.convert(receivedBytes).toString().toLowerCase() !=
+              lib.downloads.artifact.sha1.toLowerCase()) {
+            errorCallback(
+                'The artifact of library ${lib.name}\'s checksum is invalid.');
+            return;
+          }
+
+          if (receivedBytes.length != lib.downloads.artifact.size) {
+            errorCallback(
+                'The artifact of library ${lib.name}\'s size is incorrect.');
+            return;
+          }
+
+          File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', lib.downloads.artifact.path!)}')
+              .writeAsBytes(receivedBytes);
         }
-
-        if (receivedBytes.length != lib.downloads.artifact.size) {
-          errorCallback(
-              'The artifact of library ${lib.name}\'s size is incorrect.');
-          return;
-        }
-
-        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', lib.downloads.artifact.path!)}')
-            .writeAsBytes(receivedBytes);
-      }
-      _downloadNatives(it, source);
-    });
+        _downloadNatives(it, source);
+      });
+    } catch (e) {
+      errorCallback(e.toString());
+    }
   }
 
   void _downloadNatives(Iterator<Library> it, String source) async {
@@ -124,35 +129,40 @@ class LibrariesDownloadTask {
         Uri.parse(native.url
             .replaceAll(CoreConfig.DEFAULT_LIBRARIES_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
-    StreamedResponse resp = await request.send();
-    resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    int localReceived = 0;
-    List<int> receivedBytes = [];
+    try {
+      StreamedResponse resp = await request.send();
+      resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    resp.stream.listen((chunk) {
-      localReceived += chunk.length;
-      receivedBytes.addAll(chunk);
+      int localReceived = 0;
+      List<int> receivedBytes = [];
 
-      if (localReceived >= resp.contentLength!) {
-        if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-            native.sha1.toLowerCase()) {
-          errorCallback(
-              'The native of library ${lib.name}\'s checksum is invalid.');
-          return;
+      resp.stream.listen((chunk) {
+        localReceived += chunk.length;
+        receivedBytes.addAll(chunk);
+
+        if (localReceived >= resp.contentLength!) {
+          if (sha1.convert(receivedBytes).toString().toLowerCase() !=
+              native.sha1.toLowerCase()) {
+            errorCallback(
+                'The native of library ${lib.name}\'s checksum is invalid.');
+            return;
+          }
+
+          if (receivedBytes.length != native.size) {
+            errorCallback(
+                'The native of library ${lib.name}\'s size is incorrect.');
+            return;
+          }
+
+          File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', native.path!)}')
+              .writeAsBytes(receivedBytes);
         }
-
-        if (receivedBytes.length != native.size) {
-          errorCallback(
-              'The native of library ${lib.name}\'s size is incorrect.');
-          return;
-        }
-
-        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', native.path!)}')
-            .writeAsBytes(receivedBytes);
-      }
-      _downloadNext(it, source);
-    });
+        _downloadNext(it, source);
+      });
+    } catch (e) {
+      errorCallback(e.toString());
+    }
   }
 
   void _downloadNext(Iterator<Library> it, String source) {

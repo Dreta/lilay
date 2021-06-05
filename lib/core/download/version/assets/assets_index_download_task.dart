@@ -69,34 +69,38 @@ class AssetsIndexDownloadTask {
             .replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
-    StreamedResponse resp = await request.send();
+    try {
+      StreamedResponse resp = await request.send();
 
-    resp.stream.handleError((error) => errorCallback(error.toString()));
+      resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    int received = 0;
-    List<int> receivedBytes = [];
+      int received = 0;
+      List<int> receivedBytes = [];
 
-    resp.stream.listen((chunk) {
-      received += chunk.length;
-      if (resp.contentLength != null) {
-        progressCallback(received / resp.contentLength!);
-      }
-      receivedBytes.addAll(chunk);
-
-      if (received >= resp.contentLength!) {
-        String json = utf8.decode(receivedBytes);
-        Map<String, dynamic> assetsJson = jsonDecode(json)['objects'];
-        Map<String, Asset> assets = {};
-        for (MapEntry<String, dynamic> asset in assetsJson.entries) {
-          assets[asset.key] = Asset.fromJson(asset.value);
+      resp.stream.listen((chunk) {
+        received += chunk.length;
+        if (resp.contentLength != null) {
+          progressCallback(received / resp.contentLength!);
         }
+        receivedBytes.addAll(chunk);
 
-        File local = File(
-            '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', version.assets)}');
-        local.writeAsString(json);
+        if (received >= resp.contentLength!) {
+          String json = utf8.decode(receivedBytes);
+          Map<String, dynamic> assetsJson = jsonDecode(json)['objects'];
+          Map<String, Asset> assets = {};
+          for (MapEntry<String, dynamic> asset in assetsJson.entries) {
+            assets[asset.key] = Asset.fromJson(asset.value);
+          }
 
-        resultCallback(assets);
-      }
-    });
+          File local = File(
+              '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', version.assets)}');
+          local.writeAsString(json);
+
+          resultCallback(assets);
+        }
+      });
+    } catch (e) {
+      errorCallback(e.toString());
+    }
   }
 }

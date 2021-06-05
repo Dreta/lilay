@@ -61,30 +61,34 @@ class VersionDownloadTask {
             version.url.replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
-    StreamedResponse resp = await request.send();
+    try {
+      StreamedResponse resp = await request.send();
 
-    resp.stream.handleError((error) => errorCallback(error.toString()));
+      resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    int received = 0;
-    List<int> receivedBytes = [];
+      int received = 0;
+      List<int> receivedBytes = [];
 
-    resp.stream.listen((chunk) {
-      received += chunk.length;
-      if (resp.contentLength != null) {
-        progressCallback(received / resp.contentLength!);
-      }
-      receivedBytes.addAll(chunk);
+      resp.stream.listen((chunk) {
+        received += chunk.length;
+        if (resp.contentLength != null) {
+          progressCallback(received / resp.contentLength!);
+        }
+        receivedBytes.addAll(chunk);
 
-      if (received >= resp.contentLength!) {
-        String json = utf8.decode(receivedBytes);
-        VersionData data = VersionData.fromJson(jsonDecode(json));
+        if (received >= resp.contentLength!) {
+          String json = utf8.decode(receivedBytes);
+          VersionData data = VersionData.fromJson(jsonDecode(json));
 
-        File local = File(
-            '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', version.id)}');
-        local.writeAsString(json);
+          File local = File(
+              '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', version.id)}');
+          local.writeAsString(json);
 
-        resultCallback(data);
-      }
-    });
+          resultCallback(data);
+        }
+      });
+    } catch (e) {
+      errorCallback(e.toString());
+    }
   }
 }

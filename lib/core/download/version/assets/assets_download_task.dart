@@ -55,37 +55,41 @@ class AssetsDownloadTask {
     Request request = Request('GET', Uri.parse(it.current.url(source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
-    StreamedResponse resp = await request.send();
+    try {
+      StreamedResponse resp = await request.send();
 
-    // possible issue: multiple errors
-    resp.stream.handleError((error) => errorCallback(error.toString()));
+      // possible issue: multiple errors
+      resp.stream.handleError((error) => errorCallback(error.toString()));
 
-    int localReceived = 0;
-    List<int> receivedBytes = [];
+      int localReceived = 0;
+      List<int> receivedBytes = [];
 
-    resp.stream.listen((chunk) {
-      localReceived += chunk.length;
-      received += chunk.length;
-      progressCallback(received / totalSize);
-      receivedBytes.addAll(chunk);
+      resp.stream.listen((chunk) {
+        localReceived += chunk.length;
+        received += chunk.length;
+        progressCallback(received / totalSize);
+        receivedBytes.addAll(chunk);
 
-      if (localReceived >= resp.contentLength!) {
-        if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-            it.current.hash.toLowerCase()) {
-          errorCallback('File ${it.current.hash}\'s checksum is invalid.');
-          return;
+        if (localReceived >= resp.contentLength!) {
+          if (sha1.convert(receivedBytes).toString().toLowerCase() !=
+              it.current.hash.toLowerCase()) {
+            errorCallback('File ${it.current.hash}\'s checksum is invalid.');
+            return;
+          }
+
+          if (receivedBytes.length != it.current.size) {
+            errorCallback('File ${it.current.hash}\'s size is incorrect.');
+            return;
+          }
+
+          File('$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', it.current.hash.substring(0, 2)).replaceAll('{hash2}', it.current.hash)}')
+              .writeAsBytes(receivedBytes);
         }
-
-        if (receivedBytes.length != it.current.size) {
-          errorCallback('File ${it.current.hash}\'s size is incorrect.');
-          return;
-        }
-
-        File('$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', it.current.hash.substring(0, 2)).replaceAll('{hash2}', it.current.hash)}')
-            .writeAsBytes(receivedBytes);
-      }
-      it.moveNext();
-      _download(it, source);
-    });
+        it.moveNext();
+        _download(it, source);
+      });
+    } catch (e) {
+      errorCallback(e.toString());
+    }
   }
 }
