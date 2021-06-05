@@ -42,9 +42,8 @@ class ProfilesProvider extends ChangeNotifier {
       return;
     }
 
-    for (Map<String, dynamic> prof in jsonDecode(await file.readAsString())
-        as List<Map<String, dynamic>>) {
-      Profile profile = Profile.fromJson(prof);
+    for (dynamic prof in jsonDecode(await file.readAsString())) {
+      Profile profile = Profile.fromJson(prof as Map<String, dynamic>);
       if (profile.selected) {
         _selected = profile;
       }
