@@ -25,6 +25,7 @@ import 'package:lilay/ui/configuration/options/dark_mode.dart';
 import 'package:lilay/ui/configuration/options/libraries_source.dart';
 import 'package:lilay/ui/configuration/options/meta_source.dart';
 import 'package:lilay/ui/configuration/options/preferred_login_type.dart';
+import 'package:lilay/ui/configuration/options/show_snapshots.dart';
 import 'package:lilay/ui/screen.dart';
 
 /// This screen shows the list of configuration
@@ -40,7 +41,8 @@ class ConfigurationScreen extends StatelessWidget {
       MetaSource(),
       AssetsSource(),
       LibrariesSource(),
-      Padding(padding: EdgeInsets.only(top: 12), child: AccentColor())
+      Padding(padding: EdgeInsets.only(top: 12), child: AccentColor()),
+      Padding(padding: EdgeInsets.only(top: 12), child: ShowSnapshots())
     ]);
   }
 }

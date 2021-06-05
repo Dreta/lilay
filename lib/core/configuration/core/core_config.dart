@@ -95,6 +95,12 @@ class CoreConfig extends ChangeNotifier {
   /// Defaults to https://launcher.mojang.com.
   String coreSource;
 
+  /// Whether or not to show snapshots when creating
+  /// or editing a profile.
+  ///
+  /// Defaults to false
+  bool showSnapshots;
+
   CoreConfig(
       String? workingDirectory,
       BackgroundType? backgroundType,
@@ -105,7 +111,8 @@ class CoreConfig extends ChangeNotifier {
       String? metaSource,
       String? assetsSource,
       String? librariesSource,
-      String? coreSource)
+      String? coreSource,
+      bool? showSnapshots)
       : this.workingDirectory = workingDirectory ?? getDefaultMinecraft(),
         this.backgroundType = backgroundType ?? BackgroundType.asset,
         this.backgroundImage = backgroundImage,
@@ -115,13 +122,14 @@ class CoreConfig extends ChangeNotifier {
         this.metaSource = metaSource ?? DEFAULT_META_SOURCE,
         this.assetsSource = assetsSource ?? DEFAULT_ASSETS_SOURCE,
         this.librariesSource = librariesSource ?? DEFAULT_LIBRARIES_SOURCE,
-        this.coreSource = coreSource ?? DEFAULT_CORE_SOURCE;
+        this.coreSource = coreSource ?? DEFAULT_CORE_SOURCE,
+        this.showSnapshots = showSnapshots ?? false;
 
   /// Load a new CoreConfig from a file.
   factory CoreConfig.fromFile(File file) {
     if (!file.existsSync()) {
       return CoreConfig(
-          null, null, null, null, null, null, null, null, null, null);
+          null, null, null, null, null, null, null, null, null, null, null);
     }
     return _$CoreConfigFromJson(jsonDecode(file.readAsStringSync()));
   }

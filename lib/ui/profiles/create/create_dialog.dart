@@ -187,6 +187,7 @@ class _CreateDialogState extends State<CreateDialog> {
   /// Create the version dropdown
   Widget _buildVersionDropdown(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final CoreConfig config = Provider.of<CoreConfig>(context);
 
     return Theme(
         child: DropdownButtonFormField(
@@ -202,7 +203,8 @@ class _CreateDialogState extends State<CreateDialog> {
                 ..reversed)
                 // Legacy versions are not supported ATM
                 if (version.type == VersionType.release ||
-                    version.type == VersionType.snapshot)
+                    (config.showSnapshots &&
+                        version.type == VersionType.snapshot))
                   DropdownMenuItem(value: version.id, child: Text(version.id))
             ],
             onChanged: (value) {
