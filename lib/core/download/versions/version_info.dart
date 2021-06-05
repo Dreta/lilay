@@ -44,4 +44,4 @@ class VersionInfo {
 }
 
 /// The possible types of a [VersionInfo].
-enum VersionType { snapshot, release }
+enum VersionType { snapshot, release, old_beta, old_alpha }
