@@ -389,6 +389,8 @@ class _CreateDialogState extends State<CreateDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+
     return AlertDialog(
       title: Text('Create a profile'),
       content: loaded
@@ -404,7 +406,10 @@ class _CreateDialogState extends State<CreateDialog> {
                       padding: EdgeInsets.only(bottom: 3)),
                   _buildAdvancedTile(context)
                 ])
-          : Center(child: CircularProgressIndicator(value: progress)),
+          : Center(
+              child: CircularProgressIndicator(
+                  value: progress, backgroundColor: theme.backgroundColor),
+              heightFactor: 1),
       actions: [_buildSubmitButton(context)],
     );
   }
