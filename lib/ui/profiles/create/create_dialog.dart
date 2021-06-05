@@ -21,6 +21,7 @@ import 'dart:io';
 
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/version/version_data.dart';
 import 'package:lilay/core/download/versions/latest_version.dart';
@@ -32,6 +33,16 @@ import 'package:provider/provider.dart';
 
 class CreateDialog extends StatefulWidget {
   CreateDialog();
+
+  static void display(BuildContext context) {
+    showAnimatedDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => CreateDialog(),
+        animationType: DialogTransitionType.fadeScale,
+        curve: Curves.easeInOut,
+        duration: Duration(milliseconds: 400));
+  }
 
   @override
   _CreateDialogState createState() => _CreateDialogState();
@@ -58,6 +69,25 @@ class _CreateDialogState extends State<CreateDialog> {
   final TextEditingController _javaExec = TextEditingController();
   final TextEditingController _jvmArgs = TextEditingController();
   final TextEditingController _gameArgs = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    _name.dispose();
+    _versionFocus.dispose();
+    _gameDirFocus.dispose();
+    _resWidthFocus.dispose();
+    _resHeightFocus.dispose();
+    _jvmArgsFocus.dispose();
+    _gameArgsFocus.dispose();
+    _submitFocus.dispose();
+    _gameDir.dispose();
+    _resWidth.dispose();
+    _resHeight.dispose();
+    _javaExec.dispose();
+    _jvmArgs.dispose();
+    _gameArgs.dispose();
+  }
 
   /// Attempt to load the version manifest
   void _loadVersions(BuildContext context) {
