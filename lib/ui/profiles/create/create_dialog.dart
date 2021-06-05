@@ -125,6 +125,7 @@ class _CreateDialogState extends State<CreateDialog> {
           List<VersionInfo> versionObjs = [];
           versions.list().listen((directory) async {
             if (directory is Directory) {
+              // fixme this is broken
               File data = File(path.join(directory.absolute.path,
                   '${path.basename(directory.path)}.json'));
               File jar = File(path.join(directory.absolute.path,
