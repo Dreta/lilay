@@ -243,8 +243,7 @@ class _CreateDialogState extends State<CreateDialog> {
   Widget _buildResolutionFields(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
-    return Expanded(
-        child: Row(children: [
+    return Row(children: [
       Expanded(
           child: Padding(
               padding: EdgeInsets.only(right: 16),
@@ -283,7 +282,7 @@ class _CreateDialogState extends State<CreateDialog> {
                   labelText: 'Height',
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: theme.accentColor)))))
-    ]));
+    ]);
   }
 
   /// Create the Java executable field
@@ -400,7 +399,9 @@ class _CreateDialogState extends State<CreateDialog> {
                   _buildNameField(context),
                   _buildVersionDropdown(context),
                   _buildGameDirectoryField(context),
-                  _buildResolutionFields(context),
+                  Padding(
+                      child: _buildResolutionFields(context),
+                      padding: EdgeInsets.only(bottom: 3)),
                   _buildAdvancedTile(context)
                 ])
           : Center(child: CircularProgressIndicator(value: progress)),
