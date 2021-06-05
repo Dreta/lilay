@@ -25,13 +25,13 @@ part 'core_downloads.g.dart';
 class CoreDownloads {
   FriendlyDownload client;
   @JsonKey(name: 'client_mappings')
-  FriendlyDownload clientMappings;
-  FriendlyDownload server;
+  FriendlyDownload? clientMappings;
+  FriendlyDownload? server;
   @JsonKey(name: 'server_mappings')
-  FriendlyDownload serverMappings;
+  FriendlyDownload? serverMappings;
 
-  CoreDownloads(FriendlyDownload client, FriendlyDownload clientMappings,
-      FriendlyDownload server, FriendlyDownload serverMappings)
+  CoreDownloads(FriendlyDownload client, FriendlyDownload? clientMappings,
+      FriendlyDownload? server, FriendlyDownload? serverMappings)
       : this.client = client,
         this.clientMappings = clientMappings,
         this.server = server,
