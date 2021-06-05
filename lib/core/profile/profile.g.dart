@@ -20,8 +20,7 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$ProfileToJson(Profile instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'name': instance.name,
       'version': instance.version,
       'gameDirectory': instance.gameDirectory,
