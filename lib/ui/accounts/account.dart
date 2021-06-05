@@ -120,7 +120,8 @@ class _AccountWidgetState extends State<AccountWidget> {
     } else if (_showActions) {
       trailingWidget = _isRefreshing
           ? Container(
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                  strokeWidth: 2, backgroundColor: theme.backgroundColor),
               width: 15,
               height: 15,
               margin: EdgeInsets.only(right: 12))

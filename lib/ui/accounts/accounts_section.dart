@@ -58,7 +58,8 @@ class _AccountsSectionState extends State<AccountsSection> {
               leading: Container(
                   width: 15,
                   height: 15,
-                  child: CircularProgressIndicator(strokeWidth: 2)),
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, backgroundColor: theme.backgroundColor)),
               title: Text('Loading'),
               minLeadingWidth: 17)));
     } else if (accounts.loadingStatus == LoadingStatus.loaded ||
