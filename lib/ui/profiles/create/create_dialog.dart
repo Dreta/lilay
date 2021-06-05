@@ -71,6 +71,12 @@ class _CreateDialogState extends State<CreateDialog> {
   final TextEditingController _gameArgs = TextEditingController();
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadVersions(context);
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _name.dispose();
