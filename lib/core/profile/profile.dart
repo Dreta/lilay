@@ -38,6 +38,8 @@ class Profile {
   String jvmArguments;
   String gameArguments;
 
+  bool selected;
+
   Profile(
       String name,
       String version,
@@ -46,7 +48,8 @@ class Profile {
       int? resolutionHeight,
       String? javaExecutable,
       String? jvmArguments,
-      String? gameArguments)
+      String? gameArguments,
+      bool? selected)
       : this.name = name,
         this.version = version,
         this.gameDirectory = gameDirectory,
@@ -54,7 +57,8 @@ class Profile {
         this.resolutionHeight = resolutionHeight,
         this.javaExecutable = javaExecutable,
         this.jvmArguments = jvmArguments ?? DEFAULT_JVM_ARGUMENTS,
-        this.gameArguments = gameArguments ?? '';
+        this.gameArguments = gameArguments ?? '',
+        this.selected = selected ?? false;
 
   Map<String, dynamic> toJson() => _$ProfileToJson(this);
 

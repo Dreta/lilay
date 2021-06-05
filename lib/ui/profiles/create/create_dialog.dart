@@ -394,6 +394,7 @@ class _CreateDialogState extends State<CreateDialog> {
               ElevatedButton(
                   onPressed: () {
                     if (_form.currentState!.validate()) {
+                      bool select = profiles.profiles.length == 0;
                       Profile profile = Profile(
                           _name.value.text,
                           _selectedVersion,
@@ -414,11 +415,12 @@ class _CreateDialogState extends State<CreateDialog> {
                               : _jvmArgs.value.text,
                           _gameArgs.value.text.isEmpty
                               ? null
-                              : _gameArgs.value.text);
+                              : _gameArgs.value.text,
+                          select);
                       profiles.addProfile(profile);
                       profiles.saveTo(
                           GetIt.I.get<File>(instanceName: 'profilesDB'));
-                      if (profiles.profiles.length == 1) {
+                      if (select) {
                         // Select the newly created profile if we doesn't have any profiles
                         profiles.selected = profile;
                       }
