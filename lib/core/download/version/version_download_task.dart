@@ -46,6 +46,13 @@ class VersionDownloadTask {
       required this.version,
       required this.workingDir});
 
+  /// Prevent the callbacks from being called anymore.
+  void disable() {
+    progressCallback = (a) => {};
+    errorCallback = (a) => {};
+    resultCallback = (a) => {};
+  }
+
   /// Check if the version metadata already exist at the specified [workingDir].
   Future<bool> metadataExists() async {
     return File(

@@ -40,6 +40,13 @@ class LibrariesDownloadTask {
 
   int receivedLibs = 0;
 
+  /// Prevent the callbacks from being called anymore.
+  void disable() {
+    progressCallback = (a) => {};
+    errorCallback = (a) => {};
+    resultCallback = () => {};
+  }
+
   LibrariesDownloadTask(
       {required this.progressCallback,
       required this.errorCallback,

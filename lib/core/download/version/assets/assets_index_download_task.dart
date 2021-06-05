@@ -40,6 +40,13 @@ class AssetsIndexDownloadTask {
   VersionData version;
   String workingDir;
 
+  /// Prevent the callbacks from being called anymore.
+  void disable() {
+    progressCallback = (a) => {};
+    errorCallback = (a) => {};
+    resultCallback = (a) => {};
+  }
+
   AssetsIndexDownloadTask(
       {required this.progressCallback,
       required this.errorCallback,

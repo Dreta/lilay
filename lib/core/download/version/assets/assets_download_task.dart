@@ -36,6 +36,13 @@ class AssetsDownloadTask {
 
   int received = 0;
 
+  /// Prevent the callbacks from being called anymore.
+  void disable() {
+    progressCallback = (a) => {};
+    errorCallback = (a) => {};
+    resultCallback = () => {};
+  }
+
   AssetsDownloadTask(
       {required this.progressCallback,
       required this.errorCallback,

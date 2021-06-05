@@ -30,21 +30,27 @@ class VersionsDownloadTask {
   Function(VersionManifest) resultCallback;
   String workingDir;
 
-  VersionsDownloadTask(
-      {required this.progressCallback,
-      required this.errorCallback,
-      required this.resultCallback,
-      required this.workingDir});
+  VersionsDownloadTask({required this.progressCallback,
+    required this.errorCallback,
+    required this.resultCallback,
+    required this.workingDir});
 
   /// Check if a version manifest already exist at the specified [workingDir].
   Future<bool> manifestExists() async {
     return File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH').exists();
   }
 
+  /// Prevent the callbacks from being called anymore.
+  void disable() {
+    progressCallback = (a) => {};
+    errorCallback = (a) => {};
+    resultCallback = (a) => {};
+  }
+
   /// Start to download the version manifest from the download source [source].
   void start(String source) async {
     Request request =
-        Request('GET', Uri.parse(source + VersionManifest.LOCATION));
+    Request('GET', Uri.parse(source + VersionManifest.LOCATION));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {

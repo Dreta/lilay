@@ -54,6 +54,7 @@ class CreateDialog extends StatefulWidget {
 class _CreateDialogState extends State<CreateDialog> {
   late String _selectedVersion = versions.latest.release;
   late final VersionManifest versions;
+  late VersionsDownloadTask task;
 
   bool loaded = false;
   double? progress = 0;
@@ -103,14 +104,14 @@ class _CreateDialogState extends State<CreateDialog> {
     _javaExec.dispose();
     _jvmArgs.dispose();
     _gameArgs.dispose();
+    task.disable();
   }
 
   /// Attempt to load the version manifest
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
-    // TODO dispose this task once the dialog is disposed
-    final VersionsDownloadTask task = VersionsDownloadTask(
+    task = VersionsDownloadTask(
         progressCallback: (progress) =>
             setState(() => this.progress = progress),
         errorCallback: (error) {
