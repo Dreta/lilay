@@ -17,31 +17,21 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:lilay/core/auth/account.dart';
-import 'package:lilay/ui/accounts/account.dart';
-import 'package:lilay/ui/accounts/accounts_provider.dart';
-import 'package:lilay/ui/home/home.dart';
+import 'package:lilay/core/profile/profile.dart';
+import 'package:lilay/ui/profiles/profile.dart';
+import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:lilay/ui/screen.dart';
 import 'package:provider/provider.dart';
 
-/// [AccountsScreen] shows all the available
-/// accounts.
-///
-/// We don't have any real "screens" in Lilay,
-/// "screens" are emulated as "pages" instead,
-/// and they always reside in the [Homepage].
-class AccountsScreen extends StatelessWidget {
-  final Function(Account) onAccountDelete;
-
-  const AccountsScreen({required this.onAccountDelete});
-
+/// [ProfilesScreen] shows all the loaded profiles.
+class ProfilesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
+    final ProfilesProvider profiles = Provider.of<ProfilesProvider>(context);
     final ThemeData theme = Theme.of(context);
 
-    return Screen(title: 'Accounts', children: [
-      for (Account account in accounts.accounts)
+    return Screen(title: 'Profiles', children: [
+      for (Profile profile in profiles.profiles)
         Container(
             margin: const EdgeInsets.only(bottom: 14),
             decoration: BoxDecoration(
@@ -54,10 +44,7 @@ class AccountsScreen extends StatelessWidget {
                       spreadRadius: 3,
                       offset: const Offset(2, 2))
                 ]),
-            child: AccountWidget(
-                account: account,
-                showActions: true,
-                onAccountDelete: () => onAccountDelete(account)))
+            child: ProfileWidget(profile: profile, showActions: true))
     ]);
   }
 }

@@ -29,6 +29,7 @@ import 'package:lilay/ui/animated_screen.dart';
 import 'package:lilay/ui/configuration/configuration_screen.dart';
 import 'package:lilay/ui/home/navigation_drawer.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
+import 'package:lilay/ui/profiles/screen/profiles_screen.dart';
 import 'package:provider/provider.dart';
 
 /// This widget represents the main page of Lilay,
@@ -87,6 +88,8 @@ class Homepage extends StatelessWidget {
                     child: AccountsScreen(
                         onAccountDelete: (account) =>
                             deleteAccount(context, account))),
+                AnimatedScreen(
+                    screenType: ScreenType.profiles, child: ProfilesScreen()),
                 AnimatedScreen(
                     screenType: ScreenType.configuration,
                     child: ConfigurationScreen())

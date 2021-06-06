@@ -32,4 +32,4 @@ class ScreenProvider extends ChangeNotifier {
 }
 
 /// Implemented screens in Lilay.
-enum ScreenType { home, accounts, configuration }
+enum ScreenType { home, accounts, profiles, configuration }

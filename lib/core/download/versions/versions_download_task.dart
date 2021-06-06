@@ -25,7 +25,7 @@ import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:logging/logging.dart';
 
 class VersionsDownloadTask {
-  static const String MANIFEST_PATH = "versions/version_manifest_v2.json";
+  static const String MANIFEST_PATH = 'versions/version_manifest_v2.json';
 
   Function(double) progressCallback;
   Function(String) errorCallback;
