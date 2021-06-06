@@ -68,8 +68,8 @@ class AccountsProvider extends ChangeNotifier {
     notifyListeners();
 
     for (Map<String, dynamic> account
-    in (jsonDecode(await file.readAsString())['accounts']
-    as List<dynamic>)) {
+        in (jsonDecode(await file.readAsString())['accounts']
+            as List<dynamic>)) {
       String? type = account['type'];
       logger.info('Loading account ${account['username']} with type $type.');
       if (type == null) {
