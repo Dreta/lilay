@@ -23,6 +23,7 @@ import 'package:get_it/get_it.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
 import 'package:lilay/ui/configuration/configuration_section.dart';
+import 'package:lilay/ui/home/error_tile.dart';
 import 'package:lilay/ui/profiles/profiles_section.dart';
 import 'package:provider/provider.dart';
 
@@ -59,27 +60,14 @@ class NavigationDrawer extends StatelessWidget {
                         Expanded(
                             child: Align(
                                 alignment: Alignment.bottomLeft,
-                                child: ListTile(
-                                  leading: Icon(Icons.error,
-                                      color: theme.errorColor),
-                                  title: Text('Failed to load',
-                                      style:
-                                          TextStyle(color: theme.errorColor)),
-                                  minLeadingWidth: 20,
-                                ))),
-                      if (GetIt.I.get<String>(instanceName: 'java') ==
-                          '') // FIXME Incorrect alignment
+                                child: ErrorTile(message: 'Disconnected'))),
+                      if (GetIt.I
+                          .get<String>(instanceName: 'java')
+                          .isEmpty) // FIXME Incorrect alignment
                         Expanded(
                             child: Align(
                                 alignment: Alignment.bottomLeft,
-                                child: ListTile(
-                                  leading: Icon(Icons.error,
-                                      color: theme.errorColor),
-                                  title: Text('Java not found',
-                                      style:
-                                          TextStyle(color: theme.errorColor)),
-                                  minLeadingWidth: 20,
-                                )))
+                                child: ErrorTile(message: 'Java not found')))
                     ])))));
   }
 }
