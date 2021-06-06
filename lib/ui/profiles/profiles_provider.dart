@@ -20,7 +20,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/profile/profile.dart';
+import 'package:logging/logging.dart';
 
 /// Provides the currently loaded profiles as a
 /// globally accessible state.
@@ -38,12 +40,15 @@ class ProfilesProvider extends ChangeNotifier {
   }
 
   void loadFrom(File file) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Loading profiles from ${file.path}.');
     if (!await file.exists()) {
       return;
     }
 
     for (dynamic prof in jsonDecode(await file.readAsString())) {
       Profile profile = Profile.fromJson(prof as Map<String, dynamic>);
+      logger.info('Loaded profile ${profile.name} (${profile.version}).');
       if (profile.selected) {
         _selected = profile;
       }
@@ -53,6 +58,8 @@ class ProfilesProvider extends ChangeNotifier {
   }
 
   void saveTo(File file) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Saving profiles to ${file.path}.');
     List<Map<String, dynamic>> json = [];
     for (Profile profile in _profiles) {
       json.add(profile.toJson());

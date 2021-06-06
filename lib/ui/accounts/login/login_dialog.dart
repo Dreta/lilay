@@ -87,14 +87,18 @@ class _LoginDialogState extends State<LoginDialog> {
           Account.authProviders[_selectedAuthProvider]!;
 
       // Login the user
+      Logger logger = GetIt.I.get<Logger>();
+      logger.info(
+          'Logging to the account $username with authentication provider ${selected.name}.');
       provider.login(username, password, (account) {
         Navigator.pop(context); // Close the dialog
+        logger.info('Successfully logged in to the account $username.');
         _addAccount(account); // Allow the account to be added
         setState(() {
           _loggingIn = false;
         });
       }, (error) {
-        GetIt.I.get<Logger>().severe(error);
+        logger.severe('Failed to login to the account $username: $error');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Error: $error'), duration: Duration(seconds: 3)));
         Navigator.pop(context);

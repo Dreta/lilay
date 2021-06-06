@@ -19,12 +19,14 @@
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/rule.dart';
 import 'package:lilay/core/download/version/assets/friendly_download.dart';
 import 'package:lilay/core/download/version/library/library.dart';
+import 'package:logging/logging.dart';
 
 /// Download all [libraries].
 /// The downloaded files will be saved automatically.
@@ -57,15 +59,21 @@ class LibrariesDownloadTask {
 
   /// Start to download the libraries from the [source].
   void start(String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Starting to download libraries.');
     Iterator<Library> it = libraries.iterator;
     it.moveNext();
     _downloadArtifact(it, source);
   }
 
   void _downloadArtifact(Iterator<Library> it, String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Downloading the artifact of library ${it.current.name}.');
     // Check the rules
     Library lib = it.current;
     if (!Rule.multiRulesApplicable(lib.rules, account)) {
+      logger.info(
+          'The library ${it.current.name} is not applicable for download. Skipping.');
       _downloadNext(it, source);
       return;
     }
@@ -85,23 +93,29 @@ class LibrariesDownloadTask {
       List<int> receivedBytes = [];
 
       resp.stream.listen((chunk) {
+        logger.fine('Received ${chunk.length} bytes of data.');
         localReceived += chunk.length;
         receivedBytes.addAll(chunk);
 
         if (localReceived >= resp.contentLength!) {
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
               lib.downloads.artifact.sha1.toLowerCase()) {
+            logger.severe(
+                'The artifact of library ${lib.name}\'s checksum is invalid.');
             errorCallback(
                 'The artifact of library ${lib.name}\'s checksum is invalid.');
             return;
           }
 
           if (receivedBytes.length != lib.downloads.artifact.size) {
+            logger.severe(
+                'The artifact of library ${lib.name}\'s size is incorrect.');
             errorCallback(
                 'The artifact of library ${lib.name}\'s size is incorrect.');
             return;
           }
 
+          logger.info('Saving the artifact of library ${lib.name}.');
           File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', lib.downloads.artifact.path!)}')
               .writeAsBytes(receivedBytes);
         }
@@ -113,20 +127,28 @@ class LibrariesDownloadTask {
   }
 
   void _downloadNatives(Iterator<Library> it, String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Downloading the natives of library ${it.current.name}.');
     Library lib = it.current;
     if (lib.natives == null) {
+      logger.info('There are no natives for this library. Skipping.');
       _downloadNext(it, source); // Skip
       return;
     }
 
     FriendlyDownload native;
     if (Platform.isWindows && lib.natives!.windows != null) {
+      logger.info('Downloading natives for Windows.');
       native = lib.downloads.classifiers!.nativesWindows!;
     } else if (Platform.isMacOS && lib.natives!.osx != null) {
+      logger.info('Downloading natives for macOS.');
       native = lib.downloads.classifiers!.nativesMacOS!;
     } else if (Platform.isLinux && lib.natives!.linux != null) {
+      logger.info('Downloading natives for Linux.');
       native = lib.downloads.classifiers!.nativesLinux!;
     } else {
+      logger.info(
+          'There are no natives that are applicable for this operating system. Skipping.');
       _downloadNext(it, source); // Skip
       return;
     }
@@ -145,23 +167,29 @@ class LibrariesDownloadTask {
       List<int> receivedBytes = [];
 
       resp.stream.listen((chunk) {
+        logger.fine('Received ${chunk.length} bytes of data.');
         localReceived += chunk.length;
         receivedBytes.addAll(chunk);
 
         if (localReceived >= resp.contentLength!) {
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
               native.sha1.toLowerCase()) {
+            logger.severe(
+                'The native of library ${lib.name}\'s checksum is invalid.');
             errorCallback(
                 'The native of library ${lib.name}\'s checksum is invalid.');
             return;
           }
 
           if (receivedBytes.length != native.size) {
+            logger.severe(
+                'The native of library ${lib.name}\'s size is incorrect.');
             errorCallback(
                 'The native of library ${lib.name}\'s size is incorrect.');
             return;
           }
 
+          logger.info('Saving the native of library ${lib.name}.');
           File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', native.path!)}')
               .writeAsBytes(receivedBytes);
         }

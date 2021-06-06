@@ -19,8 +19,10 @@
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/download/version/assets/asset.dart';
+import 'package:logging/logging.dart';
 
 /// Download all [assets]. The downloaded files
 /// will be saved automatically.
@@ -53,12 +55,16 @@ class AssetsDownloadTask {
 
   /// Start to download the assets from the [source].
   void start(String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Starting to download assets.');
     Iterator<Asset> it = assets.iterator;
     it.moveNext();
     _download(it, source);
   }
 
   void _download(Iterator<Asset> it, String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Downloading asset ${it.current.hash}.');
     Request request = Request('GET', Uri.parse(it.current.url(source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
@@ -74,21 +80,25 @@ class AssetsDownloadTask {
       resp.stream.listen((chunk) {
         localReceived += chunk.length;
         received += chunk.length;
+        logger.fine('Received ${chunk.length} bytes of data.');
         progressCallback(received / totalSize);
         receivedBytes.addAll(chunk);
 
         if (localReceived >= resp.contentLength!) {
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
               it.current.hash.toLowerCase()) {
+            logger.severe('Asset ${it.current.hash}\'s checksum is invalid.');
             errorCallback('File ${it.current.hash}\'s checksum is invalid.');
             return;
           }
 
           if (receivedBytes.length != it.current.size) {
+            logger.severe('Asset ${it.current.hash}\'s size is incorrect.');
             errorCallback('File ${it.current.hash}\'s size is incorrect.');
             return;
           }
 
+          logger.info('Saved asset ${it.current.hash}.');
           File('$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', it.current.hash.substring(0, 2)).replaceAll('{hash2}', it.current.hash)}')
               .writeAsBytes(receivedBytes);
         }

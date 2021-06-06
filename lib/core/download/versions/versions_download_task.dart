@@ -19,8 +19,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
+import 'package:logging/logging.dart';
 
 class VersionsDownloadTask {
   static const String MANIFEST_PATH = "versions/version_manifest_v2.json";
@@ -50,6 +52,8 @@ class VersionsDownloadTask {
 
   /// Start to download the version manifest from the download source [source].
   void start(String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Starting to download the versions manifest.');
     Request request =
         Request('GET', Uri.parse(source + VersionManifest.LOCATION));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
@@ -63,6 +67,7 @@ class VersionsDownloadTask {
       List<int> receivedBytes = [];
 
       resp.stream.listen((chunk) {
+        logger.fine('Received ${chunk.length} bytes of data.');
         received += chunk.length;
         if (resp.contentLength != null) {
           progressCallback(received / resp.contentLength!);
@@ -74,6 +79,7 @@ class VersionsDownloadTask {
           String json = utf8.decode(receivedBytes);
           VersionManifest manifest = VersionManifest.fromJson(jsonDecode(json));
 
+          logger.info('Saved the version manifest.');
           // Cache the version manifest locally
           File local =
               File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');

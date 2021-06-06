@@ -19,8 +19,10 @@
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:logging/logging.dart';
 
 import '../version_data.dart';
 
@@ -34,6 +36,13 @@ class CoreDownloadTask {
   Function resultCallback;
   VersionData version;
   String workingDir;
+
+  /// Prevent the callbacks from being called anymore.
+  void disable() {
+    progressCallback = (a) => {};
+    errorCallback = (a) => {};
+    resultCallback = (a) => {};
+  }
 
   CoreDownloadTask(
       {required this.progressCallback,
@@ -58,6 +67,8 @@ class CoreDownloadTask {
 
   /// Start to download the client from the download source [source].
   void start(String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Starting to download the core game ${version.id}.');
     Request request = Request(
         'GET',
         Uri.parse(version.downloads.client.url
@@ -74,6 +85,7 @@ class CoreDownloadTask {
 
       resp.stream.listen((chunk) {
         received += chunk.length;
+        logger.fine('Received ${chunk.length} bytes of data.');
         if (resp.contentLength != null) {
           progressCallback(received / resp.contentLength!);
         }
@@ -82,15 +94,18 @@ class CoreDownloadTask {
         if (received >= resp.contentLength!) {
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
               version.downloads.client.sha1.toLowerCase()) {
+            logger.severe('Client ${version.id}.jar\'s checksum is invalid.');
             errorCallback('File ${version.id}.jar\'s checksum is invalid.');
             return;
           }
 
           if (receivedBytes.length != version.downloads.client.size) {
+            logger.severe('Client ${version.id}.jar\'s size is incorrect.');
             errorCallback('File ${version.id}.jar\'s size is incorrect.');
             return;
           }
 
+          logger.info('Saved client ${version.id}.');
           File('$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', version.id)}')
               .writeAsBytes(receivedBytes);
         }

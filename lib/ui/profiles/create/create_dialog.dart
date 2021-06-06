@@ -31,6 +31,7 @@ import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
@@ -397,6 +398,7 @@ class _CreateDialogState extends State<CreateDialog> {
                   onPressed: () {
                     if (_form.currentState!.validate()) {
                       bool select = profiles.profiles.length == 0;
+                      Logger logger = GetIt.I.get<Logger>();
                       Profile profile = Profile(
                           _name.value.text,
                           _selectedVersion,
@@ -426,6 +428,7 @@ class _CreateDialogState extends State<CreateDialog> {
                         // Select the newly created profile if we doesn't have any profiles
                         profiles.selected = profile;
                       }
+                      logger.info('Created profile ${profile.name}.');
                       Navigator.pop(context);
                     }
                   },

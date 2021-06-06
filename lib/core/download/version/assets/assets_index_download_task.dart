@@ -20,8 +20,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:logging/logging.dart';
 
 import '../version_data.dart';
 import 'asset.dart';
@@ -70,6 +72,8 @@ class AssetsIndexDownloadTask {
 
   /// Start to download the assets index from the download source [source].
   void start(String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Starting to download the asset index ${version.assets}.');
     Request request = Request(
         'GET',
         Uri.parse(version.assetsIndex.url
@@ -86,6 +90,7 @@ class AssetsIndexDownloadTask {
 
       resp.stream.listen((chunk) {
         received += chunk.length;
+        logger.fine('Received ${chunk.length} bytes of data.');
         if (resp.contentLength != null) {
           progressCallback(received / resp.contentLength!);
         }
@@ -95,10 +100,12 @@ class AssetsIndexDownloadTask {
           String json = utf8.decode(receivedBytes);
           Map<String, dynamic> assetsJson = jsonDecode(json)['objects'];
           Map<String, Asset> assets = {};
+          logger.info('Parsing assets.');
           for (MapEntry<String, dynamic> asset in assetsJson.entries) {
             assets[asset.key] = Asset.fromJson(asset.value);
           }
 
+          logger.info('Saved asset index ${version.assets}.');
           File local = File(
               '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', version.assets)}');
           local.writeAsString(json);

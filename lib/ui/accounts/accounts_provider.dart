@@ -54,6 +54,8 @@ class AccountsProvider extends ChangeNotifier {
   Account? getAccountByUUID(String uuid) => _accounts[uuid];
 
   void loadFrom(File file) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Loading accounts from ${file.path}.');
     if (!await file.exists()) {
       // Do not load for non-existent files, however
       // set the loaded state.
@@ -66,15 +68,18 @@ class AccountsProvider extends ChangeNotifier {
     notifyListeners();
 
     for (Map<String, dynamic> account
-        in (jsonDecode(await file.readAsString())['accounts']
-            as List<dynamic>)) {
+    in (jsonDecode(await file.readAsString())['accounts']
+    as List<dynamic>)) {
       String? type = account['type'];
+      logger.info('Loading account ${account['username']} with type $type.');
       if (type == null) {
-        GetIt.I.get<Logger>().severe('Found invalid account without type');
+        logger.severe('Found invalid account without type');
         continue;
       }
       Account acc = Account.accountFactories[account['type']]!(account);
       try {
+        logger.info(
+            'Attempting to refresh the token of account ${account['username']}.');
         await acc.refresh();
       } catch (e) {
         _loadingStatus = LoadingStatus.failed;
@@ -85,6 +90,7 @@ class AccountsProvider extends ChangeNotifier {
       if (acc.selected) {
         _selectedAccountUUID = acc.uuid;
       }
+      logger.info('Loaded account ${account['username']}.');
       addAccount(acc); // This implicitly runs notifyListeners().
     }
     _loadingStatus = LoadingStatus.loaded;
@@ -92,6 +98,8 @@ class AccountsProvider extends ChangeNotifier {
   }
 
   void saveTo(File file) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Saving accounts to ${file.path}.');
     List<Map<String, dynamic>> json = [];
     for (Account account in accounts) {
       json.add(account.toJson());

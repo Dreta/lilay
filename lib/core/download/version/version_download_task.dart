@@ -19,9 +19,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
+import 'package:logging/logging.dart';
 
 import 'version_data.dart';
 
@@ -62,6 +64,8 @@ class VersionDownloadTask {
 
   /// Start to download the version metadata from the download source [source].
   void start(String source) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Downloading the version manifest for version ${version.id}.');
     Request request = Request(
         'GET',
         Uri.parse(
@@ -77,6 +81,7 @@ class VersionDownloadTask {
       List<int> receivedBytes = [];
 
       resp.stream.listen((chunk) {
+        logger.fine('Received ${chunk.length} bytes of data.');
         received += chunk.length;
         if (resp.contentLength != null) {
           progressCallback(received / resp.contentLength!);
@@ -87,6 +92,7 @@ class VersionDownloadTask {
           String json = utf8.decode(receivedBytes);
           VersionData data = VersionData.fromJson(jsonDecode(json));
 
+          logger.info('Saved version manifest ${version.id}.');
           File local = File(
               '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', version.id)}');
           local.writeAsString(json);
