@@ -37,7 +37,8 @@ class ThemedUI extends StatelessWidget {
         data: ThemeData(
             brightness: darkMode ? Brightness.dark : Brightness.light,
             primarySwatch: Colors.primaries[config.accent],
-            accentColor: Colors.primaries[config.accent]),
+            accentColor: Colors.primaries[config.accent],
+            fontFamily: 'Ubuntu'),
         child: child);
   }
 }

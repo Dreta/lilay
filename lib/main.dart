@@ -22,7 +22,9 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
@@ -47,6 +49,11 @@ void main() async {
     print('[${record.level.name}] [${record.time}]: ${record.message}');
   });
   GetIt.I.registerSingleton<Logger>(logger);
+
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('font/UFL.txt');
+    yield LicenseEntryWithLineBreaks(['ubuntu_font'], license);
+  });
 
   logger.info('Registering authentication methods.');
 
