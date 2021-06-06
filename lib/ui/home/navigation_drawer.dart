@@ -23,9 +23,10 @@ import 'package:get_it/get_it.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/accounts_section.dart';
 import 'package:lilay/ui/configuration/configuration_section.dart';
-import 'package:lilay/ui/home/error_tile.dart';
 import 'package:lilay/ui/profiles/profiles_section.dart';
 import 'package:provider/provider.dart';
+
+import 'error_tile.dart';
 
 /// This is the navigation drawer always shown in Lilay.
 class NavigationDrawer extends StatelessWidget {
@@ -45,29 +46,32 @@ class NavigationDrawer extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                      Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text('Lilay', style: textTheme.headline5)),
-                      Divider(
-                          height: 1, thickness: 1, color: theme.dividerColor),
+                      Expanded(
+                          child: ListView(children: [
+                        Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text('Lilay', style: textTheme.headline5)),
+                        Divider(
+                            height: 1, thickness: 1, color: theme.dividerColor),
 
-                      // Sections
-                      AccountsSection(),
-                      ProfilesSection(),
-                      ConfigurationSection(),
-
-                      if (accounts.loadingStatus == LoadingStatus.failed)
-                        Expanded(
-                            child: Align(
-                                alignment: Alignment.bottomLeft,
-                                child: ErrorTile(message: 'Disconnected'))),
-                      if (GetIt.I
-                          .get<String>(instanceName: 'java')
-                          .isEmpty) // FIXME Incorrect alignment
-                        Expanded(
-                            child: Align(
-                                alignment: Alignment.bottomLeft,
-                                child: ErrorTile(message: 'Java not found')))
+                        // Sections
+                        AccountsSection(),
+                        ProfilesSection(),
+                        ConfigurationSection(),
+                      ])),
+                      Container(
+                          child: Align(
+                              alignment: FractionalOffset.bottomCenter,
+                              child: Container(
+                                  child: Column(children: [
+                                if (accounts.loadingStatus ==
+                                    LoadingStatus.failed)
+                                  ErrorTile(message: 'Disconnected'),
+                                if (GetIt.I
+                                    .get<String>(instanceName: 'java')
+                                    .isEmpty)
+                                  ErrorTile(message: 'Java not found')
+                              ]))))
                     ])))));
   }
 }
