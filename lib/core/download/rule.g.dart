@@ -52,7 +52,7 @@ K _$enumDecode<K, V>(
 
 const _$RuleActionEnumMap = {
   RuleAction.allow: 'allow',
-  RuleAction.deny: 'deny',
+  RuleAction.disallow: 'disallow',
 };
 
 FeatureSet _$FeatureSetFromJson(Map<String, dynamic> json) {

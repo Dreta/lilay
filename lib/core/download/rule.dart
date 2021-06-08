@@ -129,4 +129,4 @@ class OSInfo {
   Map<String, dynamic> toJson() => _$OSInfoToJson(this);
 }
 
-enum RuleAction { allow, deny }
+enum RuleAction { allow, disallow }
