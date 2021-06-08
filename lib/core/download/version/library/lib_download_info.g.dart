@@ -11,15 +11,12 @@ LibDownloadInfo _$LibDownloadInfoFromJson(Map<String, dynamic> json) {
     json['artifact'] == null
         ? null
         : FriendlyDownload.fromJson(json['artifact'] as Map<String, dynamic>),
-    json['classifiers'] == null
-        ? null
-        : ClassifiersDownload.fromJson(
-            json['classifiers'] as Map<String, dynamic>),
+    json['classifiers'] as Map<String, dynamic>?,
   );
 }
 
 Map<String, dynamic> _$LibDownloadInfoToJson(LibDownloadInfo instance) =>
     <String, dynamic>{
       'artifact': instance.artifact?.toJson(),
-      'classifiers': instance.classifiers?.toJson(),
+      'classifiers': instance.classifiers,
     };

@@ -27,6 +27,7 @@ import 'package:lilay/core/download/rule.dart';
 import 'package:lilay/core/download/version/assets/friendly_download.dart';
 import 'package:lilay/core/download/version/library/library.dart';
 import 'package:logging/logging.dart';
+import 'package:system_info/system_info.dart';
 
 /// Download all [libraries].
 /// The downloaded files will be saved automatically.
@@ -64,6 +65,10 @@ class LibrariesDownloadTask {
     Iterator<Library> it = libraries.iterator;
     it.moveNext();
     _downloadArtifact(it, source);
+  }
+
+  String _mapNativePlaceholders(String s) {
+    return s..replaceAll('{arch}', SysInfo.kernelBitness.toString());
   }
 
   void _downloadArtifact(Iterator<Library> it, String source) async {
@@ -144,14 +149,20 @@ class LibrariesDownloadTask {
 
     FriendlyDownload native;
     if (Platform.isWindows && lib.natives!.windows != null) {
-      logger.info('Downloading natives for Windows.');
-      native = lib.downloads.classifiers!.nativesWindows!;
+      String index = _mapNativePlaceholders(lib.natives!.windows!);
+      native = FriendlyDownload.fromJson(
+          lib.downloads.classifiers[index] as Map<String, dynamic>);
+      logger.info('Downloading native $index.');
     } else if (Platform.isMacOS && lib.natives!.osx != null) {
-      logger.info('Downloading natives for macOS.');
-      native = lib.downloads.classifiers!.nativesMacOS!;
+      String index = _mapNativePlaceholders(lib.natives!.osx!);
+      native = FriendlyDownload.fromJson(
+          lib.downloads.classifiers[index] as Map<String, dynamic>);
+      logger.info('Downloading native $index.');
     } else if (Platform.isLinux && lib.natives!.linux != null) {
-      logger.info('Downloading natives for Linux.');
-      native = lib.downloads.classifiers!.nativesLinux!;
+      String index = _mapNativePlaceholders(lib.natives!.linux!);
+      native = FriendlyDownload.fromJson(
+          lib.downloads.classifiers[index] as Map<String, dynamic>);
+      logger.info('Downloading native $index.');
     } else {
       logger.info(
           'There are no natives that are applicable for this operating system. Skipping.');

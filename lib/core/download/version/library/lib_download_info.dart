@@ -19,18 +19,16 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/download/version/assets/friendly_download.dart';
 
-import 'classifiers_download.dart';
-
 part 'lib_download_info.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class LibDownloadInfo {
   FriendlyDownload? artifact;
-  ClassifiersDownload? classifiers;
+  Map<String, dynamic> classifiers; // This is completely dynamic.
 
-  LibDownloadInfo(FriendlyDownload? artifact, ClassifiersDownload? classifiers)
+  LibDownloadInfo(FriendlyDownload? artifact, Map<String, dynamic>? classifiers)
       : this.artifact = artifact,
-        this.classifiers = classifiers;
+        this.classifiers = classifiers ?? {};
 
   Map<String, dynamic> toJson() => _$LibDownloadInfoToJson(this);
 
