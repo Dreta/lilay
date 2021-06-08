@@ -62,12 +62,12 @@ class AssetsIndexDownloadTask {
     File file = File(
         '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', version.assets)}');
     return (await file.exists()) &&
-        (version.assetsIndex.sha1.toLowerCase() ==
+        (version.assetIndex!.sha1.toLowerCase() ==
             sha1
                 .convert(List.from(await file.readAsBytes()))
                 .toString()
                 .toLowerCase()) &&
-        (await file.length() == version.assetsIndex.size);
+        (await file.length() == version.assetIndex!.size);
   }
 
   /// Start to download the assets index from the download source [source].
@@ -76,7 +76,7 @@ class AssetsIndexDownloadTask {
     logger.info('Starting to download the asset index ${version.assets}.');
     Request request = Request(
         'GET',
-        Uri.parse(version.assetsIndex.url
+        Uri.parse(version.assetIndex!.url
             .replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
