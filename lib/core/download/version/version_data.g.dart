@@ -8,8 +8,12 @@ part of 'version_data.dart';
 
 VersionData _$VersionDataFromJson(Map<String, dynamic> json) {
   return VersionData(
-    ArgumentsData.fromJson(json['arguments'] as Map<String, dynamic>),
-    AssetsIndex.fromJson(json['assetsIndex'] as Map<String, dynamic>),
+    json['arguments'] == null
+        ? null
+        : ArgumentsData.fromJson(json['arguments'] as Map<String, dynamic>),
+    json['assetIndex'] == null
+        ? null
+        : AssetsIndex.fromJson(json['assetIndex'] as Map<String, dynamic>),
     json['assets'] as String,
     json['complianceLevel'] as int,
     CoreDownloads.fromJson(json['downloads'] as Map<String, dynamic>),
@@ -18,6 +22,7 @@ VersionData _$VersionDataFromJson(Map<String, dynamic> json) {
         .map((e) => Library.fromJson(e as Map<String, dynamic>))
         .toList(),
     json['mainClass'] as String,
+    json['minecraftArguments'] as String?,
     DateTime.parse(json['releaseTime'] as String),
     DateTime.parse(json['time'] as String),
     _$enumDecode(_$VersionTypeEnumMap, json['type']),
@@ -26,14 +31,15 @@ VersionData _$VersionDataFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$VersionDataToJson(VersionData instance) =>
     <String, dynamic>{
-      'arguments': instance.arguments.toJson(),
-      'assetsIndex': instance.assetsIndex.toJson(),
+      'arguments': instance.arguments?.toJson(),
+      'assetIndex': instance.assetIndex?.toJson(),
       'assets': instance.assets,
       'complianceLevel': instance.complianceLevel,
       'downloads': instance.downloads.toJson(),
       'id': instance.id,
       'libraries': instance.libraries.map((e) => e.toJson()).toList(),
       'mainClass': instance.mainClass,
+      'minecraftArguments': instance.minecraftArguments,
       'releaseTime': instance.releaseTime.toIso8601String(),
       'time': instance.time.toIso8601String(),
       'type': _$VersionTypeEnumMap[instance.type],

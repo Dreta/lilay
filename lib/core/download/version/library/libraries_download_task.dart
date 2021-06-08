@@ -77,11 +77,17 @@ class LibrariesDownloadTask {
       _downloadNext(it, source);
       return;
     }
+    if (lib.natives == null) {
+      logger.info(
+          'There are no artifacts for this library. Skipping to natives.');
+      _downloadNatives(it, source); // Skip
+      return;
+    }
 
     // Download the artifact
     Request request = Request(
         'GET',
-        Uri.parse(lib.downloads.artifact.url
+        Uri.parse(lib.downloads.artifact!.url
             .replaceAll(CoreConfig.DEFAULT_LIBRARIES_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
@@ -99,7 +105,7 @@ class LibrariesDownloadTask {
 
         if (localReceived >= resp.contentLength!) {
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-              lib.downloads.artifact.sha1.toLowerCase()) {
+              lib.downloads.artifact!.sha1.toLowerCase()) {
             logger.severe(
                 'The artifact of library ${lib.name}\'s checksum is invalid.');
             errorCallback(
@@ -107,7 +113,7 @@ class LibrariesDownloadTask {
             return;
           }
 
-          if (receivedBytes.length != lib.downloads.artifact.size) {
+          if (receivedBytes.length != lib.downloads.artifact!.size) {
             logger.severe(
                 'The artifact of library ${lib.name}\'s size is incorrect.');
             errorCallback(
@@ -116,7 +122,7 @@ class LibrariesDownloadTask {
           }
 
           logger.info('Saving the artifact of library ${lib.name}.');
-          File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', lib.downloads.artifact.path!)}')
+          File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', lib.downloads.artifact!.path!)}')
               .writeAsBytes(receivedBytes);
         }
         _downloadNatives(it, source);

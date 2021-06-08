@@ -28,8 +28,8 @@ part 'version_data.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class VersionData {
-  ArgumentsData arguments;
-  AssetsIndex assetsIndex;
+  ArgumentsData? arguments;
+  AssetsIndex? assetIndex;
   String assets;
   int complianceLevel;
   CoreDownloads downloads;
@@ -39,31 +39,36 @@ class VersionData {
   // TODO support logging
   String mainClass;
 
+  String?
+      minecraftArguments; // Legacy versions (I'm not entirely sure about the meaning of this)
+
   //int minimumLauncherVersion
   DateTime releaseTime;
   DateTime time;
   VersionType type;
 
   VersionData(
-      ArgumentsData arguments,
-      AssetsIndex assetsIndex,
+      ArgumentsData? arguments,
+      AssetsIndex? assetIndex,
       String assets,
       int complianceLevel,
       CoreDownloads downloads,
       String id,
       List<Library> libraries,
       String mainClass,
+      String? minecraftArguments,
       DateTime releaseTime,
       DateTime time,
       VersionType type)
       : this.arguments = arguments,
-        this.assetsIndex = assetsIndex,
+        this.assetIndex = assetIndex,
         this.assets = assets,
         this.complianceLevel = complianceLevel,
         this.downloads = downloads,
         this.id = id,
         this.libraries = libraries,
         this.mainClass = mainClass,
+        this.minecraftArguments = minecraftArguments,
         this.releaseTime = releaseTime,
         this.time = time,
         this.type = type;
