@@ -8,7 +8,9 @@ part of 'lib_download_info.dart';
 
 LibDownloadInfo _$LibDownloadInfoFromJson(Map<String, dynamic> json) {
   return LibDownloadInfo(
-    FriendlyDownload.fromJson(json['artifact'] as Map<String, dynamic>),
+    json['artifact'] == null
+        ? null
+        : FriendlyDownload.fromJson(json['artifact'] as Map<String, dynamic>),
     json['classifiers'] == null
         ? null
         : ClassifiersDownload.fromJson(
@@ -18,6 +20,6 @@ LibDownloadInfo _$LibDownloadInfoFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$LibDownloadInfoToJson(LibDownloadInfo instance) =>
     <String, dynamic>{
-      'artifact': instance.artifact.toJson(),
+      'artifact': instance.artifact?.toJson(),
       'classifiers': instance.classifiers?.toJson(),
     };
