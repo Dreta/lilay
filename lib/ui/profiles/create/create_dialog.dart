@@ -111,11 +111,12 @@ class _CreateDialogState extends State<CreateDialog> {
   /// Attempt to load the version manifest
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
+    final Logger logger = GetIt.I.get<Logger>();
 
     task = VersionsDownloadTask(
         progressCallback: (progress) =>
             setState(() => this.progress = progress),
-        errorCallback: (error) {
+        errorCallback: (error) async {
           // Construct our own version manifest from the downloaded versions
           setState(() =>
               progress = null); // Make the loading indicator indeterminate
@@ -124,9 +125,13 @@ class _CreateDialogState extends State<CreateDialog> {
           Directory versions = Directory(
               '${config.workingDirectory}${Platform.pathSeparator}versions');
           List<VersionInfo> versionObjs = [];
-          versions.list().listen((directory) async {
+          await for (FileSystemEntity directory in versions.list()) {
             if (directory is Directory) {
-              // fixme this is broken
+              if (directory.path.contains('fabric') ||
+                  directory.path.contains('forge') ||
+                  directory.path.contains('liteloader')) {
+                continue; // Modded versions are not supported yet.
+              }
               File data = File(path.join(directory.absolute.path,
                   '${path.basename(directory.path)}.json'));
               File jar = File(path.join(directory.absolute.path,
@@ -134,16 +139,25 @@ class _CreateDialogState extends State<CreateDialog> {
               if (await data.exists() && await jar.exists()) {
                 // If the game is executable (We check the hash later)
                 try {
-                  VersionData vData = VersionData.fromJson(jsonDecode(await data
-                      .readAsString())); // Parse and create the VersionInfo
+                  Map<String, dynamic> json =
+                      jsonDecode(await data.readAsString());
+                  if (json.containsKey('type') &&
+                      json['type'].toString().contains('old')) {
+                    // Skip
+                    continue;
+                  }
+                  VersionData vData = VersionData.fromJson(
+                      json); // Parse and create the VersionInfo
                   versionObjs.add(VersionInfo(
                       vData.id, vData.type, '', vData.time, vData.releaseTime));
-                } catch (ignored) {
+                } catch (e) {
                   // Ignore parsing errors for the version data - we will discard this version
+                  logger.severe(
+                      'Failed to parse the version data in ${directory.absolute.path}: $e.');
                 }
               }
             }
-          });
+          }
 
           // Sort and determine the latest version
           versionObjs.sort((a, b) => (a.releaseTime.compareTo(b.releaseTime)));
@@ -151,11 +165,11 @@ class _CreateDialogState extends State<CreateDialog> {
           String? latestSnapshot;
           for (VersionInfo version in versionObjs.reversed) {
             if (version.type == VersionType.snapshot &&
-                latestSnapshot != null) {
+                latestSnapshot == null) {
               latestSnapshot = version.id;
               continue;
             }
-            if (version.type == VersionType.release && latestRelease != null) {
+            if (version.type == VersionType.release && latestRelease == null) {
               latestRelease = version.id;
               continue;
             }
@@ -166,6 +180,7 @@ class _CreateDialogState extends State<CreateDialog> {
           // Create the manifest
           setState(() {
             this.versions = VersionManifest(latest, versionObjs);
+            _selectedVersion = this.versions.latest.release;
             loaded = true;
           });
         },
