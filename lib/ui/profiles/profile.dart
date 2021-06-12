@@ -37,6 +37,27 @@ class ProfileWidget extends StatelessWidget {
       this.openScreen = false,
       this.showActions = false});
 
+  void delete(BuildContext context) {
+    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
+    final ProfilesProvider profiles = Provider.of<ProfilesProvider>(context);
+
+    if (profiles.profiles.length == 1) {
+      profiles.selected = null;
+      screen.current = ScreenType.home;
+    } else if (profile.selected) {
+      profile.selected = false;
+      for (Profile prof in profiles.profiles) {
+        if (profile != prof) {
+          prof.selected = true;
+          profiles.selected = prof;
+          break;
+        }
+      }
+    }
+    profiles.removeProfile(profile);
+    profiles.saveTo(GetIt.I.get<File>(instanceName: 'profilesDB'));
+  }
+
   @override
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
@@ -56,23 +77,7 @@ class ProfileWidget extends StatelessWidget {
             color: theme.errorColor,
             tooltip: 'Delete',
             onPressed: () {
-              DeleteDialog.display(context, () {
-                if (profiles.profiles.length == 1) {
-                  profiles.selected = null;
-                  screen.current = ScreenType.home;
-                } else if (profile.selected) {
-                  profile.selected = false;
-                  for (Profile prof in profiles.profiles) {
-                    if (profile != prof) {
-                      prof.selected = true;
-                      profiles.selected = prof;
-                      break;
-                    }
-                  }
-                }
-                profiles.removeProfile(profile);
-                profiles.saveTo(GetIt.I.get<File>(instanceName: 'profilesDB'));
-              });
+              DeleteDialog.display(context, () => delete(context));
             })
       ]);
     }
