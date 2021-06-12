@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
+import 'package:lilay/ui/profiles/edit_dialog.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:lilay/ui/profiles/screen/delete_dialog.dart';
 import 'package:provider/provider.dart';
@@ -70,8 +71,9 @@ class ProfileWidget extends StatelessWidget {
     } else if (showActions) {
       trailingWidget = Row(mainAxisSize: MainAxisSize.min, children: [
         IconButton(
-            icon: Icon(Icons.edit), tooltip: 'Edit', onPressed: () {} // TODO
-            ),
+            icon: Icon(Icons.edit),
+            tooltip: 'Edit',
+            onPressed: () => EditDialog.display(context, profile)),
         IconButton(
             icon: Icon(Icons.delete),
             color: theme.errorColor,

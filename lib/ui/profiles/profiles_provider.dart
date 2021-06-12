@@ -67,6 +67,10 @@ class ProfilesProvider extends ChangeNotifier {
     await file.writeAsString(jsonEncode(_profiles));
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
   void addProfile(Profile profile) {
     _profiles.add(profile);
     notifyListeners();
