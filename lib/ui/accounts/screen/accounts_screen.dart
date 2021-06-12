@@ -31,10 +31,6 @@ import 'package:provider/provider.dart';
 /// "screens" are emulated as "pages" instead,
 /// and they always reside in the [Homepage].
 class AccountsScreen extends StatelessWidget {
-  final Function(Account) onAccountDelete;
-
-  const AccountsScreen({required this.onAccountDelete});
-
   @override
   Widget build(BuildContext context) {
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
@@ -54,10 +50,7 @@ class AccountsScreen extends StatelessWidget {
                       spreadRadius: 3,
                       offset: const Offset(2, 2))
                 ]),
-            child: AccountWidget(
-                account: account,
-                showActions: true,
-                onAccountDelete: () => onAccountDelete(account)))
+            child: AccountWidget(account: account, showActions: true))
     ]);
   }
 }

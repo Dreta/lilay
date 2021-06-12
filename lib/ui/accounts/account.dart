@@ -46,26 +46,16 @@ class AccountWidget extends StatefulWidget {
   /// will be shown for this widget.
   final bool showActions;
 
-  /// This function will be called when the user attempts
-  /// to delete the [account].
-  ///
-  /// Must be specified if [showActions] is true.
-  final Function? onAccountDelete;
-
   AccountWidget(
       {required this.account,
       this.openScreen = false,
-      this.showActions = false,
-      this.onAccountDelete})
+      this.showActions = false})
       : super(key: Key(account.uuid));
 
   @override
   _AccountWidgetState createState() {
     return _AccountWidgetState(
-        account: account,
-        openScreen: openScreen,
-        showActions: showActions,
-        onAccountDelete: onAccountDelete);
+        account: account, openScreen: openScreen, showActions: showActions);
   }
 }
 
@@ -75,19 +65,15 @@ class _AccountWidgetState extends State<AccountWidget> {
   final bool _showActions;
   bool _isRefreshing = false;
 
-  // This will be called after a confirmation dialog is shown.
-  final Function? _onAccountDelete;
   late File _cachedSkinPath;
 
   _AccountWidgetState(
       {required Account account,
       required bool openScreen,
-      required bool showActions,
-      Function? onAccountDelete})
+      required bool showActions})
       : _account = account,
         _openScreen = openScreen,
-        _showActions = showActions,
-        _onAccountDelete = onAccountDelete {
+        _showActions = showActions {
     _cachedSkinPath = File(
         '${GetIt.I.get<Directory>(instanceName: 'cache').absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
 
@@ -139,8 +125,30 @@ class _AccountWidgetState extends State<AccountWidget> {
                   icon: Icon(Icons.delete),
                   color: theme.errorColor,
                   tooltip: 'Delete',
-                  onPressed: () =>
-                      DeleteDialog.display(context, () => _onAccountDelete!()))
+                  onPressed: () => DeleteDialog.display(context, () {
+                        final ScreenProvider screen =
+                            Provider.of<ScreenProvider>(context, listen: false);
+                        final AccountsProvider accounts =
+                            Provider.of<AccountsProvider>(context,
+                                listen: false);
+
+                        if (accounts.accounts.length == 1) {
+                          accounts.selectedAccount = null;
+                          screen.current = ScreenType.home;
+                        } else if (_account.selected) {
+                          _account.selected = false;
+                          for (Account acc in accounts.accounts) {
+                            if (_account.uuid != acc.uuid) {
+                              acc.selected = true;
+                              accounts.selectedAccount = acc;
+                              break;
+                            }
+                          }
+                        }
+                        accounts.removeAccount(_account.uuid);
+                        accounts.saveTo(
+                            GetIt.I.get<File>(instanceName: 'accountsDB'));
+                      }))
             ]);
     }
 

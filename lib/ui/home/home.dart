@@ -19,11 +19,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/configuration/core/types.dart';
-import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/accounts/screen/accounts_screen.dart';
 import 'package:lilay/ui/animated_screen.dart';
 import 'package:lilay/ui/configuration/configuration_screen.dart';
@@ -36,29 +33,6 @@ import 'package:provider/provider.dart';
 /// consisting of the accounts, the game profiles
 /// and the play button.
 class Homepage extends StatelessWidget {
-  void deleteAccount(BuildContext context, Account account) {
-    final ScreenProvider screen =
-        Provider.of<ScreenProvider>(context, listen: false);
-    final AccountsProvider accounts =
-        Provider.of<AccountsProvider>(context, listen: false);
-
-    if (accounts.accounts.length == 1) {
-      accounts.selectedAccount = null;
-      screen.current = ScreenType.home;
-    } else if (account.selected) {
-      account.selected = false;
-      for (Account acc in accounts.accounts) {
-        if (account.uuid != acc.uuid) {
-          acc.selected = true;
-          accounts.selectedAccount = acc;
-          break;
-        }
-      }
-    }
-    accounts.removeAccount(account.uuid);
-    accounts.saveTo(GetIt.I.get<File>(instanceName: 'accountsDB'));
-  }
-
   @override
   Widget build(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
@@ -84,10 +58,7 @@ class Homepage extends StatelessWidget {
               Expanded(
                   child: Stack(children: [
                 AnimatedScreen(
-                    screenType: ScreenType.accounts,
-                    child: AccountsScreen(
-                        onAccountDelete: (account) =>
-                            deleteAccount(context, account))),
+                    screenType: ScreenType.accounts, child: AccountsScreen()),
                 AnimatedScreen(
                     screenType: ScreenType.profiles, child: ProfilesScreen()),
                 AnimatedScreen(
