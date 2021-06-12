@@ -94,6 +94,29 @@ class _AccountWidgetState extends State<AccountWidget> {
     }
   }
 
+  void delete() {
+    final ScreenProvider screen =
+        Provider.of<ScreenProvider>(context, listen: false);
+    final AccountsProvider accounts =
+        Provider.of<AccountsProvider>(context, listen: false);
+
+    if (accounts.accounts.length == 1) {
+      accounts.selectedAccount = null;
+      screen.current = ScreenType.home;
+    } else if (_account.selected) {
+      _account.selected = false;
+      for (Account acc in accounts.accounts) {
+        if (_account.uuid != acc.uuid) {
+          acc.selected = true;
+          accounts.selectedAccount = acc;
+          break;
+        }
+      }
+    }
+    accounts.removeAccount(_account.uuid);
+    accounts.saveTo(GetIt.I.get<File>(instanceName: 'accountsDB'));
+  }
+
   @override
   Widget build(BuildContext context) {
     final ScreenProvider screen = Provider.of<ScreenProvider>(context);
@@ -125,30 +148,8 @@ class _AccountWidgetState extends State<AccountWidget> {
                   icon: Icon(Icons.delete),
                   color: theme.errorColor,
                   tooltip: 'Delete',
-                  onPressed: () => DeleteDialog.display(context, () {
-                        final ScreenProvider screen =
-                            Provider.of<ScreenProvider>(context, listen: false);
-                        final AccountsProvider accounts =
-                            Provider.of<AccountsProvider>(context,
-                                listen: false);
-
-                        if (accounts.accounts.length == 1) {
-                          accounts.selectedAccount = null;
-                          screen.current = ScreenType.home;
-                        } else if (_account.selected) {
-                          _account.selected = false;
-                          for (Account acc in accounts.accounts) {
-                            if (_account.uuid != acc.uuid) {
-                              acc.selected = true;
-                              accounts.selectedAccount = acc;
-                              break;
-                            }
-                          }
-                        }
-                        accounts.removeAccount(_account.uuid);
-                        accounts.saveTo(
-                            GetIt.I.get<File>(instanceName: 'accountsDB'));
-                      }))
+                  onPressed: () =>
+                      DeleteDialog.display(context, () => delete()))
             ]);
     }
 
