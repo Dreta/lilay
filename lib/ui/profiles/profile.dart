@@ -23,6 +23,7 @@ import 'package:get_it/get_it.dart';
 import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
+import 'package:lilay/ui/profiles/screen/delete_dialog.dart';
 import 'package:provider/provider.dart';
 
 /// This widget represents a game profile in Lilay.
@@ -54,8 +55,25 @@ class ProfileWidget extends StatelessWidget {
             icon: Icon(Icons.delete),
             color: theme.errorColor,
             tooltip: 'Delete',
-            onPressed: () {} // TODO
-            )
+            onPressed: () {
+              DeleteDialog.display(context, () {
+                if (profiles.profiles.length == 1) {
+                  profiles.selected = null;
+                  screen.current = ScreenType.home;
+                } else if (profile.selected) {
+                  profile.selected = false;
+                  for (Profile prof in profiles.profiles) {
+                    if (profile != prof) {
+                      prof.selected = true;
+                      profiles.selected = prof;
+                      break;
+                    }
+                  }
+                }
+                profiles.removeProfile(profile);
+                profiles.saveTo(GetIt.I.get<File>(instanceName: 'profilesDB'));
+              });
+            })
       ]);
     }
 
