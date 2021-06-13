@@ -63,6 +63,7 @@ abstract class DownloadTask<D, R> {
 
   /// Notify all the callbacks of changes in this task.
   void notify() {
+    if (cancelled) return;
     for (TaskUpdateCallback callback in callbacks) callback();
   }
 
