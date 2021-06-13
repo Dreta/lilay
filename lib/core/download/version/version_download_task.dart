@@ -22,6 +22,7 @@ import 'dart:io';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:lilay/core/download/task.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:logging/logging.dart';
 
@@ -32,50 +33,49 @@ import 'version_data.dart';
 ///
 /// This is a SHALLOW download. The associated assets, client, libraries etc.
 /// are NOT downloaded within this task.
-class VersionDownloadTask {
+class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   static const String VERSION_PATH = 'versions/{version}/{version}.json';
 
-  Function(double) progressCallback;
-  Function(String) errorCallback;
-  Function(VersionData) resultCallback;
-  VersionInfo version;
-  String workingDir;
-
   VersionDownloadTask(
-      {required this.progressCallback,
-      required this.errorCallback,
-      required this.resultCallback,
-      required this.version,
-      required this.workingDir});
-
-  /// Prevent the callbacks from being called anymore.
-  void disable() {
-    progressCallback = (a) => {};
-    errorCallback = (a) => {};
-    resultCallback = (a) => {};
-  }
+      {required String source,
+      required VersionInfo dependency,
+      required String workingDir})
+      : super(source: source, dependency: dependency, workingDir: workingDir);
 
   /// Check if the version metadata already exist at the specified [workingDir].
-  Future<bool> metadataExists() async {
-    return File(
-            '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', version.id)}')
-        .exists();
+  @override
+  Future<bool> get cacheAvailable async {
+    try {
+      return File(
+              '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}')
+          .exists();
+    } catch (e) {
+      exceptionPhase = Phase.loadCache;
+      exception = e;
+      notify();
+      return false;
+    }
   }
 
-  /// Start to download the version metadata from the download source [source].
-  void start(String source) async {
+  @override
+  Future<void> download() async {
     Logger logger = GetIt.I.get<Logger>();
-    logger.info('Downloading the version manifest for version ${version.id}.');
+    logger
+        .info('Downloading the version manifest for version ${dependency.id}.');
     Request request = Request(
         'GET',
         Uri.parse(
-            version.url.replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
+            dependency.url.replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
       StreamedResponse resp = await request.send();
 
-      resp.stream.handleError((error) => errorCallback(error.toString()));
+      resp.stream.handleError((error) {
+        exceptionPhase = Phase.download;
+        exception = error;
+        notify();
+      });
 
       int received = 0;
       List<int> receivedBytes = [];
@@ -83,25 +83,33 @@ class VersionDownloadTask {
       resp.stream.listen((chunk) {
         logger.fine('Received ${chunk.length} bytes of data.');
         received += chunk.length;
-        if (resp.contentLength != null) {
-          progressCallback(received / resp.contentLength!);
-        }
+        progress = received / request.contentLength;
+        notify();
         receivedBytes.addAll(chunk);
 
-        if (received >= resp.contentLength!) {
+        if (finished) {
           String json = utf8.decode(receivedBytes);
-          VersionData data = VersionData.fromJson(jsonDecode(json));
-
-          logger.info('Saved version manifest ${version.id}.');
-          File local = File(
-              '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', version.id)}');
-          local.writeAsString(json);
-
-          resultCallback(data);
+          result = VersionData.fromJson(jsonDecode(json));
+          notify();
         }
       });
     } catch (e) {
-      errorCallback(e.toString());
+      exceptionPhase = Phase.download;
+      exception = e;
+      notify();
+    }
+  }
+
+  @override
+  Future<void> save() async {
+    try {
+      File local = File(
+          '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
+      local.writeAsString(jsonEncode(result!.toJson()));
+    } catch (e) {
+      exceptionPhase = Phase.save;
+      exception = e;
+      notify();
     }
   }
 }

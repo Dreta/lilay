@@ -21,37 +21,33 @@ import 'dart:io';
 
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
+import 'package:lilay/core/download/task.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:logging/logging.dart';
 
-class VersionsDownloadTask {
+class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
   static const String MANIFEST_PATH = 'versions/version_manifest_v2.json';
 
-  Function(double) progressCallback;
-  Function(String) errorCallback;
-  Function(VersionManifest) resultCallback;
-  String workingDir;
-
-  VersionsDownloadTask(
-      {required this.progressCallback,
-      required this.errorCallback,
-      required this.resultCallback,
-      required this.workingDir});
+  VersionsDownloadTask({required String source, required String workingDir})
+      : super(source: source, dependency: null, workingDir: workingDir);
 
   /// Check if a version manifest already exist at the specified [workingDir].
-  Future<bool> manifestExists() async {
-    return File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH').exists();
-  }
-
-  /// Prevent the callbacks from being called anymore.
-  void disable() {
-    progressCallback = (a) => {};
-    errorCallback = (a) => {};
-    resultCallback = (a) => {};
+  @override
+  Future<bool> get cacheAvailable async {
+    try {
+      return File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH')
+          .exists();
+    } catch (e) {
+      exceptionPhase = Phase.loadCache;
+      exception = e;
+      notify();
+      return false;
+    }
   }
 
   /// Start to download the version manifest from the download source [source].
-  void start(String source) async {
+  @override
+  Future<void> download() async {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Starting to download the versions manifest.');
     Request request =
@@ -61,7 +57,11 @@ class VersionsDownloadTask {
     try {
       StreamedResponse resp = await request.send();
 
-      resp.stream.handleError((error) => errorCallback(error.toString()));
+      resp.stream.handleError((error) {
+        exceptionPhase = Phase.download;
+        exception = error;
+        notify();
+      });
 
       int received = 0;
       List<int> receivedBytes = [];
@@ -69,27 +69,33 @@ class VersionsDownloadTask {
       resp.stream.listen((chunk) {
         logger.fine('Received ${chunk.length} bytes of data.');
         received += chunk.length;
-        if (resp.contentLength != null) {
-          progressCallback(received / resp.contentLength!);
-        }
+        progress = received / resp.contentLength!;
+        notify();
         receivedBytes.addAll(chunk);
 
-        if (received >= resp.contentLength!) {
+        if (finished) {
           // We're done!
           String json = utf8.decode(receivedBytes);
-          VersionManifest manifest = VersionManifest.fromJson(jsonDecode(json));
-
-          logger.info('Saved the version manifest.');
-          // Cache the version manifest locally
-          File local =
-              File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
-          local.writeAsString(json);
-
-          resultCallback(manifest);
+          result = VersionManifest.fromJson(jsonDecode(json));
+          notify();
         }
       });
     } catch (e) {
-      errorCallback(e.toString());
+      exceptionPhase = Phase.download;
+      exception = e;
+      notify();
+    }
+  }
+
+  @override
+  Future<void> save() async {
+    try {
+      File local = File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
+      local.writeAsString(jsonEncode(result!.toJson()));
+    } catch (e) {
+      exceptionPhase = Phase.save;
+      exception = e;
+      notify();
     }
   }
 }

@@ -121,7 +121,7 @@ class _EditDialogState extends State<EditDialog> {
     _javaExec.dispose();
     _jvmArgs.dispose();
     _gameArgs.dispose();
-    task.disable();
+    task.cancelled = true;
   }
 
   /// Attempt to load the version manifest
@@ -130,84 +130,87 @@ class _EditDialogState extends State<EditDialog> {
     final Logger logger = GetIt.I.get<Logger>();
 
     task = VersionsDownloadTask(
-        progressCallback: (progress) =>
-            setState(() => this.progress = progress),
-        errorCallback: (error) async {
-          // Construct our own version manifest from the downloaded versions
-          setState(() =>
-              progress = null); // Make the loading indicator indeterminate
+        source: config.metaSource, workingDir: config.workingDirectory);
+    task.callbacks.add(() => setState(() => progress = task.progress));
+    task.callbacks.add(() async {
+      if (task.exception != null) {
+        // Construct our own version manifest from the downloaded versions
+        setState(
+            () => progress = null); // Make the loading indicator indeterminate
 
-          // Enumerate the versions/ directory for valid versions
-          Directory versions = Directory(
-              '${config.workingDirectory}${Platform.pathSeparator}versions');
-          List<VersionInfo> versionObjs = [];
-          await for (FileSystemEntity directory in versions.list()) {
-            if (directory is Directory) {
-              if (directory.path.contains('fabric') ||
-                  directory.path.contains('forge') ||
-                  directory.path.contains('liteloader')) {
-                continue; // Modded versions are not supported yet.
-              }
-              File data = File(path.join(directory.absolute.path,
-                  '${path.basename(directory.path)}.json'));
-              File jar = File(path.join(directory.absolute.path,
-                  '${path.basename(directory.path)}.jar'));
-              if (await data.exists() && await jar.exists()) {
-                // If the game is executable (We check the hash later)
-                try {
-                  Map<String, dynamic> json =
-                      jsonDecode(await data.readAsString());
-                  if (json.containsKey('type') &&
-                      json['type'].toString().contains('old')) {
-                    // Skip
-                    continue;
-                  }
-                  VersionData vData = VersionData.fromJson(
-                      json); // Parse and create the VersionInfo
-                  versionObjs.add(VersionInfo(
-                      vData.id, vData.type, '', vData.time, vData.releaseTime));
-                } catch (e) {
-                  // Ignore parsing errors for the version data - we will discard this version
-                  logger.severe(
-                      'Failed to parse the version data in ${directory.absolute.path}: $e.');
+        // Enumerate the versions/ directory for valid versions
+        Directory versions = Directory(
+            '${config.workingDirectory}${Platform.pathSeparator}versions');
+        List<VersionInfo> versionObjs = [];
+        await for (FileSystemEntity directory in versions.list()) {
+          if (directory is Directory) {
+            if (directory.path.contains('fabric') ||
+                directory.path.contains('forge') ||
+                directory.path.contains('liteloader')) {
+              continue; // Modded versions are not supported yet.
+            }
+            File data = File(path.join(directory.absolute.path,
+                '${path.basename(directory.path)}.json'));
+            File jar = File(path.join(directory.absolute.path,
+                '${path.basename(directory.path)}.jar'));
+            if (await data.exists() && await jar.exists()) {
+              // If the game is executable (We check the hash later)
+              try {
+                Map<String, dynamic> json =
+                    jsonDecode(await data.readAsString());
+                if (json.containsKey('type') &&
+                    json['type'].toString().contains('old')) {
+                  // Skip
+                  continue;
                 }
+                VersionData vData = VersionData.fromJson(
+                    json); // Parse and create the VersionInfo
+                versionObjs.add(VersionInfo(
+                    vData.id, vData.type, '', vData.time, vData.releaseTime));
+              } catch (e) {
+                // Ignore parsing errors for the version data - we will discard this version
+                logger.severe(
+                    'Failed to parse the version data in ${directory.absolute.path}: $e.');
               }
             }
           }
+        }
 
-          // Sort and determine the latest version
-          versionObjs.sort((a, b) => (a.releaseTime.compareTo(b.releaseTime)));
-          String? latestRelease;
-          String? latestSnapshot;
-          for (VersionInfo version in versionObjs.reversed) {
-            if (version.type == VersionType.snapshot &&
-                latestSnapshot == null) {
-              latestSnapshot = version.id;
-              continue;
-            }
-            if (version.type == VersionType.release && latestRelease == null) {
-              latestRelease = version.id;
-              continue;
-            }
+        // Sort and determine the latest version
+        versionObjs.sort((a, b) => (a.releaseTime.compareTo(b.releaseTime)));
+        String? latestRelease;
+        String? latestSnapshot;
+        for (VersionInfo version in versionObjs.reversed) {
+          if (version.type == VersionType.snapshot && latestSnapshot == null) {
+            latestSnapshot = version.id;
+            continue;
           }
-          LatestVersion latest =
-              LatestVersion(latestRelease ?? '', latestSnapshot ?? '');
+          if (version.type == VersionType.release && latestRelease == null) {
+            latestRelease = version.id;
+            continue;
+          }
+        }
+        LatestVersion latest =
+            LatestVersion(latestRelease ?? '', latestSnapshot ?? '');
 
-          // Create the manifest
-          setState(() {
-            this.versions = VersionManifest(latest, versionObjs);
-            loaded = true;
-          });
-        },
-        resultCallback: (result) {
-          setState(() {
-            // Use the downloaded versions manifest
-            versions = result;
-            loaded = true;
-          });
-        },
-        workingDir: config.workingDirectory);
-    task.start(config.metaSource);
+        // Create the manifest
+        setState(() {
+          this.versions = VersionManifest(latest, versionObjs);
+          loaded = true;
+        });
+      }
+    });
+    task.callbacks.add(() {
+      if (task.result != null) {
+        task.save();
+        setState(() {
+          // Use the downloaded versions manifest
+          versions = task.result!;
+          loaded = true;
+        });
+      }
+    });
+    task.start();
   }
 
   /// Create the profile name field

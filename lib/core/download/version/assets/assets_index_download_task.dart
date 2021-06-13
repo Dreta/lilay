@@ -5,7 +5,7 @@
  * Lilay is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * (at your option) any later dependency.
  *
  * Lilay is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,7 @@ import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:logging/logging.dart';
 
+import '../../task.dart';
 import '../version_data.dart';
 import 'asset.dart';
 
@@ -33,57 +34,57 @@ import 'asset.dart';
 ///
 /// This is a SHALLOW download. The associated assets with the index are NOT
 /// downloaded within this task.
-class AssetsIndexDownloadTask {
+class AssetsIndexDownloadTask
+    extends DownloadTask<VersionData, Map<String, Asset>> {
   static const String ASSETS_INDEX_PATH = 'assets/indexes/{type}.json';
 
-  Function(double) progressCallback;
-  Function(String) errorCallback;
-  Function(Map<String, Asset>) resultCallback;
-  VersionData version;
-  String workingDir;
-
-  /// Prevent the callbacks from being called anymore.
-  void disable() {
-    progressCallback = (a) => {};
-    errorCallback = (a) => {};
-    resultCallback = (a) => {};
-  }
-
   AssetsIndexDownloadTask(
-      {required this.progressCallback,
-      required this.errorCallback,
-      required this.resultCallback,
-      required this.version,
-      required this.workingDir});
+      {required String source,
+      required VersionData dependency,
+      required String workingDir})
+      : super(source: source, dependency: dependency, workingDir: workingDir);
 
   /// Check if the assets index already exist at the specified [workingDir],
   /// and that the hash matches.
-  Future<bool> indexExists() async {
-    File file = File(
-        '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', version.assets)}');
-    return (await file.exists()) &&
-        (version.assetIndex!.sha1.toLowerCase() ==
-            sha1
-                .convert(List.from(await file.readAsBytes()))
-                .toString()
-                .toLowerCase()) &&
-        (await file.length() == version.assetIndex!.size);
+  @override
+  Future<bool> get cacheAvailable async {
+    try {
+      File file = File(
+          '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
+      return (await file.exists()) &&
+          (dependency.assetIndex!.sha1.toLowerCase() ==
+              sha1
+                  .convert(List.from(await file.readAsBytes()))
+                  .toString()
+                  .toLowerCase()) &&
+          (await file.length() == dependency.assetIndex!.size);
+    } catch (e) {
+      exceptionPhase = Phase.loadCache;
+      exception = e;
+      notify();
+      return false;
+    }
   }
 
   /// Start to download the assets index from the download source [source].
-  void start(String source) async {
+  @override
+  Future<void> download() async {
     Logger logger = GetIt.I.get<Logger>();
-    logger.info('Starting to download the asset index ${version.assets}.');
+    logger.info('Starting to download the asset index ${dependency.assets}.');
     Request request = Request(
         'GET',
-        Uri.parse(version.assetIndex!.url
+        Uri.parse(dependency.assetIndex!.url
             .replaceAll(CoreConfig.DEFAULT_META_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
       StreamedResponse resp = await request.send();
 
-      resp.stream.handleError((error) => errorCallback(error.toString()));
+      resp.stream.handleError((error) {
+        exceptionPhase = Phase.download;
+        exception = error;
+        notify();
+      });
 
       int received = 0;
       List<int> receivedBytes = [];
@@ -91,9 +92,8 @@ class AssetsIndexDownloadTask {
       resp.stream.listen((chunk) {
         received += chunk.length;
         logger.fine('Received ${chunk.length} bytes of data.');
-        if (resp.contentLength != null) {
-          progressCallback(received / resp.contentLength!);
-        }
+        progress = received / resp.contentLength!;
+        notify();
         receivedBytes.addAll(chunk);
 
         if (received >= resp.contentLength!) {
@@ -105,16 +105,28 @@ class AssetsIndexDownloadTask {
             assets[asset.key] = Asset.fromJson(asset.value);
           }
 
-          logger.info('Saved asset index ${version.assets}.');
-          File local = File(
-              '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', version.assets)}');
-          local.writeAsString(json);
-
-          resultCallback(assets);
+          result = assets;
+          notify();
         }
       });
     } catch (e) {
-      errorCallback(e.toString());
+      exceptionPhase = Phase.download;
+      exception = e;
+      notify();
+    }
+  }
+
+  @override
+  Future<void> save() async {
+    try {
+      File local = File(
+          '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
+      local.writeAsString(jsonEncode(result!
+          .map((key, value) => MapEntry(key, jsonEncode(value.toJson())))));
+    } catch (e) {
+      exceptionPhase = Phase.save;
+      exception = e;
+      notify();
     }
   }
 }
