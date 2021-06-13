@@ -47,17 +47,26 @@ class AssetsIndexDownloadTask
   /// Check if the assets index already exist at the specified [workingDir],
   /// and that the hash matches.
   @override
-  Future<bool> get cacheAvailable async {
+  Future<bool> get tryLoadCache async {
     try {
       File file = File(
           '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
-      return (await file.exists()) &&
+      bool available = (await file.exists()) &&
           (dependency.assetIndex!.sha1.toLowerCase() ==
               sha1
                   .convert(List.from(await file.readAsBytes()))
                   .toString()
                   .toLowerCase()) &&
           (await file.length() == dependency.assetIndex!.size);
+      if (available) {
+        Map<String, dynamic> assetsJson =
+            jsonDecode(await file.readAsString())['objects'];
+        result = {};
+        for (MapEntry<String, dynamic> asset in assetsJson.entries) {
+          result![asset.key] = Asset.fromJson(asset.value);
+        }
+      }
+      return available;
     } catch (e) {
       exceptionPhase = Phase.loadCache;
       exception = e;
@@ -121,8 +130,9 @@ class AssetsIndexDownloadTask
     try {
       File local = File(
           '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
-      local.writeAsString(jsonEncode(result!
-          .map((key, value) => MapEntry(key, jsonEncode(value.toJson())))));
+      local.writeAsString(jsonEncode({
+        'objects': result!.map((key, value) => MapEntry(key, value.toJson()))
+      }));
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;

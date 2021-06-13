@@ -41,17 +41,21 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
   /// Check if the client already exist at the specified [workingDir]
   /// and that the hash matches.
   @override
-  Future<bool> get cacheAvailable async {
+  Future<bool> get tryLoadCache async {
     try {
       File file = File(
           '$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', dependency.id)}');
-      return ((await file.exists()) &&
+      bool available = ((await file.exists()) &&
               (dependency.downloads.client.sha1.toLowerCase() ==
                   sha1
                       .convert(List.from(await file.readAsBytes()))
                       .toString()
                       .toLowerCase())) &&
           (await file.length() == dependency.downloads.client.size);
+      if (available) {
+        result = await file.readAsBytes();
+      }
+      return available;
     } catch (e) {
       exceptionPhase = Phase.loadCache;
       exception = e;

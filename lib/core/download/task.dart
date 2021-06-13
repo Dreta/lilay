@@ -40,10 +40,10 @@ abstract class DownloadTask<D, R> {
     for (TaskUpdateCallback callback in callbacks) callback();
   }
 
-  Future<bool> get cacheAvailable;
+  Future<bool> get tryLoadCache;
 
   Future<void> start() async {
-    if (await cacheAvailable) return;
+    if (await tryLoadCache) return;
     download();
   }
 

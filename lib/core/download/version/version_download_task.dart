@@ -44,11 +44,16 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
 
   /// Check if the version metadata already exist at the specified [workingDir].
   @override
-  Future<bool> get cacheAvailable async {
+  Future<bool> get tryLoadCache async {
+    // TODO Verify checksum
     try {
-      return File(
-              '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}')
-          .exists();
+      File file = File(
+          '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
+      if (await file.exists()) {
+        result = VersionData.fromJson(jsonDecode(await file.readAsString()));
+        return true;
+      }
+      return false;
     } catch (e) {
       exceptionPhase = Phase.loadCache;
       exception = e;
@@ -103,9 +108,8 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   @override
   Future<void> save() async {
     try {
-      File local = File(
-          '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
-      local.writeAsString(jsonEncode(result!.toJson()));
+      File('$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}')
+          .writeAsString(jsonEncode(result!.toJson()));
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;

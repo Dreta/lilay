@@ -33,8 +33,10 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
 
   /// Check if a version manifest already exist at the specified [workingDir].
   @override
-  Future<bool> get cacheAvailable async {
+  Future<bool> get tryLoadCache async {
     try {
+      // We will not load the cache here because we always want to download
+      // a new version manifest.
       return File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH')
           .exists();
     } catch (e) {
@@ -90,8 +92,8 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
   @override
   Future<void> save() async {
     try {
-      File local = File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
-      local.writeAsString(jsonEncode(result!.toJson()));
+      File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH')
+          .writeAsString(jsonEncode(result!.toJson()));
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;
