@@ -104,6 +104,7 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
           }
 
           result = receivedBytes;
+          notify();
         }
       });
     } catch (e) {
