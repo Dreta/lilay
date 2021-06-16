@@ -28,6 +28,7 @@ part 'version_data.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class VersionData {
+  // TODO support inherits from
   ArgumentsData? arguments;
   AssetsIndex? assetIndex;
   String assets;
