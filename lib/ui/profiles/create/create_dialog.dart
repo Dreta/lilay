@@ -128,11 +128,6 @@ class _CreateDialogState extends State<CreateDialog> {
         List<VersionInfo> versionObjs = [];
         await for (FileSystemEntity directory in versions.list()) {
           if (directory is Directory) {
-            if (directory.path.contains('fabric') ||
-                directory.path.contains('forge') ||
-                directory.path.contains('liteloader')) {
-              continue; // Modded versions are not supported yet.
-            }
             File data = File(path.join(directory.absolute.path,
                 '${path.basename(directory.path)}.json'));
             File jar = File(path.join(directory.absolute.path,
