@@ -26,15 +26,17 @@ part 'library.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class Library {
-  LibDownloadInfo downloads;
+  LibDownloadInfo? downloads;
   String name;
+  String? url;
   NativesMapping? natives;
   List<Rule> rules;
 
-  Library(LibDownloadInfo downloads, String name, NativesMapping? natives,
-      List<Rule>? rules)
+  Library(LibDownloadInfo? downloads, String name, String? url,
+      NativesMapping? natives, List<Rule>? rules)
       : this.downloads = downloads,
         this.name = name,
+        this.url = url,
         this.natives = natives,
         this.rules = rules ?? [];
 

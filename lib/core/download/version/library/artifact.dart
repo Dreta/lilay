@@ -16,6 +16,8 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 /// Represents a Maven artifact.
 class Artifact {
   final String groupId;
@@ -35,6 +37,18 @@ class Artifact {
   /// Get the URL of the SHA-1 hash of this artifact from a root URL.
   String urlHash(String root) {
     return '$root/${groupId.replaceAll('.', '/')}/$artifactId/$version/$artifactId-$version.jar.sha1';
+  }
+
+  /// Get where to store this artifact in.
+  String path(String root) {
+    return '$root${Platform.pathSeparator}'
+        '${groupId.replaceAll('.', Platform.pathSeparator)}'
+        '${Platform.pathSeparator}'
+        '$artifactId'
+        '${Platform.pathSeparator}'
+        '$version'
+        '${Platform.pathSeparator}'
+        '$artifactId-$version.jar';
   }
 
   @override

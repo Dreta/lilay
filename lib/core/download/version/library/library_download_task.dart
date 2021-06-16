@@ -26,6 +26,7 @@ import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/rule.dart';
 import 'package:lilay/core/download/task.dart';
 import 'package:lilay/core/download/version/assets/friendly_download.dart';
+import 'package:lilay/core/download/version/library/artifact.dart';
 import 'package:lilay/core/download/version/library/library.dart';
 import 'package:logging/logging.dart';
 import 'package:system_info/system_info.dart';
@@ -58,7 +59,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
   }
 
   FriendlyDownload? get _platformNative {
-    if (dependency.natives == null) {
+    if (dependency.natives == null || dependency.downloads == null) {
       return null;
     }
 
@@ -76,22 +77,42 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
     }
 
     return FriendlyDownload.fromJson(
-        dependency.downloads.classifiers[index] as Map<String, dynamic>);
+        dependency.downloads!.classifiers[index] as Map<String, dynamic>);
   }
 
   @override
   Future<bool> get tryLoadCache async {
     try {
       // Attempt to load the artifact first.
-      File artifact = File(
-          '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads.artifact!.path!)}');
-      bool artifactAvailable = (await artifact.exists()) &&
-          (dependency.downloads.artifact!.sha1.toLowerCase() ==
-              sha1
-                  .convert(List.from(await artifact.readAsBytes()))
-                  .toString()
-                  .toLowerCase()) &&
-          (await artifact.length() == dependency.downloads.artifact!.size);
+      // Handle two cases: the vanilla case with [dependency.downloads] or the
+      // out-of-nowhere case with [dependency.url].
+      bool artifactAvailable;
+      File artifact;
+      if (dependency.downloads != null) {
+        artifact = File(
+            '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads!.artifact!.path!)}');
+        artifactAvailable = (await artifact.exists()) &&
+            (dependency.downloads!.artifact!.sha1.toLowerCase() ==
+                sha1
+                    .convert(List.from(await artifact.readAsBytes()))
+                    .toString()
+                    .toLowerCase()) &&
+            (await artifact.length() == dependency.downloads!.artifact!.size);
+      } else {
+        Artifact artif = Artifact(dependency.name);
+        artifact = File(artif.path(workingDir));
+
+        // Fetch SHA-1 hash of this artifact
+        String hash =
+            (await get(Uri.parse(artif.urlHash(dependency.url!)))).body.trim();
+
+        artifactAvailable = (await artifact.exists()) &&
+            (hash.toLowerCase() ==
+                sha1
+                    .convert(List.from(await artifact.readAsBytes()))
+                    .toString()
+                    .toLowerCase());
+      }
       if (artifactAvailable) {
         result = await artifact.readAsBytes();
       }
@@ -145,10 +166,14 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the artifact of library ${dependency.name}.');
 
+    Artifact artifact = Artifact(dependency.name);
+
     Request request = Request(
         'GET',
-        Uri.parse(dependency.downloads.artifact!.url
-            .replaceAll(CoreConfig.DEFAULT_LIBRARIES_SOURCE, source)));
+        Uri.parse(dependency.downloads == null
+            ? artifact.url(dependency.url!)
+            : dependency.downloads!.artifact!.url
+                .replaceAll(CoreConfig.DEFAULT_LIBRARIES_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
@@ -161,7 +186,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
 
       int received = 0;
       List<int> receivedBytes = [];
-      resp.stream.listen((chunk) {
+      resp.stream.listen((chunk) async {
         received += chunk.length;
         logger.fine('Received ${chunk.length} bytes of data.');
         // The progress is divided into two parts - the artifact and the native.
@@ -171,7 +196,11 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
 
         if (received >= resp.contentLength!) {
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-              dependency.downloads.artifact!.sha1.toLowerCase()) {
+              (dependency.downloads == null
+                  ? (await get(Uri.parse(artifact.urlHash(dependency.url!))))
+                      .body
+                      .trim()
+                  : dependency.downloads!.artifact!.sha1.toLowerCase())) {
             logger.severe(
                 'Library artifact ${dependency.name}\'s checksum is invalid.');
             exceptionPhase = Phase.download;
@@ -180,13 +209,15 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
             return;
           }
 
-          if (receivedBytes.length != dependency.downloads.artifact!.size) {
-            logger.severe(
-                'Library artifact ${dependency.name}\'s size is incorrect.');
-            exceptionPhase = Phase.download;
-            exception = Exception(
-                'Library artifact ${dependency.name}\'s size is incorrect.');
-            return;
+          if (dependency.downloads != null) {
+            if (receivedBytes.length != dependency.downloads!.artifact!.size) {
+              logger.severe(
+                  'Library artifact ${dependency.name}\'s size is incorrect.');
+              exceptionPhase = Phase.download;
+              exception = Exception(
+                  'Library artifact ${dependency.name}\'s size is incorrect.');
+              return;
+            }
           }
 
           result = receivedBytes;
@@ -275,7 +306,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
   Future<void> save() async {
     try {
       if (result!.isNotEmpty) {
-        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads.artifact!.path!)}')
+        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads == null ? Artifact(dependency.name).path(workingDir) : dependency.downloads!.artifact!.path!)}')
             .writeAsBytes(result!);
       }
 
