@@ -22,8 +22,7 @@ Library _$LibraryFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$LibraryToJson(Library instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$LibraryToJson(Library instance) => <String, dynamic>{
       'downloads': instance.downloads?.toJson(),
       'name': instance.name,
       'url': instance.url,
