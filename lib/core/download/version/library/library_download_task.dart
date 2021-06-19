@@ -42,7 +42,7 @@ import 'package:logging/logging.dart';
 class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
   static const String LIBRARY_PATH = 'libraries/{path}';
 
-  late List<int>? resultNative;
+  List<int>? resultNative;
 
   LibraryDownloadTask(
       {required String source,
@@ -90,6 +90,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       // Now attempt to load the natives.
       FriendlyDownload? native = dependency.platformNative;
       if (native == null) {
+        resultNative = [];
         return artifactAvailable;
       }
 

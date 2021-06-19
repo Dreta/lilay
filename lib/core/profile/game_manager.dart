@@ -271,7 +271,7 @@ class GameManager {
       }
     });
     task.callbacks.add(() {
-      if (task.result != null) {
+      if (task.result != null && task.resultNative != null) {
         task.save();
         if (iterator.moveNext()) {
           _downloadLibrary(data, iterator);
@@ -405,11 +405,11 @@ extension TaskExtension on Task {
   String get text {
     return {
       Task.downloadManifest: 'Downloading manifest',
-      Task.downloadVersionData: 'Downloading version data',
-      Task.downloadAssetsIndex: 'Downloading assets index',
-      Task.downloadAssets: 'Downloading assets',
-      Task.downloadLibraries: 'Downloading libraries',
-      Task.downloadCore: 'Downloading client',
+      Task.downloadVersionData: 'Verifying and downloading version data',
+      Task.downloadAssetsIndex: 'Verifying and downloading assets index',
+      Task.downloadAssets: 'Verifying and downloading assets',
+      Task.downloadLibraries: 'Verifying and downloading libraries',
+      Task.downloadCore: 'Verifying and downloading client',
       Task.start: 'Starting game'
     }[this]!;
   }
