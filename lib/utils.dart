@@ -17,6 +17,9 @@
  */
 
 import 'dart:io';
+import 'dart:math';
+
+Random random = Random();
 
 /// Add dashes to a UUID string for parsing into a UuidValue.
 String dashifyUUID(String uuid) =>
@@ -32,6 +35,24 @@ String getDefaultMinecraft() {
     return '${Platform.environment['HOME']}/.minecraft/';
   }
 }
+
+/// Get the location of the platform-dependent temporary directory location.
+String getTempDirectory() {
+  if (Platform.isWindows) {
+    return '${Platform.environment['LOCALAPPDATA']}\\Temp/';
+  } else if (Platform.isMacOS) {
+    return '${Platform.environment['TMPDIR']}/';
+  } else {
+    return '/tmp/';
+  }
+}
+
+const characters =
+    'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+
+/// Generate a random string.
+String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
+    length, (_) => characters.codeUnitAt(random.nextInt(characters.length))));
 
 /// Get the operating system name, in Minecraft's fashion.
 ///
