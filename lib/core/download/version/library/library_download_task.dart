@@ -21,7 +21,6 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
-import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/rule.dart';
 import 'package:lilay/core/download/task.dart';
@@ -44,13 +43,11 @@ import 'package:system_info/system_info.dart';
 class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
   static const String LIBRARY_PATH = 'libraries/{path}';
 
-  final Account account;
   late List<int>? resultNative;
 
   LibraryDownloadTask(
       {required String source,
       required Library dependency,
-      required this.account,
       required String workingDir})
       : super(source: source, dependency: dependency, workingDir: workingDir);
 
@@ -149,7 +146,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Starting to download the library ${dependency.name}');
 
-    if (!Rule.multiRulesApplicable(dependency.rules, account)) {
+    if (!Rule.multiRulesApplicable(dependency.rules, null)) {
       logger.info(
           'The library ${dependency.name} is not applicable for download on this platform. Skipping.');
       result = [];

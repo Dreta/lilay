@@ -36,7 +36,7 @@ class Rule {
         this.features = features,
         this.os = os;
 
-  static bool multiRulesApplicable(List<Rule> rules, Account account) {
+  static bool multiRulesApplicable(List<Rule> rules, Account? account) {
     bool applicability = rules.isEmpty;
 
     for (Rule rule in rules) {
@@ -54,7 +54,7 @@ class Rule {
     return applicability;
   }
 
-  applicable(Account account) {
+  applicable(Account? account) {
     bool featuresCompatible =
         features != null ? features!.applicable(account) : true;
     bool osCompatible = os != null ? os!.applicable() : true;
@@ -78,7 +78,10 @@ class FeatureSet {
       : this.isDemoUser = isDemoUser,
         this.hasCustomResolution = hasCustomResolution;
 
-  bool applicable(Account account) {
+  bool applicable(Account? account) {
+    if (account == null) {
+      return true;
+    }
     if (isDemoUser != null && !isDemoUser! && account.paid) {
       // If isDemoUser is false and account is paid
       return false;
