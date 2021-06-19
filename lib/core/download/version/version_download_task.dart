@@ -108,8 +108,10 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   @override
   Future<void> save() async {
     try {
-      File('$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}')
-          .writeAsString(jsonEncode(result!.toJson()));
+      File local = File(
+          '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
+      local.parent.create(recursive: true);
+      local.writeAsString(jsonEncode(result!.toJson()));
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;

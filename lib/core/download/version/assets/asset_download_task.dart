@@ -117,8 +117,10 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
   @override
   Future<void> save() async {
     try {
-      File('$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', dependency.hash.substring(0, 2)).replaceAll('{hash2}', dependency.hash)}')
-          .writeAsBytes(result!);
+      File local = File(
+          '$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', dependency.hash.substring(0, 2)).replaceAll('{hash2}', dependency.hash)}');
+      local.parent.create(recursive: true);
+      local.writeAsBytes(result!);
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;

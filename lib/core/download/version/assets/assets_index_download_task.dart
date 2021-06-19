@@ -130,6 +130,7 @@ class AssetsIndexDownloadTask
     try {
       File local = File(
           '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
+      await local.parent.create(recursive: true);
       local.writeAsString(jsonEncode({
         'objects': result!.map((key, value) => MapEntry(key, value.toJson()))
       }));

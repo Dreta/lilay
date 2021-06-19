@@ -276,13 +276,17 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
   Future<void> save() async {
     try {
       if (result!.isNotEmpty) {
-        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads == null ? Artifact(dependency.name).path(workingDir) : dependency.downloads!.artifact!.path!)}')
-            .writeAsBytes(result!);
+        File local = File(
+            '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads == null ? Artifact(dependency.name).path(workingDir) : dependency.downloads!.artifact!.path!)}');
+        local.parent.create(recursive: true);
+        local.writeAsBytes(result!);
       }
 
       if (resultNative!.isNotEmpty) {
-        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.platformNative!.path!)}')
-            .writeAsBytes(resultNative!);
+        File local = File(
+            '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.platformNative!.path!)}');
+        local.parent.create(recursive: true);
+        local.writeAsBytes(resultNative!);
       }
     } catch (e) {
       exceptionPhase = Phase.save;
