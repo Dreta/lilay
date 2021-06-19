@@ -35,10 +35,10 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
   @override
   Future<bool> get tryLoadCache async {
     try {
-      // We will not load the cache here because we always want to download
-      // a new version manifest.
-      return File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH')
-          .exists();
+      // Check Internet connectivity
+      // If Internet is available , we make sure we download a newer version.
+      Request('GET', Uri.parse('https://example.org')).send();
+      return false;
     } catch (e) {
       exceptionPhase = Phase.loadCache;
       exception = e;

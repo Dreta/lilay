@@ -180,10 +180,10 @@ class GameManager {
   }
 
   void _downloadAsset(
-      VersionData data, Iterator<MapEntry<String, Asset>> iterator) {
+      VersionData data, Iterator<MapEntry<String, Asset>> iterator) async {
     Logger logger = GetIt.I.get<Logger>();
     MapEntry<String, Asset> asset = iterator.current;
-    logger.info('Downloading asset ${asset.key} for ${profile.name}.');
+    logger.fine('Downloading asset ${asset.key} for ${profile.name}.');
     AssetDownloadTask task = AssetDownloadTask(
         source: config.assetsSource,
         dependency: asset.value,
@@ -233,7 +233,7 @@ class GameManager {
   void _downloadLibrary(VersionData data, Iterator<Library> iterator) {
     Logger logger = GetIt.I.get<Logger>();
     Library library = iterator.current;
-    logger.info('Downloading library ${library.name}.');
+    logger.fine('Downloading library ${library.name}.');
     LibraryDownloadTask task = LibraryDownloadTask(
         source: config.librariesSource,
         dependency: library,
