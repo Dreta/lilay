@@ -43,6 +43,13 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
       exceptionPhase = Phase.loadCache;
       exception = e;
       notify();
+      // Use the cache when we must
+      File file = File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
+      if (await file.exists()) {
+        result =
+            VersionManifest.fromJson(jsonDecode(await file.readAsString()));
+        return true;
+      }
       return false;
     }
   }

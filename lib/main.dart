@@ -38,6 +38,7 @@ import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
 import 'package:lilay/ui/app.dart';
 import 'package:lilay/ui/home/screen_provider.dart';
+import 'package:lilay/ui/launch/launch_provider.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
@@ -106,6 +107,7 @@ void main() async {
     ChangeNotifierProvider.value(value: accounts),
     ChangeNotifierProvider.value(value: profiles),
     ChangeNotifierProvider.value(value: ScreenProvider()),
-    ChangeNotifierProvider.value(value: coreConfig)
+    ChangeNotifierProvider.value(value: coreConfig),
+    ChangeNotifierProvider.value(value: LaunchProvider())
   ], child: App()));
 }

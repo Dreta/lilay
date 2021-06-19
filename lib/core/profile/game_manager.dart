@@ -34,6 +34,7 @@ import 'package:lilay/core/download/version/version_download_task.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
+import 'package:lilay/ui/launch/launch_provider.dart';
 import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
@@ -43,35 +44,21 @@ import 'package:path/path.dart';
 class GameManager {
   final Profile profile;
   final CoreConfig config;
-  final List<Function(Task, String)> errors = [];
+  final LaunchProvider parent;
 
-  // Task: the current task
-  // first int: the total progress (out of all tasks)
-  // second int: the progress of the current task
-  final List<Function(Task, double, double)> progressCallbacks = [];
+  String? error;
+  Task? task;
   double totalProgress = 0;
 
-  late VersionData data; // The downloaded version data for use later.
-
-  void _error(Task task, String error) {
-    Logger logger = GetIt.I.get<Logger>();
-    logger.severe(error);
-    for (Function(Task, String) callback in errors) {
-      callback(task, error);
-    }
-  }
-
-  void _progress(Task task, double totalProgress, double taskProgress) {
-    for (Function(Task, double, double) callback in progressCallbacks) {
-      callback(task, totalProgress, taskProgress);
-    }
-  }
+  VersionData? data; // The downloaded version data for use later.
 
   void startDownload() {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the version manifest.');
     VersionsDownloadTask task = VersionsDownloadTask(
         source: config.metaSource, workingDir: config.workingDirectory);
+    this.task = Task.downloadManifest;
+    parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
@@ -79,15 +66,15 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
-        _progress(Task.downloadManifest, totalProgress, task.progress);
+        parent.notify();
       }
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(
-            Task.downloadManifest,
+        error =
             'An error occurred when downloading the version manifest:\n${task.exception.toString()} '
-            '(Phase: ${task.exceptionPhase.toString()})');
+            '(Phase: ${task.exceptionPhase.toString()})';
+        parent.notify();
       }
     });
     task.callbacks.add(() {
@@ -99,8 +86,9 @@ class GameManager {
             return;
           }
         }
-        _error(Task.downloadVersionData,
-            'An error occurred when finding the version:\nCan\'t find version ${profile.version}.');
+        error =
+            'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
+        parent.notify();
       }
     });
     task.start();
@@ -113,6 +101,8 @@ class GameManager {
         source: config.metaSource,
         dependency: info,
         workingDir: config.workingDirectory);
+    this.task = Task.downloadVersionData;
+    parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
@@ -120,15 +110,15 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
-        _progress(Task.downloadManifest, totalProgress, task.progress);
+        parent.notify();
       }
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(
-            Task.downloadVersionData,
+        error =
             'An error occurred when downloading the version data:\n${task.exception.toString()} '
-            '(Phase: ${task.exceptionPhase.toString()})');
+            '(Phase: ${task.exceptionPhase.toString()})';
+        parent.notify();
       }
     });
     task.callbacks.add(() {
@@ -148,6 +138,8 @@ class GameManager {
         source: config.metaSource,
         dependency: data,
         workingDir: config.workingDirectory);
+    this.task = Task.downloadAssetsIndex;
+    parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
@@ -155,15 +147,15 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
-        _progress(Task.downloadManifest, totalProgress, task.progress);
+        parent.notify();
       }
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(
-            Task.downloadAssetsIndex,
+        error =
             'An error occurred when downloading the assets index:\n${task.exception.toString()} '
-            '(Phase: ${task.exceptionPhase.toString()})');
+            '(Phase: ${task.exceptionPhase.toString()})';
+        parent.notify();
       }
     });
     task.callbacks.add(() {
@@ -179,6 +171,8 @@ class GameManager {
     // TODO Simultaneously download multiple assets
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Starting to download assets for ${profile.name}.');
+    this.task = Task.downloadAssets;
+    parent.notify();
     Iterator<MapEntry<String, Asset>> iterator = assets.entries.iterator;
     if (iterator.moveNext()) {
       _downloadAsset(data, iterator);
@@ -201,13 +195,14 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
-        _progress(Task.downloadManifest, totalProgress, task.progress);
+        parent.notify();
       }
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(Task.downloadAssets,
-            'An error occurred when downloading the asset ${asset.key} for ${profile.name}:\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})');
+        error =
+            'An error occurred when downloading the asset ${asset.key} for ${profile.name}:\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})';
+        parent.notify();
       }
     });
     task.callbacks.add(() {
@@ -227,6 +222,8 @@ class GameManager {
     // TODO Simultaneously download multiple libraries
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Starting to download libraries for ${profile.name}.');
+    this.task = Task.downloadLibraries;
+    parent.notify();
     Iterator<Library> iterator = data.libraries.iterator;
     if (iterator.moveNext()) {
       _downloadLibrary(data, iterator);
@@ -248,13 +245,14 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
-        _progress(Task.downloadManifest, totalProgress, task.progress);
+        parent.notify();
       }
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(Task.downloadLibraries,
-            'An error occurred when downloading the library ${library.name}:\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})');
+        error =
+            'An error occurred when downloading the library ${library.name}:\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})';
+        parent.notify();
       }
     });
     task.callbacks.add(() {
@@ -277,6 +275,8 @@ class GameManager {
         source: config.coreSource,
         dependency: data,
         workingDir: config.workingDirectory);
+    this.task = Task.downloadCore;
+    parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
@@ -284,38 +284,33 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
-        _progress(Task.downloadManifest, totalProgress, task.progress);
+        parent.notify();
       }
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(
-            Task.downloadCore,
+        error =
             'An error occurred when downloading the client (${data.id}) of ${profile.name}:'
-            '\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})');
+            '\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})';
+        parent.notify();
       }
     });
     task.callbacks.add(() {
       if (task.result != null) {
         task.save();
-        _progress(Task.downloadCore, 1, 1);
+        parent.notify();
       }
     });
     task.start();
   }
 
-  GameManager({required this.profile, required this.config});
-
-  void handleError(Function(Task, String) handler) {
-    errors.add(handler);
-  }
-
-  void handleProgress(Function(Task, double, double) handler) {
-    progressCallbacks.add(handler);
-  }
+  GameManager(
+      {required this.profile, required this.config, required this.parent});
 
   void startGame(VersionData data, Account account) async {
     Logger logger = GetIt.I.get<Logger>();
+    this.task = Task.start;
+    parent.notify();
     logger.info('Starting game ${data.id} from profile ${profile.name}.');
 
     logger.info('Setting up the temporary native directory.');
@@ -328,7 +323,8 @@ class GameManager {
         File file = File(
             '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${native.path}');
         if (!await file.exists()) {
-          _error(Task.start, 'Can\'t find required native at ${native.path}.');
+          error = 'Can\'t find required native at ${native.path}.';
+          parent.notify();
           return;
         }
         file.copy(
@@ -385,4 +381,18 @@ enum Task {
   downloadLibraries,
   downloadCore,
   start
+}
+
+extension TaskExtension on Task {
+  String get text {
+    return {
+      Task.downloadManifest: 'Downloading manifest',
+      Task.downloadVersionData: 'Downloading version data',
+      Task.downloadAssetsIndex: 'Downloading assets index',
+      Task.downloadAssets: 'Downloading assets',
+      Task.downloadLibraries: 'Downloading libraries',
+      Task.downloadCore: 'Downloading client',
+      Task.start: 'Starting game'
+    }[this]!;
+  }
 }
