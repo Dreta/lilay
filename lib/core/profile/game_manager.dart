@@ -49,6 +49,7 @@ class GameManager {
   String? error;
   Task? task;
   double totalProgress = 0;
+  String? subtitle;
 
   VersionData? data; // The downloaded version data for use later.
 
@@ -58,6 +59,7 @@ class GameManager {
     VersionsDownloadTask task = VersionsDownloadTask(
         source: config.metaSource, workingDir: config.workingDirectory);
     this.task = Task.downloadManifest;
+    subtitle = 'Versions Manifest';
     parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
@@ -66,6 +68,7 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
+        subtitle = 'Versions Manifest (${(task.progress * 100).round()}%)';
         parent.notify();
       }
     });
@@ -102,6 +105,7 @@ class GameManager {
         dependency: info,
         workingDir: config.workingDirectory);
     this.task = Task.downloadVersionData;
+    subtitle = 'Version Data ${info.id}';
     parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
@@ -110,6 +114,8 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
+        subtitle =
+            'Version Data ${info.id} (${(task.progress * 100).round()}%)';
         parent.notify();
       }
     });
@@ -139,6 +145,7 @@ class GameManager {
         dependency: data,
         workingDir: config.workingDirectory);
     this.task = Task.downloadAssetsIndex;
+    subtitle = 'Assets index ${data.assets}';
     parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
@@ -147,6 +154,8 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
+        subtitle =
+            'Assets index ${data.assets} (${(task.progress * 100).round()}%)';
         parent.notify();
       }
     });
@@ -184,6 +193,8 @@ class GameManager {
     Logger logger = GetIt.I.get<Logger>();
     MapEntry<String, Asset> asset = iterator.current;
     logger.fine('Downloading asset ${asset.key} for ${profile.name}.');
+    subtitle = asset.key;
+    parent.notify();
     AssetDownloadTask task = AssetDownloadTask(
         source: config.assetsSource,
         dependency: asset.value,
@@ -195,6 +206,7 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
+        subtitle = '${asset.key} (${(task.progress * 100).round()}%)';
         parent.notify();
       }
     });
@@ -238,6 +250,8 @@ class GameManager {
         source: config.librariesSource,
         dependency: library,
         workingDir: config.workingDirectory);
+    subtitle = library.name;
+    parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
@@ -245,6 +259,7 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
+        subtitle = '${library.name} (${(task.progress * 100).round()}%)';
         parent.notify();
       }
     });
@@ -276,6 +291,7 @@ class GameManager {
         dependency: data,
         workingDir: config.workingDirectory);
     this.task = Task.downloadCore;
+    subtitle = '${data.id} client';
     parent.notify();
     double previousProgress = 0;
     task.callbacks.add(() {
@@ -284,6 +300,7 @@ class GameManager {
         totalProgress +=
             (task.progress - previousProgress) * (1 / Task.values.length);
         previousProgress = task.progress;
+        subtitle = '${data.id} client (${(task.progress * 100).round()}%)';
         parent.notify();
       }
     });
@@ -310,6 +327,7 @@ class GameManager {
   void startGame(VersionData data, Account account) async {
     Logger logger = GetIt.I.get<Logger>();
     this.task = Task.start;
+    subtitle = null;
     parent.notify();
     logger.info('Starting game ${data.id} from profile ${profile.name}.');
 

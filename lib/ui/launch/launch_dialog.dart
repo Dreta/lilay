@@ -52,12 +52,27 @@ class LaunchDialog extends StatelessWidget {
     }
 
     if (manager.error == null) {
-      return SimpleDialog(title: Text(manager.task!.text), children: [
-        Center(
-            child: CircularProgressIndicator(
-                value: manager.totalProgress,
-                backgroundColor: theme.backgroundColor),
-            heightFactor: 9)
+      return SimpleDialog(title: Text('Starting game'), children: [
+        SizedBox(
+            width: 512,
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.only(left: 24, right: 24),
+                      child: Text(manager.task!.text,
+                          style: theme.textTheme.subtitle2)),
+                  if (manager.subtitle != null)
+                    Padding(
+                        padding: const EdgeInsets.only(left: 24, right: 24),
+                        child: Text(manager.subtitle!)),
+                  Center(
+                      child: CircularProgressIndicator(
+                          value: manager.totalProgress,
+                          backgroundColor: theme.backgroundColor),
+                      heightFactor: 9)
+                ]))
       ]);
     }
     return SimpleDialog(
