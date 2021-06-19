@@ -16,9 +16,13 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/download/rule.dart';
+import 'package:lilay/core/download/version/assets/friendly_download.dart';
 import 'package:lilay/core/download/version/library/natives_mapping.dart';
+import 'package:system_info/system_info.dart';
 
 import 'lib_download_info.dart';
 
@@ -31,6 +35,32 @@ class Library {
   String? url;
   NativesMapping? natives;
   List<Rule> rules;
+
+  String _mapNativePlaceholders(String s) {
+    return s..replaceAll('{arch}', SysInfo.kernelBitness.toString());
+  }
+
+  FriendlyDownload? get platformNative {
+    if (natives == null || downloads == null) {
+      return null;
+    }
+
+    String? index;
+    if (Platform.isWindows && natives!.windows != null) {
+      index = _mapNativePlaceholders(natives!.windows!);
+    } else if (Platform.isMacOS && natives!.osx != null) {
+      index = _mapNativePlaceholders(natives!.osx!);
+    } else if (Platform.isLinux && natives!.linux != null) {
+      index = _mapNativePlaceholders(natives!.linux!);
+    }
+
+    if (index == null) {
+      return null;
+    }
+
+    return FriendlyDownload.fromJson(
+        downloads!.classifiers[index] as Map<String, dynamic>);
+  }
 
   Library(LibDownloadInfo? downloads, String name, String? url,
       NativesMapping? natives, List<Rule>? rules)

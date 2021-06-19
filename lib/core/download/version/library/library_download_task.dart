@@ -28,7 +28,6 @@ import 'package:lilay/core/download/version/assets/friendly_download.dart';
 import 'package:lilay/core/download/version/library/artifact.dart';
 import 'package:lilay/core/download/version/library/library.dart';
 import 'package:logging/logging.dart';
-import 'package:system_info/system_info.dart';
 
 /// This task downloads an individual [Library].
 ///
@@ -50,32 +49,6 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       required Library dependency,
       required String workingDir})
       : super(source: source, dependency: dependency, workingDir: workingDir);
-
-  String _mapNativePlaceholders(String s) {
-    return s..replaceAll('{arch}', SysInfo.kernelBitness.toString());
-  }
-
-  FriendlyDownload? get _platformNative {
-    if (dependency.natives == null || dependency.downloads == null) {
-      return null;
-    }
-
-    String? index;
-    if (Platform.isWindows && dependency.natives!.windows != null) {
-      index = _mapNativePlaceholders(dependency.natives!.windows!);
-    } else if (Platform.isMacOS && dependency.natives!.osx != null) {
-      index = _mapNativePlaceholders(dependency.natives!.osx!);
-    } else if (Platform.isLinux && dependency.natives!.linux != null) {
-      index = _mapNativePlaceholders(dependency.natives!.linux!);
-    }
-
-    if (index == null) {
-      return null;
-    }
-
-    return FriendlyDownload.fromJson(
-        dependency.downloads!.classifiers[index] as Map<String, dynamic>);
-  }
 
   @override
   Future<bool> get tryLoadCache async {
@@ -115,7 +88,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       }
 
       // Now attempt to load the natives.
-      FriendlyDownload? native = _platformNative;
+      FriendlyDownload? native = dependency.platformNative;
       if (native == null) {
         return artifactAvailable;
       }
@@ -234,7 +207,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the native of library ${dependency.name}.');
 
-    FriendlyDownload? native = _platformNative;
+    FriendlyDownload? native = dependency.platformNative;
     if (native == null) {
       logger.info(
           'There are no natives that are applicable for this platform. Skipping.');
@@ -308,7 +281,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       }
 
       if (resultNative!.isNotEmpty) {
-        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', _platformNative!.path!)}')
+        File('$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.platformNative!.path!)}')
             .writeAsBytes(resultNative!);
       }
     } catch (e) {
