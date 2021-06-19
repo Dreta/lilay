@@ -50,6 +50,8 @@ void main() async {
   });
   GetIt.I.registerSingleton<Logger>(logger);
 
+  GetIt.I.registerSingleton<String>('1.0.0', instanceName: 'version');
+
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('font/UFL.txt');
     yield LicenseEntryWithLineBreaks(['ubuntu_font'], license);

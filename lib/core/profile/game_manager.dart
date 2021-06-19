@@ -16,12 +16,17 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:get_it/get_it.dart';
+import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:lilay/core/download/version/arguments/argument.dart';
 import 'package:lilay/core/download/version/assets/asset.dart';
 import 'package:lilay/core/download/version/assets/asset_download_task.dart';
 import 'package:lilay/core/download/version/assets/assets_index_download_task.dart';
 import 'package:lilay/core/download/version/assets/core_download_task.dart';
+import 'package:lilay/core/download/version/assets/friendly_download.dart';
 import 'package:lilay/core/download/version/library/library.dart';
 import 'package:lilay/core/download/version/library/library_download_task.dart';
 import 'package:lilay/core/download/version/version_data.dart';
@@ -29,14 +34,16 @@ import 'package:lilay/core/download/version/version_download_task.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
+import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
+import 'package:path/path.dart';
 
 /// [GameManager] manages starting the game, downloading the game,
 /// receiving logs from the game etc.
 class GameManager {
   final Profile profile;
   final CoreConfig config;
-  final List<Function(String)> errors = [];
+  final List<Function(Task, String)> errors = [];
 
   // Task: the current task
   // first int: the total progress (out of all tasks)
@@ -44,11 +51,13 @@ class GameManager {
   final List<Function(Task, double, double)> progressCallbacks = [];
   double totalProgress = 0;
 
-  void _error(String error) {
+  late VersionData data; // The downloaded version data for use later.
+
+  void _error(Task task, String error) {
     Logger logger = GetIt.I.get<Logger>();
     logger.severe(error);
-    for (Function(String) callback in errors) {
-      callback(error);
+    for (Function(Task, String) callback in errors) {
+      callback(task, error);
     }
   }
 
@@ -76,6 +85,7 @@ class GameManager {
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
+            Task.downloadManifest,
             'An error occurred when downloading the version manifest:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})');
       }
@@ -89,7 +99,7 @@ class GameManager {
             return;
           }
         }
-        _error(
+        _error(Task.downloadVersionData,
             'An error occurred when finding the version:\nCan\'t find version ${profile.version}.');
       }
     });
@@ -116,6 +126,7 @@ class GameManager {
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
+            Task.downloadVersionData,
             'An error occurred when downloading the version data:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})');
       }
@@ -123,6 +134,7 @@ class GameManager {
     task.callbacks.add(() {
       if (task.result != null) {
         task.save();
+        data = task.result!;
         downloadAssetsIndex(task.result!);
       }
     });
@@ -149,6 +161,7 @@ class GameManager {
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
+            Task.downloadAssetsIndex,
             'An error occurred when downloading the assets index:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})');
       }
@@ -193,7 +206,7 @@ class GameManager {
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(
+        _error(Task.downloadAssets,
             'An error occurred when downloading the asset ${asset.key} for ${profile.name}:\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})');
       }
     });
@@ -240,7 +253,7 @@ class GameManager {
     });
     task.callbacks.add(() {
       if (task.exception != null) {
-        _error(
+        _error(Task.downloadLibraries,
             'An error occurred when downloading the library ${library.name}:\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})');
       }
     });
@@ -277,6 +290,7 @@ class GameManager {
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
+            Task.downloadCore,
             'An error occurred when downloading the client (${data.id}) of ${profile.name}:'
             '\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})');
       }
@@ -284,7 +298,7 @@ class GameManager {
     task.callbacks.add(() {
       if (task.result != null) {
         task.save();
-        // TODO Notify listeners of completion
+        _progress(Task.downloadCore, 1, 1);
       }
     });
     task.start();
@@ -292,12 +306,74 @@ class GameManager {
 
   GameManager({required this.profile, required this.config});
 
-  void handleError(Function(String) handler) {
+  void handleError(Function(Task, String) handler) {
     errors.add(handler);
   }
 
   void handleProgress(Function(Task, double, double) handler) {
     progressCallbacks.add(handler);
+  }
+
+  void startGame(VersionData data, Account account) async {
+    Logger logger = GetIt.I.get<Logger>();
+    logger.info('Starting game ${data.id} from profile ${profile.name}.');
+
+    logger.info('Setting up the temporary native directory.');
+    Directory natives = Directory(
+        '${getTempDirectory()}${Platform.pathSeparator}lilayntvs-${getRandomString(8)}');
+    await natives.create();
+    for (Library library in data.libraries) {
+      FriendlyDownload? native = library.platformNative;
+      if (native != null) {
+        File file = File(
+            '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${native.path}');
+        if (!await file.exists()) {
+          _error(Task.start, 'Can\'t find required native at ${native.path}.');
+          return;
+        }
+        file.copy(
+            '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
+      }
+    }
+
+    logger.info('Setting up arguments.');
+    List<String> gameArgs = profile.gameArguments.split(' ');
+    List<String> jvmArgs = profile.jvmArguments.split(' ');
+    if (data.arguments != null) {
+      for (Argument argument in data.arguments!.gameParsed) {
+        if (argument.applicable(account)) {
+          gameArgs.add(argument.contextualValue(
+              account, profile, config, data, natives.absolute.path));
+        }
+      }
+
+      for (Argument argument in data.arguments!.jvmParsed) {
+        if (argument.applicable(account)) {
+          jvmArgs.add(argument.contextualValue(
+              account, profile, config, data, natives.absolute.path));
+        }
+      }
+    } else {
+      for (String argument in (data.minecraftArguments ?? '').split(' ')) {
+        if (argument.isEmpty) {
+          continue;
+        }
+        Argument arg = Argument(value: argument, rules: []);
+        gameArgs.add(arg.contextualValue(
+            account, profile, config, data, natives.absolute.path));
+      }
+    }
+
+    logger.info('Starting game ${data.id} with profile ${profile.name}.');
+
+    List<String> args = [];
+    args.addAll(jvmArgs);
+    args.add(data.mainClass);
+    args.addAll(gameArgs);
+
+    await Process.start(
+        profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),
+        args);
   }
 }
 
@@ -307,5 +383,6 @@ enum Task {
   downloadAssetsIndex,
   downloadAssets,
   downloadLibraries,
-  downloadCore
+  downloadCore,
+  start
 }
