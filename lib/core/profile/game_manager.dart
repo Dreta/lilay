@@ -38,7 +38,11 @@ class GameManager {
   final CoreConfig config;
   final List<Function(String)> errors = [];
 
-  // TODO Add progress tracking
+  // Task: the current task
+  // first int: the total progress (out of all tasks)
+  // second int: the progress of the current task
+  final List<Function(Task, double, double)> progressCallbacks = [];
+  double totalProgress = 0;
 
   void _error(String error) {
     Logger logger = GetIt.I.get<Logger>();
@@ -48,11 +52,27 @@ class GameManager {
     }
   }
 
+  void _progress(Task task, double totalProgress, double taskProgress) {
+    for (Function(Task, double, double) callback in progressCallbacks) {
+      callback(task, totalProgress, taskProgress);
+    }
+  }
+
   void startDownload() {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the version manifest.');
     VersionsDownloadTask task = VersionsDownloadTask(
         source: config.metaSource, workingDir: config.workingDirectory);
+    double previousProgress = 0;
+    task.callbacks.add(() {
+      // We divide the progress into different parts.
+      if (task.progress != previousProgress) {
+        totalProgress +=
+            (task.progress - previousProgress) * (1 / Task.values.length);
+        previousProgress = task.progress;
+        _progress(Task.downloadManifest, totalProgress, task.progress);
+      }
+    });
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
@@ -83,6 +103,16 @@ class GameManager {
         source: config.metaSource,
         dependency: info,
         workingDir: config.workingDirectory);
+    double previousProgress = 0;
+    task.callbacks.add(() {
+      // We divide the progress into different parts.
+      if (task.progress != previousProgress) {
+        totalProgress +=
+            (task.progress - previousProgress) * (1 / Task.values.length);
+        previousProgress = task.progress;
+        _progress(Task.downloadManifest, totalProgress, task.progress);
+      }
+    });
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
@@ -106,6 +136,16 @@ class GameManager {
         source: config.metaSource,
         dependency: data,
         workingDir: config.workingDirectory);
+    double previousProgress = 0;
+    task.callbacks.add(() {
+      // We divide the progress into different parts.
+      if (task.progress != previousProgress) {
+        totalProgress +=
+            (task.progress - previousProgress) * (1 / Task.values.length);
+        previousProgress = task.progress;
+        _progress(Task.downloadManifest, totalProgress, task.progress);
+      }
+    });
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
@@ -141,6 +181,16 @@ class GameManager {
         source: config.assetsSource,
         dependency: asset.value,
         workingDir: config.workingDirectory);
+    double previousProgress = 0;
+    task.callbacks.add(() {
+      // We divide the progress into different parts.
+      if (task.progress != previousProgress) {
+        totalProgress +=
+            (task.progress - previousProgress) * (1 / Task.values.length);
+        previousProgress = task.progress;
+        _progress(Task.downloadManifest, totalProgress, task.progress);
+      }
+    });
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
@@ -178,6 +228,16 @@ class GameManager {
         source: config.librariesSource,
         dependency: library,
         workingDir: config.workingDirectory);
+    double previousProgress = 0;
+    task.callbacks.add(() {
+      // We divide the progress into different parts.
+      if (task.progress != previousProgress) {
+        totalProgress +=
+            (task.progress - previousProgress) * (1 / Task.values.length);
+        previousProgress = task.progress;
+        _progress(Task.downloadManifest, totalProgress, task.progress);
+      }
+    });
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
@@ -204,6 +264,16 @@ class GameManager {
         source: config.coreSource,
         dependency: data,
         workingDir: config.workingDirectory);
+    double previousProgress = 0;
+    task.callbacks.add(() {
+      // We divide the progress into different parts.
+      if (task.progress != previousProgress) {
+        totalProgress +=
+            (task.progress - previousProgress) * (1 / Task.values.length);
+        previousProgress = task.progress;
+        _progress(Task.downloadManifest, totalProgress, task.progress);
+      }
+    });
     task.callbacks.add(() {
       if (task.exception != null) {
         _error(
@@ -225,4 +295,17 @@ class GameManager {
   void handleError(Function(String) handler) {
     errors.add(handler);
   }
+
+  void handleProgress(Function(Task, double, double) handler) {
+    progressCallbacks.add(handler);
+  }
+}
+
+enum Task {
+  downloadManifest,
+  downloadVersionData,
+  downloadAssetsIndex,
+  downloadAssets,
+  downloadLibraries,
+  downloadCore
 }
