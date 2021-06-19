@@ -72,10 +72,10 @@ class Homepage extends StatelessWidget {
                     screenType: ScreenType.accounts, child: AccountsScreen()),
                 AnimatedScreen(
                     screenType: ScreenType.profiles, child: ProfilesScreen()),
-                    AnimatedScreen(
-                        screenType: ScreenType.configuration,
-                        child: ConfigurationScreen())
-                  ]))
+                AnimatedScreen(
+                    screenType: ScreenType.configuration,
+                    child: ConfigurationScreen())
+              ]))
             ])));
   }
 }
