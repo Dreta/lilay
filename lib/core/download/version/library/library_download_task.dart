@@ -85,7 +85,6 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       }
       if (artifactAvailable) {
         result = await artifact.readAsBytes();
-        notify();
       }
 
       // Now attempt to load the natives.
