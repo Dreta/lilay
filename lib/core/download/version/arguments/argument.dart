@@ -76,7 +76,7 @@ class Argument {
           .replaceAll('\${version_type}',
               data.type.toString().replaceAll('VersionType.', ''))
           .replaceAll(
-              '\${user_properties}', 'null') // TODO What the hell is this?
+              '\${user_properties}', '{}') // TODO What the hell is this?
           .replaceAll(
               '\${auth_session}',
               account
