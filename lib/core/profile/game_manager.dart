@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
@@ -83,15 +84,47 @@ class GameManager {
         parent.notify();
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null) {
         task.save();
+        // Find from manifest
         for (VersionInfo version in task.result!.versions) {
           if (version.id == profile.version) {
             downloadVersionData(version);
             return;
           }
         }
+        // Use local version
+        Directory versions = Directory(
+            '${config.workingDirectory}${Platform.pathSeparator}versions');
+        await for (FileSystemEntity directory in versions.list()) {
+          if (directory is Directory) {
+            File data = File(join(
+                directory.absolute.path, '${basename(directory.path)}.json'));
+            if (await data.exists()) {
+              try {
+                Map<String, dynamic> json =
+                    jsonDecode(await data.readAsString());
+                if (json.containsKey('type') &&
+                    json['type'].toString().contains('old')) {
+                  continue;
+                }
+                VersionData vData = VersionData.fromJson(
+                    json); // Parse and create the VersionInfo
+                if (vData.id == profile.version) {
+                  totalProgress += 1 / 6; // Skip downloading the version data
+                  downloadAssetsIndex(vData);
+                  return;
+                }
+              } catch (e) {
+                // Ignore parsing errors for the version data - we will discard this version
+                logger.severe(
+                    'Failed to parse the version data in ${directory.absolute.path}: $e.');
+              }
+            }
+          }
+        }
+
         error =
             'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
         parent.notify();
