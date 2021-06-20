@@ -56,11 +56,10 @@ class Homepage extends StatelessWidget {
     }
 
     return Scaffold(
-        floatingActionButton: screen.current == ScreenType.home &&
-                profiles.selected != null &&
-                accounts.selectedAccount != null
-            ? LaunchButton()
-            : null,
+        floatingActionButton:
+            profiles.selected != null && accounts.selectedAccount != null
+                ? LaunchButton()
+                : null,
         body: Container(
             decoration: BoxDecoration(
                 image: DecorationImage(image: background, fit: BoxFit.cover)),
