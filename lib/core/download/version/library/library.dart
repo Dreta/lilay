@@ -37,11 +37,14 @@ class Library {
   List<Rule> rules;
 
   String _mapNativePlaceholders(String s) {
-    return s..replaceAll('{arch}', SysInfo.kernelBitness.toString());
+    return s..replaceAll('\${arch}', SysInfo.kernelBitness.toString());
   }
 
   FriendlyDownload? get platformNative {
     if (natives == null || downloads == null) {
+      return null;
+    }
+    if (downloads != null && downloads!.classifiers.isEmpty) {
       return null;
     }
 
@@ -55,6 +58,9 @@ class Library {
     }
 
     if (index == null) {
+      return null;
+    }
+    if (!downloads!.classifiers.containsKey(index)) {
       return null;
     }
 

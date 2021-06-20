@@ -432,7 +432,7 @@ class GameManager {
     args.addAll(gameArgs);
 
     logger.info('Starting game ${data.id} with profile ${profile.name}.');
-    logger.info('Arguments: ${args.join(' ')}');
+    logger.fine('Arguments: ${args.join(' ')}');
 
     await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),
