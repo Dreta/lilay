@@ -40,15 +40,21 @@ class LaunchDialog extends StatelessWidget {
     final LaunchProvider launch = Provider.of<LaunchProvider>(context);
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
     if (launch.manager == null) {
-      Navigator.pop(context);
-      return Container();
+      return SimpleDialog(title: Text('Game unavailable'), children: [
+        Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+            child: Text('Invalid call. Please start the game again.'))
+      ]);
     }
     final ThemeData theme = Theme.of(context);
     final GameManager manager = launch.manager!;
-    if (manager.totalProgress >= 1) {
+    if (manager.totalProgress >= 1 && launch.status == LaunchStatus.starting) {
       manager.startGame(manager.data!, accounts.selectedAccount!);
-      Navigator.pop(context);
-      return Container();
+      return SimpleDialog(title: Text('Game launched'), children: [
+        Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+            child: Text('You can close this dialog now.'))
+      ]);
     }
 
     if (manager.error == null) {
@@ -75,8 +81,10 @@ class LaunchDialog extends StatelessWidget {
                 ]))
       ]);
     }
-    return SimpleDialog(
-        title: Text('Failed to start the game'),
-        children: [Text(manager.error!)]);
+    return SimpleDialog(title: Text('Failed to start the game'), children: [
+      Padding(
+          padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
+          child: SizedBox(width: 512, child: Text(manager.error!)))
+    ]);
   }
 }

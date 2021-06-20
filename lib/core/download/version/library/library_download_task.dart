@@ -91,6 +91,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       FriendlyDownload? native = dependency.platformNative;
       if (native == null) {
         resultNative = [];
+        progress = 1;
         return artifactAvailable;
       }
 
@@ -106,6 +107,10 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       if (nativeAvailable) {
         resultNative = await nativeFile.readAsBytes();
       }
+
+      if (artifactAvailable && nativeAvailable) {
+        progress = 1;
+      }
       return artifactAvailable && nativeAvailable;
     } catch (e) {
       exceptionPhase = Phase.loadCache;
@@ -120,7 +125,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Starting to download the library ${dependency.name}');
 
-    if (!Rule.multiRulesApplicable(dependency.rules, null)) {
+    if (!Rule.multiRulesApplicable(dependency.rules, null, null)) {
       logger.info(
           'The library ${dependency.name} is not applicable for download on this platform. Skipping.');
       result = [];

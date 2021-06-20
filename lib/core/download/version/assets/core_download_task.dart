@@ -54,6 +54,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
           (await file.length() == dependency.downloads.client.size);
       if (available) {
         result = await file.readAsBytes();
+        progress = 1;
       }
       return available;
     } catch (e) {

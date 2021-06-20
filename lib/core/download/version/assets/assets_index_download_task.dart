@@ -65,6 +65,7 @@ class AssetsIndexDownloadTask
         for (MapEntry<String, dynamic> asset in assetsJson.entries) {
           result![asset.key] = Asset.fromJson(asset.value);
         }
+        progress = 1;
       }
       return available;
     } catch (e) {

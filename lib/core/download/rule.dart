@@ -20,6 +20,7 @@ import 'dart:io';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/auth/account.dart';
+import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/utils.dart';
 import 'package:system_info/system_info.dart';
 
@@ -36,16 +37,17 @@ class Rule {
         this.features = features,
         this.os = os;
 
-  static bool multiRulesApplicable(List<Rule> rules, Account? account) {
+  static bool multiRulesApplicable(
+      List<Rule> rules, Account? account, Profile? profile) {
     bool applicability = rules.isEmpty;
 
     for (Rule rule in rules) {
       if (rule.action == RuleAction.allow) {
-        if (rule.applicable(account)) {
+        if (rule.applicable(account, profile)) {
           applicability = true;
         }
       } else {
-        if (rule.applicable(account)) {
+        if (rule.applicable(account, profile)) {
           return false;
         }
       }
@@ -54,9 +56,9 @@ class Rule {
     return applicability;
   }
 
-  applicable(Account? account) {
+  applicable(Account? account, Profile? profile) {
     bool featuresCompatible =
-        features != null ? features!.applicable(account) : true;
+        features != null ? features!.applicable(account, profile) : true;
     bool osCompatible = os != null ? os!.applicable() : true;
     return featuresCompatible && osCompatible;
   }
@@ -78,16 +80,20 @@ class FeatureSet {
       : this.isDemoUser = isDemoUser,
         this.hasCustomResolution = hasCustomResolution;
 
-  bool applicable(Account? account) {
-    if (account == null) {
+  bool applicable(Account? account, Profile? profile) {
+    // This is truly spaghetti code.
+    if (account == null && profile == null) {
       return true;
     }
-    if (isDemoUser != null && !isDemoUser! && account.paid) {
-      // If isDemoUser is false and account is paid
-      return false;
+    if (isDemoUser ?? false) {
+      return false; // Never use demo mode
     }
-    // TODO Check for custom resolution within game profiles here
-    return true;
+    if (profile != null &&
+        (hasCustomResolution ?? false) &&
+        (profile.resolutionWidth != null || profile.resolutionHeight != null)) {
+      return true;
+    }
+    return false;
   }
 
   factory FeatureSet.fromJson(Map<String, dynamic> json) =>

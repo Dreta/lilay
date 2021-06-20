@@ -18,6 +18,7 @@
 
 import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
@@ -35,9 +36,10 @@ import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/ui/launch/launch_provider.dart';
-import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
+
+import '../../utils.dart';
 
 /// [GameManager] manages starting the game, downloading the game,
 /// receiving logs from the game etc.
@@ -65,8 +67,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress +=
-            (task.progress - previousProgress) * (1 / Task.values.length);
+        totalProgress += (task.progress - previousProgress) * (1 / 6);
         previousProgress = task.progress;
         subtitle = 'Versions Manifest (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -111,8 +112,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress +=
-            (task.progress - previousProgress) * (1 / Task.values.length);
+        totalProgress += (task.progress - previousProgress) * (1 / 6);
         previousProgress = task.progress;
         subtitle =
             'Version Data ${info.id} (${(task.progress * 100).round()}%)';
@@ -151,8 +151,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress +=
-            (task.progress - previousProgress) * (1 / Task.values.length);
+        totalProgress += (task.progress - previousProgress) * (1 / 6);
         previousProgress = task.progress;
         subtitle =
             'Assets index ${data.assets} (${(task.progress * 100).round()}%)';
@@ -184,12 +183,12 @@ class GameManager {
     parent.notify();
     Iterator<MapEntry<String, Asset>> iterator = assets.entries.iterator;
     if (iterator.moveNext()) {
-      _downloadAsset(data, iterator);
+      _downloadAsset(data, iterator, assets.length);
     }
   }
 
-  void _downloadAsset(
-      VersionData data, Iterator<MapEntry<String, Asset>> iterator) async {
+  void _downloadAsset(VersionData data,
+      Iterator<MapEntry<String, Asset>> iterator, int total) async {
     Logger logger = GetIt.I.get<Logger>();
     MapEntry<String, Asset> asset = iterator.current;
     logger.fine('Downloading asset ${asset.key} for ${profile.name}.');
@@ -204,7 +203,7 @@ class GameManager {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
         totalProgress +=
-            (task.progress - previousProgress) * (1 / Task.values.length);
+            (task.progress - previousProgress) * (1 / total) * (1 / 6);
         previousProgress = task.progress;
         subtitle = '${asset.key} (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -221,7 +220,7 @@ class GameManager {
       if (task.result != null) {
         task.save();
         if (iterator.moveNext()) {
-          _downloadAsset(data, iterator);
+          _downloadAsset(data, iterator, total);
         } else {
           downloadLibraries(data);
         }
@@ -238,11 +237,12 @@ class GameManager {
     parent.notify();
     Iterator<Library> iterator = data.libraries.iterator;
     if (iterator.moveNext()) {
-      _downloadLibrary(data, iterator);
+      _downloadLibrary(data, iterator, data.libraries.length);
     }
   }
 
-  void _downloadLibrary(VersionData data, Iterator<Library> iterator) {
+  void _downloadLibrary(
+      VersionData data, Iterator<Library> iterator, int total) {
     Logger logger = GetIt.I.get<Logger>();
     Library library = iterator.current;
     logger.fine('Downloading library ${library.name}.');
@@ -257,7 +257,7 @@ class GameManager {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
         totalProgress +=
-            (task.progress - previousProgress) * (1 / Task.values.length);
+            (task.progress - previousProgress) * (1 / total) * (1 / 6);
         previousProgress = task.progress;
         subtitle = '${library.name} (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -274,7 +274,7 @@ class GameManager {
       if (task.result != null && task.resultNative != null) {
         task.save();
         if (iterator.moveNext()) {
-          _downloadLibrary(data, iterator);
+          _downloadLibrary(data, iterator, total);
         } else {
           downloadCore(data);
         }
@@ -297,8 +297,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress +=
-            (task.progress - previousProgress) * (1 / Task.values.length);
+        totalProgress += (task.progress - previousProgress) * (1 / 6);
         previousProgress = task.progress;
         subtitle = '${data.id} client (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -327,8 +326,9 @@ class GameManager {
   void startGame(VersionData data, Account account) async {
     Logger logger = GetIt.I.get<Logger>();
     this.task = Task.start;
+    parent.status = LaunchStatus.started;
     subtitle = null;
-    parent.notify();
+    //parent.notify();
     logger.info('Starting game ${data.id} from profile ${profile.name}.');
 
     logger.info('Setting up the temporary native directory.');
@@ -338,15 +338,37 @@ class GameManager {
     for (Library library in data.libraries) {
       FriendlyDownload? native = library.platformNative;
       if (native != null) {
+        print(native.path);
         File file = File(
             '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${native.path}');
         if (!await file.exists()) {
           error = 'Can\'t find required native at ${native.path}.';
-          parent.notify();
+          //parent.notify();
           return;
         }
-        file.copy(
+        await file.copy(
             '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
+
+        File target = File(
+            '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
+        try {
+          Archive archive =
+              ZipDecoder().decodeBytes(await target.readAsBytes());
+          for (ArchiveFile file in archive.files) {
+            print(file.name);
+            if (file.name.toLowerCase().contains('meta') ||
+                file.name.toLowerCase().contains('manifest')) {
+              continue; // Hardcode files that shouldn't be extracted
+            }
+            if (file.isFile) {
+              File unzip =
+                  File('${natives.path}${Platform.pathSeparator}${file.name}');
+              await unzip.parent.create(recursive: true);
+              await unzip.writeAsBytes(file.content);
+            }
+          }
+          await target.delete();
+        } catch (ignored) {}
       }
     }
 
@@ -355,16 +377,16 @@ class GameManager {
     List<String> jvmArgs = profile.jvmArguments.split(' ');
     if (data.arguments != null) {
       for (Argument argument in data.arguments!.gameParsed) {
-        if (argument.applicable(account)) {
-          gameArgs.add(argument.contextualValue(
-              account, profile, config, data, natives.absolute.path));
+        if (argument.applicable(account, profile)) {
+          gameArgs.addAll(argument.contextualValue(
+              account, profile, config, data, natives.path));
         }
       }
 
       for (Argument argument in data.arguments!.jvmParsed) {
-        if (argument.applicable(account)) {
-          jvmArgs.add(argument.contextualValue(
-              account, profile, config, data, natives.absolute.path));
+        if (argument.applicable(account, profile)) {
+          jvmArgs.addAll(argument.contextualValue(
+              account, profile, config, data, natives.path));
         }
       }
     } else {
@@ -372,9 +394,9 @@ class GameManager {
         if (argument.isEmpty) {
           continue;
         }
-        Argument arg = Argument(value: argument, rules: []);
-        gameArgs.add(arg.contextualValue(
-            account, profile, config, data, natives.absolute.path));
+        Argument arg = Argument(value: [argument], rules: []);
+        gameArgs.addAll(
+            arg.contextualValue(account, profile, config, data, natives.path));
       }
     }
 
@@ -384,6 +406,9 @@ class GameManager {
     args.addAll(jvmArgs);
     args.add(data.mainClass);
     args.addAll(gameArgs);
+
+    print(profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'));
+    print(args.join(' '));
 
     await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),

@@ -32,65 +32,73 @@ import '../../rule.dart';
 /// Represents argument(s) in the version manifest file.
 /// The arguments can either be a plain argument or ruled.
 class Argument {
-  String value;
+  List<dynamic> value;
   List<Rule> rules;
 
   Argument({required this.value, required this.rules});
 
-  String contextualValue(
+  List<String> contextualValue(
       Account account, Profile profile, CoreConfig config, VersionData data,
       [String natives = '']) {
     List<String> classpaths = [];
     for (Library library in data.libraries) {
-      if (library.downloads == null) {
-        classpaths.add(
-            '${Artifact(library.name).path('${config.workingDirectory}${Platform.pathSeparator}libraries')}');
-      } else if (library.downloads!.artifact != null) {
-        classpaths.add(
-            '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${library.downloads!.artifact!.path}');
+      if (Rule.multiRulesApplicable(library.rules, account, profile)) {
+        if (library.downloads == null) {
+          classpaths.add(
+              '${Artifact(library.name).path('${config.workingDirectory}${Platform.pathSeparator}libraries')}');
+        } else if (library.downloads!.artifact != null) {
+          classpaths.add(
+              '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${library.downloads!.artifact!.path}');
+        }
       }
     }
     classpaths.add(
         '${config.workingDirectory}${Platform.pathSeparator}versions${Platform.pathSeparator}${data.id}${Platform.pathSeparator}${data.id}.jar');
 
-    return value
-        .replaceAll('\${auth_user_name}', account.profileName)
-        .replaceAll('\${version_name}', data.id)
-        .replaceAll('\${game_directory}',
-            profile.gameDirectory ?? getDefaultMinecraft())
-        .replaceAll('\${assets_root}',
-            '${config.workingDirectory}${Platform.pathSeparator}assets')
-        .replaceAll('\${game_assets',
-            '${config.workingDirectory}${Platform.pathSeparator}assets')
-        .replaceAll('\${assets_index_name}', data.assets)
-        .replaceAll('\${auth_uuid}', account.uuid.replaceAll('-', ''))
-        .replaceAll('\${auth_access_token}', account.accessToken)
-        .replaceAll(
-            '\${user_type}', // TODO What is this for?
-            account.type == 'microsoft' ? 'microsoft' : 'mojang')
-        .replaceAll('\${version_type}', data.type.toString())
-        .replaceAll(
-            '\${user_properties}', 'null') // TODO What the hell is this?
-        .replaceAll(
-            '\${auth_session}',
-            account
-                .accessToken) // TODO Found in legacy versions. Legacy auth method?
-        .replaceAll(
-            '\${resolution_width}',
-            profile.resolutionWidth == null
-                ? 'nevergonnagiveyouup'
-                : profile.resolutionWidth.toString())
-        .replaceAll(
-            '\${resolution_height}',
-            profile.resolutionHeight == null
-                ? 'nevergonnaletyoudown'
-                : profile.resolutionHeight.toString())
-        .replaceAll('\${natives_directory}', natives)
-        .replaceAll('\${launcher_name}', 'Lilay')
-        .replaceAll('\${launcher_version}',
-            GetIt.I.get<String>(instanceName: 'version'))
-        .replaceAll('\${classpath}', classpaths.join(':'));
+    return List.from(value.map((s) {
+      return s
+          .toString()
+          .replaceAll('\${auth_player_name}', account.profileName)
+          .replaceAll('\${auth_user_name}', account.profileName)
+          .replaceAll('\${version_name}', data.id)
+          .replaceAll('\${game_directory}',
+              profile.gameDirectory ?? getDefaultMinecraft())
+          .replaceAll('\${assets_root}',
+              '${config.workingDirectory}${Platform.pathSeparator}assets')
+          .replaceAll('\${game_assets',
+              '${config.workingDirectory}${Platform.pathSeparator}assets')
+          .replaceAll('\${assets_index_name}', data.assets)
+          .replaceAll('\${auth_uuid}', account.uuid.replaceAll('-', ''))
+          .replaceAll('\${auth_access_token}', account.accessToken)
+          .replaceAll(
+              '\${user_type}', // TODO What is this for?
+              account.type == 'microsoft' ? 'microsoft' : 'mojang')
+          .replaceAll('\${version_type}',
+              data.type.toString().replaceAll('VersionType.', ''))
+          .replaceAll(
+              '\${user_properties}', 'null') // TODO What the hell is this?
+          .replaceAll(
+              '\${auth_session}',
+              account
+                  .accessToken) // TODO Found in legacy versions. Legacy auth method?
+          .replaceAll(
+              '\${resolution_width}',
+              profile.resolutionWidth == null
+                  ? '1024'
+                  : profile.resolutionWidth.toString())
+          .replaceAll(
+              '\${resolution_height}',
+              profile.resolutionHeight == null
+                  ? '576'
+                  : profile.resolutionHeight.toString())
+          .replaceAll('\${natives_directory}', natives)
+          .replaceAll('\${launcher_name}', 'Lilay')
+          .replaceAll('\${launcher_version}',
+              GetIt.I.get<String>(instanceName: 'version'))
+          .replaceAll('\${classpath}', classpaths.join(':'));
+    }));
   }
 
-  bool applicable(Account account) => Rule.multiRulesApplicable(rules, account);
+  bool applicable(Account account, Profile profile) =>
+      Rule.multiRulesApplicable(rules, account, profile);
 }

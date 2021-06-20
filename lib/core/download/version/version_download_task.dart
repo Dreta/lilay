@@ -51,6 +51,7 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
           '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
       if (await file.exists()) {
         result = VersionData.fromJson(jsonDecode(await file.readAsString()));
+        progress = 1;
         return true;
       }
       return false;

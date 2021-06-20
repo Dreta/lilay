@@ -37,7 +37,9 @@ class ArgumentsData {
     for (dynamic i in game) {
       if (i is String) {
         // If this is a plain argument
-        arguments.add(Argument(value: i, rules: [])); // Add without rules
+        arguments.add(Argument(value: [i], rules: [])); // Add without rules
+      } else if (i is List) {
+        arguments.add(Argument(value: i, rules: []));
       } else if (i is Map) {
         // If this is a JSON object (rules: [...], value: ...)
         List<Rule> rules = [];
@@ -47,8 +49,12 @@ class ArgumentsData {
             rules.add(Rule.fromJson(rule)); // Parse the rules and add them
           }
         }
-        arguments
-            .add(Argument(value: i['value'], rules: rules)); // Add with rules
+        if (i['value'] is String) {
+          arguments.add(Argument(value: [i['value']], rules: rules));
+        } else {
+          arguments
+              .add(Argument(value: i['value'], rules: rules)); // Add with rules
+        }
       }
     }
     return arguments;
@@ -58,6 +64,8 @@ class ArgumentsData {
     List<Argument> arguments = [];
     for (dynamic i in jvm) {
       if (i is String) {
+        arguments.add(Argument(value: [i], rules: []));
+      } else if (i is List) {
         arguments.add(Argument(value: i, rules: []));
       } else if (i is Map) {
         List<Rule> rules = [];
@@ -66,7 +74,11 @@ class ArgumentsData {
             rules.add(Rule.fromJson(rule));
           }
         }
-        arguments.add(Argument(value: i['value'], rules: rules));
+        if (i['value'] is String) {
+          arguments.add(Argument(value: [i['value']], rules: rules));
+        } else {
+          arguments.add(Argument(value: i['value'], rules: rules));
+        }
       }
     }
     return arguments;
