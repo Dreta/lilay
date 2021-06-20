@@ -48,7 +48,11 @@ class LaunchDialog extends StatelessWidget {
     }
     final ThemeData theme = Theme.of(context);
     final GameManager manager = launch.manager!;
-    if (manager.totalProgress >= 1 && launch.status == LaunchStatus.starting) {
+    // I can't believe that I can't find a method to simply round to
+    // five digits.
+    // The reason that we round is percentages like 0.9999999999999829 exist.
+    if (double.parse(manager.totalProgress.toStringAsFixed(5)) >= 1 &&
+        launch.status == LaunchStatus.starting) {
       manager.startGame(manager.data!, accounts.selectedAccount!);
       return SimpleDialog(title: Text('Game launched'), children: [
         Padding(

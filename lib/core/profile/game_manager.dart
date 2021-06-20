@@ -22,6 +22,7 @@ import 'package:archive/archive.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
+import 'package:lilay/core/download/rule.dart';
 import 'package:lilay/core/download/version/arguments/argument.dart';
 import 'package:lilay/core/download/version/assets/asset.dart';
 import 'package:lilay/core/download/version/assets/asset_download_task.dart';
@@ -335,39 +336,42 @@ class GameManager {
     logger.info('Setting up the temporary native directory.');
     Directory natives = Directory(
         '${getTempDirectory()}${Platform.pathSeparator}lilayntvs-${getRandomString(8)}');
+    logger.info('Natives directory available at ${natives.path}.');
     await natives.create();
     for (Library library in data.libraries) {
-      FriendlyDownload? native = library.platformNative;
-      if (native != null) {
-        File file = File(
-            '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${native.path}');
-        if (!await file.exists()) {
-          error = 'Can\'t find required native at ${native.path}.';
-          //parent.notify();
-          return;
-        }
-        await file.copy(
-            '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
-
-        File target = File(
-            '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
-        try {
-          Archive archive =
-              ZipDecoder().decodeBytes(await target.readAsBytes());
-          for (ArchiveFile file in archive.files) {
-            if (file.name.toLowerCase().contains('meta') ||
-                file.name.toLowerCase().contains('manifest')) {
-              continue; // Hardcode files that shouldn't be extracted
-            }
-            if (file.isFile) {
-              File unzip =
-                  File('${natives.path}${Platform.pathSeparator}${file.name}');
-              await unzip.parent.create(recursive: true);
-              await unzip.writeAsBytes(file.content);
-            }
+      if (Rule.multiRulesApplicable(library.rules, account, profile)) {
+        FriendlyDownload? native = library.platformNative;
+        if (native != null) {
+          File file = File(
+              '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${native.path}');
+          if (!await file.exists()) {
+            error = 'Can\'t find required native at ${native.path}.';
+            parent.notify();
+            return;
           }
-          await target.delete();
-        } catch (ignored) {}
+          await file.copy(
+              '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
+
+          File target = File(
+              '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
+          try {
+            Archive archive =
+                ZipDecoder().decodeBytes(await target.readAsBytes());
+            for (ArchiveFile file in archive.files) {
+              if (file.name.toLowerCase().contains('meta') ||
+                  file.name.toLowerCase().contains('manifest')) {
+                continue; // Hardcode files that shouldn't be extracted
+              }
+              if (file.isFile) {
+                File unzip = File(
+                    '${natives.path}${Platform.pathSeparator}${file.name}');
+                await unzip.parent.create(recursive: true);
+                await unzip.writeAsBytes(file.content);
+              }
+            }
+            await target.delete();
+          } catch (ignored) {}
+        }
       }
     }
 
@@ -432,7 +436,7 @@ class GameManager {
     args.addAll(gameArgs);
 
     logger.info('Starting game ${data.id} with profile ${profile.name}.');
-    logger.fine('Arguments: ${args.join(' ')}');
+    logger.info('Arguments: ${args.join(' ')}');
 
     await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),
