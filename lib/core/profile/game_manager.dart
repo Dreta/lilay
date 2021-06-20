@@ -455,7 +455,7 @@ class GameManager {
       }
       jvmArgs.addAll(Argument(value: [
         '-Djava.library.path=\${natives_directory}',
-        '-Dminecraft.kauncher.brand=\${launcher_name}',
+        '-Dminecraft.launcher.brand=\${launcher_name}',
         '-Dminecraft.launcher.version=\${launcher_version}',
         '-cp',
         '\${classpath}'
