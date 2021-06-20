@@ -36,6 +36,9 @@ import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
 class CreateDialog extends StatefulWidget {
+  // Only support versions released after 1.7.2
+  static final minimumSupportTime = DateTime(2013, 10, 25, 13);
+
   CreateDialog();
 
   static void display(BuildContext context) {
@@ -142,6 +145,13 @@ class _CreateDialogState extends State<CreateDialog> {
                   // Skip
                   continue;
                 }
+                if (json['releaseTime'] != null) {
+                  DateTime releaseTime = DateTime.parse(json['releaseTime']);
+                  if (releaseTime.compareTo(CreateDialog.minimumSupportTime) <
+                      0) {
+                    continue;
+                  }
+                }
                 VersionData vData = VersionData.fromJson(
                     json); // Parse and create the VersionInfo
                 versionObjs.add(VersionInfo(
@@ -185,7 +195,17 @@ class _CreateDialogState extends State<CreateDialog> {
         task.save();
         setState(() {
           // Use the downloaded versions manifest
-          versions = task.result!;
+          VersionManifest manifest = task.result!;
+          List<VersionInfo> applicable = [];
+          for (VersionInfo version in manifest.versions) {
+            if (version.releaseTime
+                    .compareTo(CreateDialog.minimumSupportTime) >=
+                0) {
+              applicable.add(version);
+            }
+          }
+          manifest.versions = applicable;
+          versions = manifest;
           _selectedVersion = versions.latest.release;
           loaded = true;
         });

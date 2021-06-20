@@ -31,3 +31,4 @@ config.json
 accounts.json
 profiles.json
 cache/
+logs/

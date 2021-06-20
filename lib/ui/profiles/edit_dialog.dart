@@ -30,6 +30,7 @@ import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
+import 'package:lilay/ui/profiles/create/create_dialog.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
@@ -163,6 +164,13 @@ class _EditDialogState extends State<EditDialog> {
                   // Skip
                   continue;
                 }
+                if (json['releaseTime'] != null) {
+                  DateTime releaseTime = DateTime.parse(json['releaseTime']);
+                  if (releaseTime.compareTo(CreateDialog.minimumSupportTime) <
+                      0) {
+                    continue;
+                  }
+                }
                 VersionData vData = VersionData.fromJson(
                     json); // Parse and create the VersionInfo
                 versionObjs.add(VersionInfo(
@@ -205,7 +213,17 @@ class _EditDialogState extends State<EditDialog> {
         task.save();
         setState(() {
           // Use the downloaded versions manifest
-          versions = task.result!;
+          VersionManifest manifest = task.result!;
+          List<VersionInfo> applicable = [];
+          for (VersionInfo version in manifest.versions) {
+            if (version.releaseTime
+                    .compareTo(CreateDialog.minimumSupportTime) >=
+                0) {
+              applicable.add(version);
+            }
+          }
+          manifest.versions = applicable;
+          versions = manifest;
           loaded = true;
         });
       }
