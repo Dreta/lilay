@@ -338,7 +338,6 @@ class GameManager {
     for (Library library in data.libraries) {
       FriendlyDownload? native = library.platformNative;
       if (native != null) {
-        print(native.path);
         File file = File(
             '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${native.path}');
         if (!await file.exists()) {
@@ -355,7 +354,6 @@ class GameManager {
           Archive archive =
               ZipDecoder().decodeBytes(await target.readAsBytes());
           for (ArchiveFile file in archive.files) {
-            print(file.name);
             if (file.name.toLowerCase().contains('meta') ||
                 file.name.toLowerCase().contains('manifest')) {
               continue; // Hardcode files that shouldn't be extracted
@@ -406,9 +404,6 @@ class GameManager {
     args.addAll(jvmArgs);
     args.add(data.mainClass);
     args.addAll(gameArgs);
-
-    print(profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'));
-    print(args.join(' '));
 
     await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),

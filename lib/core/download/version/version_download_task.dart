@@ -89,7 +89,7 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
       resp.stream.listen((chunk) {
         logger.fine('Received ${chunk.length} bytes of data.');
         received += chunk.length;
-        progress = received / request.contentLength;
+        progress = received / resp.contentLength!;
         notify();
         receivedBytes.addAll(chunk);
 
