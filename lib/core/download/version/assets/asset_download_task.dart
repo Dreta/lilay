@@ -49,6 +49,7 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
           (await file.length() == dependency.size);
       if (available) {
         result = await file.readAsBytes();
+        notify();
       }
       return available;
     } catch (e) {

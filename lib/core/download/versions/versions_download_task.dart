@@ -48,6 +48,7 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
       if (await file.exists()) {
         result =
             VersionManifest.fromJson(jsonDecode(await file.readAsString()));
+        notify();
         return true;
       }
       return false;
