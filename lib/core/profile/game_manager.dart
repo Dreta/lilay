@@ -38,6 +38,7 @@ import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/ui/launch/launch_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart';
+import 'package:system_info/system_info.dart';
 
 import '../../utils.dart';
 
@@ -398,12 +399,40 @@ class GameManager {
       }
     }
 
-    logger.info('Starting game ${data.id} with profile ${profile.name}.');
+    if (data.arguments == null) {
+      // Fill in our own JVM arguments
+      if (Platform.isMacOS) {
+        jvmArgs.add('-XstartOnFirstThread');
+      }
+      if (Platform.isWindows) {
+        jvmArgs.add(
+            '-XX:HeadDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.headdump');
+      }
+      if (Platform.isWindows &&
+          RegExp('^10\\.').hasMatch(Platform.operatingSystemVersion)) {
+        jvmArgs.add('-Dos.name=Windows 10');
+        jvmArgs.add('-Dos.version=10.0');
+      }
+      if (SysInfo.kernelArchitecture == 'x86') {
+        jvmArgs.add('-Xss1M');
+      }
+      jvmArgs.addAll(Argument(value: [
+        '-Djava.library.path=\${natives_directory}',
+        '-Dminecraft.kauncher.brand=\${launcher_name}',
+        '-Dminecraft.launcher.version=\${launcher_version}',
+        '-cp',
+        '\${classpath}'
+      ], rules: [])
+          .contextualValue(account, profile, config, data, natives.path));
+    }
 
     List<String> args = [];
     args.addAll(jvmArgs);
     args.add(data.mainClass);
     args.addAll(gameArgs);
+
+    logger.info('Starting game ${data.id} with profile ${profile.name}.');
+    logger.info('Arguments: ${args.join(' ')}');
 
     await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),

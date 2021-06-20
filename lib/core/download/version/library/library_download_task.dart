@@ -58,33 +58,41 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       // out-of-nowhere case with [dependency.url].
       bool artifactAvailable;
       File artifact;
-      if (dependency.downloads != null) {
-        artifact = File(
-            '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads!.artifact!.path!)}');
-        artifactAvailable = (await artifact.exists()) &&
-            (dependency.downloads!.artifact!.sha1.toLowerCase() ==
-                sha1
-                    .convert(List.from(await artifact.readAsBytes()))
-                    .toString()
-                    .toLowerCase()) &&
-            (await artifact.length() == dependency.downloads!.artifact!.size);
+      if (dependency.downloads != null &&
+          dependency.downloads!.artifact == null) {
+        artifactAvailable = true;
+        result = [];
       } else {
-        Artifact artif = Artifact(dependency.name);
-        artifact = File(artif.path(workingDir));
+        if (dependency.downloads != null) {
+          artifact = File(
+              '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads!.artifact!.path!)}');
+          artifactAvailable = (await artifact.exists()) &&
+              (dependency.downloads!.artifact!.sha1.toLowerCase() ==
+                  sha1
+                      .convert(List.from(await artifact.readAsBytes()))
+                      .toString()
+                      .toLowerCase()) &&
+              (await artifact.length() == dependency.downloads!.artifact!.size);
+        } else {
+          Artifact artif = Artifact(dependency.name);
+          artifact = File(artif.path(workingDir));
 
-        // Fetch SHA-1 hash of this artifact
-        String hash =
-            (await get(Uri.parse(artif.urlHash(dependency.url!)))).body.trim();
+          // Fetch SHA-1 hash of this artifact
+          String hash = (await get(Uri.parse(artif.urlHash(dependency.url!))))
+              .body
+              .trim();
 
-        artifactAvailable = (await artifact.exists()) &&
-            (hash.toLowerCase() ==
-                sha1
-                    .convert(List.from(await artifact.readAsBytes()))
-                    .toString()
-                    .toLowerCase());
-      }
-      if (artifactAvailable) {
-        result = await artifact.readAsBytes();
+          artifactAvailable = (await artifact.exists()) &&
+              (hash.toLowerCase() ==
+                  sha1
+                      .convert(List.from(await artifact.readAsBytes()))
+                      .toString()
+                      .toLowerCase());
+        }
+
+        if (artifactAvailable) {
+          result = await artifact.readAsBytes();
+        }
       }
 
       // Now attempt to load the natives.
@@ -141,6 +149,13 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
   Future<void> _downloadArtifact() async {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the artifact of library ${dependency.name}.');
+
+    if (dependency.downloads != null &&
+        dependency.downloads!.artifact == null) {
+      logger
+          .info('There is no artifact for this library. Skipping to natives.');
+      return await _downloadNative();
+    }
 
     Artifact artifact = Artifact(dependency.name);
 
