@@ -16,25 +16,28 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:io';
+
 import 'package:json_annotation/json_annotation.dart';
 
-part 'asset_object.g.dart';
+part 'asset.g.dart';
 
-/// Represents an asset object, available in the asset index of Minecraft.
+/// Represents a downloadable asset.
 @JsonSerializable(explicitToJson: true)
-class AssetObject {
+class Asset {
   String hash;
   int size;
 
-  AssetObject(String hash, int size)
+  Asset(String hash, int size)
       : this.hash = hash,
         this.size = size;
 
-  /// Get where to download this asset index - /[first two characters of hash]/[hash]
-  String get downloadPath => '/${hash.substring(0, 2)}/$hash';
+  String path(String workingDir) =>
+      '$workingDir${Platform.pathSeparator}assets${Platform.pathSeparator}objects${Platform.pathSeparator}${hash.substring(0, 2)}${Platform.pathSeparator}$hash';
 
-  Map<String, dynamic> toJson() => _$AssetObjectToJson(this);
+  String url(String source) => '$source/${hash.substring(0, 2)}/$hash';
 
-  factory AssetObject.fromJson(Map<String, dynamic> json) =>
-      _$AssetObjectFromJson(json);
+  Map<String, dynamic> toJson() => _$AssetToJson(this);
+
+  factory Asset.fromJson(Map<String, dynamic> json) => _$AssetFromJson(json);
 }

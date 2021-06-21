@@ -9,7 +9,7 @@ part of 'assets_index.dart';
 AssetsIndex _$AssetsIndexFromJson(Map<String, dynamic> json) {
   return AssetsIndex(
     (json['objects'] as Map<String, dynamic>).map(
-      (k, e) => MapEntry(k, AssetObject.fromJson(e as Map<String, dynamic>)),
+      (k, e) => MapEntry(k, Asset.fromJson(e as Map<String, dynamic>)),
     ),
   );
 }

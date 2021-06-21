@@ -21,8 +21,8 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
+import 'package:lilay/core/download/assets/asset.dart';
 import 'package:lilay/core/download/task.dart';
-import 'package:lilay/core/download/version/assets/asset.dart';
 import 'package:logging/logging.dart';
 
 /// This task downloads an individual [Asset].

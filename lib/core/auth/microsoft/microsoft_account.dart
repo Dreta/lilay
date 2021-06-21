@@ -188,6 +188,6 @@ class MicrosoftAccount extends Account {
 
   @override
   Future<void> invalidate() async {
-    // TODO Is there an API endpoint for invalidating a token? idk
+    // Is there an API endpoint for invalidating a token? idk
   }
 }

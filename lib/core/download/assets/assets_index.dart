@@ -17,16 +17,17 @@
  */
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:lilay/core/download/assets/asset_object.dart';
+
+import 'asset.dart';
 
 part 'assets_index.g.dart';
 
 /// Represents the asset index of Minecraft.
 @JsonSerializable(explicitToJson: true)
 class AssetsIndex {
-  Map<String, AssetObject> objects;
+  Map<String, Asset> objects;
 
-  AssetsIndex(Map<String, AssetObject> objects) : this.objects = objects;
+  AssetsIndex(Map<String, Asset> objects) : this.objects = objects;
 
   Map<String, dynamic> toJson() => _$AssetsIndexToJson(this);
 

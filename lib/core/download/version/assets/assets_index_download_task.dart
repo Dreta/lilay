@@ -25,9 +25,9 @@ import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:logging/logging.dart';
 
+import '../../assets/asset.dart';
 import '../../task.dart';
 import '../version_data.dart';
-import 'asset.dart';
 
 /// This task downloads the asset index file from a
 /// [VersionData] and caches it accordingly.
