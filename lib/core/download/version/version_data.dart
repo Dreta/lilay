@@ -115,17 +115,17 @@ class VersionData {
   /// Get the arguments of this version, inheriting from the parent.
   ///
   /// This getter will merge the arguments object of the two versions
-  /// through a simple substitution method.
+  /// by combining all arguments.
   ///
   /// Example:
   ///   Parent Arguments:
   ///     JVM: [a, b, c]
   ///     Game: [a, b, c]
   ///   Self Arguments:
-  ///     JVM: [a, b, c, d]
+  ///     JVM: [d, e, f, g]
   ///     Game: null
   /// Result:
-  ///   JVM: [a, b, c, d]
+  ///   JVM: [a, b, c, d, e, f, g]
   ///   Game: [a, b, c]
   ArgumentsData? get arguments {
     if (parent == null) {
@@ -134,14 +134,13 @@ class VersionData {
     if (selfArguments == null) {
       return parent!.arguments;
     }
-    // TODO Do we really want to use substitution, instead of merging for arguments?
-    return ArgumentsData(
-        selfArguments!.jvm == null
-            ? parent!.arguments?.jvm
-            : selfArguments!.jvm,
-        selfArguments!.game == null
-            ? parent!.arguments?.game
-            : selfArguments!.game);
+    List<dynamic> jvmArgs = [];
+    jvmArgs.addAll(selfArguments!.jvm ?? []);
+    jvmArgs.addAll(parent!.arguments?.jvm ?? []);
+    List<dynamic> gameArgs = [];
+    gameArgs.addAll(selfArguments!.game ?? []);
+    gameArgs.addAll(parent!.arguments?.game ?? []);
+    return ArgumentsData(gameArgs, jvmArgs);
   }
 
   /// Get the asset index of this version, inheriting from the parent.
