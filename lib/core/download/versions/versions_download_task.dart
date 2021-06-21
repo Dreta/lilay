@@ -101,8 +101,8 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
   Future<void> save() async {
     try {
       File local = File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
-      local.parent.create(recursive: true);
-      local.writeAsString(jsonEncode(result!.toJson()));
+      await local.parent.create(recursive: true);
+      await local.writeAsString(jsonEncode(result!.toJson()));
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;

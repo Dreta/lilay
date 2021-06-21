@@ -130,8 +130,8 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
     try {
       File local = File(
           '$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', dependency.id)}');
-      local.parent.create(recursive: true);
-      local.writeAsBytes(result!);
+      await local.parent.create(recursive: true);
+      await local.writeAsBytes(result!);
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;

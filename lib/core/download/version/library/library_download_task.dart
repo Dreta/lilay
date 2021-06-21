@@ -296,21 +296,18 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
   @override
   Future<void> save() async {
     try {
-      // FIXME Sometimes the library won't be saved. Error:
-      // Unhandled Exception: FileSystemException: Cannot open file, path = '...' (OS Error: No such file or directory, errno = 2)
-      // This always happen with realm libraries - for some reason.
       if (result!.isNotEmpty) {
         File local = File(
             '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads == null ? Artifact(dependency.name).path(workingDir) : dependency.downloads!.artifact!.path!)}');
-        local.parent.create(recursive: true);
-        local.writeAsBytes(result!);
+        await local.parent.create(recursive: true);
+        await local.writeAsBytes(result!);
       }
 
       if (resultNative!.isNotEmpty) {
         File local = File(
             '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.platformNative!.path!)}');
-        local.parent.create(recursive: true);
-        local.writeAsBytes(resultNative!);
+        await local.parent.create(recursive: true);
+        await local.writeAsBytes(resultNative!);
       }
     } catch (e) {
       exceptionPhase = Phase.save;

@@ -108,12 +108,10 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   @override
   Future<void> save() async {
     try {
-      // FIXME The data is not saved.
-      // Error: Unhandled Exception: FileSystemException: Cannot open file, path = '...' (OS Error: No such file or directory, errno = 2)
       File local = File(
           '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
-      local.parent.create(recursive: true);
-      local.writeAsString(jsonEncode(result!.toJson()));
+      await local.parent.create(recursive: true);
+      await local.writeAsString(jsonEncode(result!.toJson()));
     } catch (e) {
       exceptionPhase = Phase.save;
       exception = e;
