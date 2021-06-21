@@ -129,7 +129,6 @@ class YggdrasilAccount extends Account {
     _paid = respPaid.statusCode == 200;
   }
 
-  // TODO Make requires reauth actually work
   @override
   bool get requiresReauth => _requiresReauth;
 

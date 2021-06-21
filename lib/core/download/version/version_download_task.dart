@@ -45,7 +45,6 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   /// Check if the version metadata already exist at the specified [workingDir].
   @override
   Future<bool> get tryLoadCache async {
-    // TODO Verify checksum
     try {
       File file = File(
           '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');

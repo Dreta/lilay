@@ -70,17 +70,12 @@ class Argument {
           .replaceAll('\${assets_index_name}', data.assets)
           .replaceAll('\${auth_uuid}', account.uuid.replaceAll('-', ''))
           .replaceAll('\${auth_access_token}', account.accessToken)
-          .replaceAll(
-              '\${user_type}', // TODO What is this for?
+          .replaceAll('\${user_type}',
               account.type == 'microsoft' ? 'microsoft' : 'mojang')
           .replaceAll('\${version_type}',
               data.type.toString().replaceAll('VersionType.', ''))
-          .replaceAll(
-              '\${user_properties}', '{}') // TODO What the hell is this?
-          .replaceAll(
-              '\${auth_session}',
-              account
-                  .accessToken) // TODO Found in legacy versions. Legacy auth method?
+          .replaceAll('\${user_properties}', '{}')
+          .replaceAll('\${auth_session}', account.accessToken)
           .replaceAll(
               '\${resolution_width}',
               profile.resolutionWidth == null
