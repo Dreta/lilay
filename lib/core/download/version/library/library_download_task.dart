@@ -60,10 +60,12 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       File artifact;
       if (dependency.downloads != null &&
           dependency.downloads!.artifact == null) {
+        // If we have no artifacts.
         artifactAvailable = true;
         result = [];
       } else {
         if (dependency.downloads != null) {
+          // If the hash and the path is specified, use them.
           artifact = File(
               '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads!.artifact!.path!)}');
           artifactAvailable = (await artifact.exists()) &&
@@ -74,23 +76,31 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
                       .toLowerCase()) &&
               (await artifact.length() == dependency.downloads!.artifact!.size);
         } else {
+          // If the hash and the path aren't available, extract them from
+          // the artifact name and the hash URL.
           Artifact artif = Artifact(dependency.name);
           artifact = File(artif.path(workingDir));
 
           // Fetch SHA-1 hash of this artifact
-          String hash = (await get(Uri.parse(artif.urlHash(dependency.url!))))
-              .body
-              .trim();
+          Response hashResp =
+              await get(Uri.parse(artif.urlHash(dependency.url!)));
+          if (hashResp.statusCode != 200) {
+            // Don't check the hash if it isn't available.
+            artifactAvailable = true;
+          } else {
+            String hash = hashResp.body.trim();
 
-          artifactAvailable = (await artifact.exists()) &&
-              (hash.toLowerCase() ==
-                  sha1
-                      .convert(List.from(await artifact.readAsBytes()))
-                      .toString()
-                      .toLowerCase());
+            artifactAvailable = (await artifact.exists()) &&
+                (hash.toLowerCase() ==
+                    sha1
+                        .convert(List.from(await artifact.readAsBytes()))
+                        .toString()
+                        .toLowerCase());
+          }
         }
 
         if (artifactAvailable) {
+          // Set the result if the artifact is available.
           result = await artifact.readAsBytes();
         }
       }
@@ -103,6 +113,8 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         return artifactAvailable;
       }
 
+      // If a native is available, then the hash and path will always be
+      // available. Check for that.
       File nativeFile = File(
           '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', native.path!)}');
       bool nativeAvailable = (await nativeFile.exists()) &&
@@ -181,26 +193,43 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         received += chunk.length;
         logger.fine('Received ${chunk.length} bytes of data.');
         // The progress is divided into two parts - the artifact and the native.
+        // This is the first half, so we divide the progress by two.
         progress = received / resp.contentLength! / 2;
         notify();
         receivedBytes.addAll(chunk);
 
         if (received >= resp.contentLength!) {
-          if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-              (dependency.downloads == null
-                  ? (await get(Uri.parse(artifact.urlHash(dependency.url!))))
-                      .body
-                      .trim()
-                  : dependency.downloads!.artifact!.sha1.toLowerCase())) {
-            logger.severe(
-                'Library artifact ${dependency.name}\'s checksum is invalid.');
-            exceptionPhase = Phase.download;
-            exception = Exception(
-                'Library artifact ${dependency.name}\'s checksum is invalid.');
-            return;
+          if (dependency.downloads == null) {
+            // If the hash isn't directly available.
+            Response hashResp =
+                await get(Uri.parse(artifact.urlHash(dependency.url!)));
+            if (hashResp.statusCode == 200) {
+              // If the hash is available online.
+              if (sha1.convert(receivedBytes).toString().toLowerCase() !=
+                  hashResp.body.trim().toLowerCase()) {
+                logger.severe(
+                    'Library artifact ${dependency.name}\'s checksum is invalid.');
+                exceptionPhase = Phase.download;
+                exception = Exception(
+                    'Library artifact ${dependency.name}\'s checksum is invalid.');
+                return;
+              }
+            }
+          } else {
+            // Verify the checksum by using the local hash.
+            if (sha1.convert(receivedBytes).toString().toLowerCase() !=
+                dependency.downloads!.artifact!.sha1.toLowerCase()) {
+              logger.severe(
+                  'Library artifact ${dependency.name}\'s checksum is invalid.');
+              exceptionPhase = Phase.download;
+              exception = Exception(
+                  'Library artifact ${dependency.name}\'s checksum is invalid.');
+              return;
+            }
           }
 
           if (dependency.downloads != null) {
+            // Verify the size
             if (receivedBytes.length != dependency.downloads!.artifact!.size) {
               logger.severe(
                   'Library artifact ${dependency.name}\'s size is incorrect.');
@@ -258,11 +287,13 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         received += chunk.length;
         logger.fine('Received ${chunk.length} bytes of data.');
         // The progress is divided into two parts - the artifact and the native.
+        // This is the second part, so we add 0.5 to the progress first.
         progress = 0.5 + received / resp.contentLength!;
         notify();
         receivedBytes.addAll(chunk);
 
         if (finished) {
+          // Verify the checksum and the size
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
               native.sha1.toLowerCase()) {
             logger.severe(

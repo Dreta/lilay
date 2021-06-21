@@ -20,6 +20,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'assets_index.g.dart';
 
+/// Represents the asset index field WITHIN THE VERSION MANIFEST.
 @JsonSerializable(explicitToJson: true)
 class AssetsIndex {
   String id;

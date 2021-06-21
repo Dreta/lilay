@@ -27,6 +27,9 @@ import 'version_parent_download_task.dart';
 
 part 'version_data.g.dart';
 
+/// Represents the manifest for a version in Minecraft.
+///
+/// Found under [working directory]/versions/[version]/[version].json
 @JsonSerializable(explicitToJson: true, ignoreUnannotated: true)
 class VersionData {
   /// The loaded parent [VersionData] from [inheritsFrom].
@@ -35,6 +38,9 @@ class VersionData {
   /// the parent of this version.
   VersionData? parent;
 
+  // Self fields are raw fields from the JSON.
+  // They do not factor in the parent of this version. Please use
+  // the getters instead.
   @JsonKey(name: 'arguments')
   ArgumentsData? selfArguments;
   @JsonKey(name: 'assetIndex')
@@ -95,6 +101,7 @@ class VersionData {
         this.selfTime = selfTime,
         this.selfType = selfType {
     if (selfInheritsFrom == null) {
+      // If we do not have a parent, then certain fields must be present.
       assert(selfAssets != null);
       assert(selfDownloads != null);
       assert(selfLibraries != null);
@@ -106,6 +113,21 @@ class VersionData {
     }
   }
 
+  /// Get the arguments of this version, inheriting from the parent.
+  ///
+  /// This getter will merge the arguments object of the two versions
+  /// through a simple substitution method.
+  ///
+  /// Example:
+  ///   Parent Arguments:
+  ///     JVM: [a, b, c]
+  ///     Game: [a, b, c]
+  ///   Self Arguments:
+  ///     JVM: [a, b, c, d]
+  ///     Game: null
+  /// Result:
+  ///   JVM: [a, b, c, d]
+  ///   Game: [a, b, c]
   ArgumentsData? get arguments {
     if (parent == null) {
       return selfArguments;
@@ -123,6 +145,10 @@ class VersionData {
             : selfArguments!.game);
   }
 
+  /// Get the asset index of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's asset index if BOTH the parent
+  /// is available AND the self asset index is NOT available.
   AssetsIndex? get assetIndex {
     if (parent != null && selfAssetIndex == null) {
       return parent!.assetIndex;
@@ -130,6 +156,10 @@ class VersionData {
     return selfAssetIndex;
   }
 
+  /// Get the assets ID of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's assets ID if BOTH the parent
+  /// is available AND the self assets ID is NOT available.
   String get assets {
     if (parent != null && selfAssets == null) {
       return parent!.assets;
@@ -137,6 +167,10 @@ class VersionData {
     return selfAssets!;
   }
 
+  /// Get the compliance level of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's compliance level if BOTH the parent
+  /// is available AND the self compliance level is NOT available.
   int? get complianceLevel {
     if (parent != null && selfComplianceLevel == null) {
       return parent!.complianceLevel;
@@ -144,6 +178,27 @@ class VersionData {
     return selfComplianceLevel;
   }
 
+  /// Get the downloads of this version, inheriting from the parent.
+  ///
+  /// This getter will merge the downloads object of the two versions
+  /// through a simple substitution method.
+  ///
+  /// Example:
+  ///   Parent Downloads:
+  ///     Client: never
+  ///     Client Mappings: null
+  ///     Server: gonna
+  ///     Server Mappings: null
+  ///   Self Downloads:
+  ///     Client: give
+  ///     Client Mappings: up
+  ///     Server: null
+  ///     Server Mappings: null
+  /// Result:
+  ///   Client: give
+  ///   Client Mappings: up
+  ///   Server: gonna
+  ///   Server Mappings: null
   CoreDownloads get downloads {
     if (parent == null) {
       return selfDownloads!;
@@ -166,10 +221,23 @@ class VersionData {
             : selfDownloads!.serverMappings);
   }
 
+  /// Get the ID of this version.
   String get id => selfID;
 
+  /// Get the parent ID of this version.
+  ///
+  /// For the loaded parent object, see [parent].
   String? get inheritsFrom => selfInheritsFrom;
 
+  /// Get the libraries of this version, inheriting from the parent.
+  ///
+  /// This getter will merge the libraries of the two versions
+  /// by combining them together in one list.
+  ///
+  /// Example:
+  ///   Parent Libraries: a, b, c, d
+  ///   Self Libraries: e, f, g
+  ///   Result: a, b, c, d, e, f, g
   List<Library> get libraries {
     if (parent == null) {
       return selfLibraries!;
@@ -183,6 +251,10 @@ class VersionData {
     return libraries;
   }
 
+  /// Get the main class of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's main class if BOTH the parent
+  //   /// is available AND the self main class is NOT available.
   String get mainClass {
     if (parent != null && selfMainClass == null) {
       return parent!.mainClass;
@@ -190,6 +262,10 @@ class VersionData {
     return selfMainClass!;
   }
 
+  /// Get the Minecraft arguments of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's Minecraft arguments if BOTH the parent
+  /// is available AND the self Minecraft arguments is NOT available.
   String? get minecraftArguments {
     if (parent != null && selfMinecraftArguments == null) {
       return parent!.minecraftArguments;
@@ -197,6 +273,10 @@ class VersionData {
     return selfMinecraftArguments!;
   }
 
+  /// Get the release time of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's release time if BOTH the parent
+  /// is available AND the self release time is NOT available.
   DateTime get releaseTime {
     if (parent != null && selfReleaseTime == null) {
       return parent!.releaseTime;
@@ -204,6 +284,10 @@ class VersionData {
     return selfReleaseTime!;
   }
 
+  /// Get the time (what is this?) of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's time if BOTH the parent
+  /// is available AND the self time is NOT available.
   DateTime get time {
     if (parent != null && selfTime == null) {
       return parent!.time;
@@ -211,6 +295,10 @@ class VersionData {
     return selfTime!;
   }
 
+  /// Get the type of this version, inheriting from the parent.
+  ///
+  /// This getter will return the parent's type if BOTH the parent
+  /// is available AND the self type is NOT available.
   VersionType get type {
     if (parent != null && selfType == null) {
       return parent!.type;

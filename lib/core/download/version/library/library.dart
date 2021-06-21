@@ -28,6 +28,7 @@ import 'lib_download_info.dart';
 
 part 'library.g.dart';
 
+/// Represents a library in the version manifest.
 @JsonSerializable(explicitToJson: true)
 class Library {
   LibDownloadInfo? downloads;
@@ -36,10 +37,12 @@ class Library {
   NativesMapping? natives;
   List<Rule> rules;
 
+  /// Replace the placeholders in the name of natives within the native mappings.
   String _mapNativePlaceholders(String s) {
     return s..replaceAll('\${arch}', SysInfo.kernelBitness.toString());
   }
 
+  /// Get the platform-dependent native for this library.
   FriendlyDownload? get platformNative {
     if (natives == null || downloads == null) {
       return null;

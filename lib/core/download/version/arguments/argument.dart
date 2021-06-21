@@ -32,22 +32,27 @@ import '../../rule.dart';
 /// Represents argument(s) in the version manifest file.
 /// The arguments can either be a plain argument or ruled.
 class Argument {
-  List<dynamic> value;
-  List<Rule> rules;
+  List<dynamic> value; // The value(s) of this argument
+  List<Rule> rules; // The rules required for this argument to be used
 
   Argument({required this.value, required this.rules});
 
+  /// Get the value of this argument with placeholders replaced
+  /// based on the provided context.
   List<String> contextualValue(
       Account account, Profile profile, CoreConfig config, VersionData data,
       [String natives = '']) {
+    // The classpath includes all libraries and the game itself.
     List<String> classpaths = [];
+    // Find libraries
     for (Library library in data.libraries) {
       if (Rule.multiRulesApplicable(library.rules, account, profile)) {
         if (library.downloads == null) {
           classpaths.add(
+              // Add the default path if the downloads isn't available
               '${Artifact(library.name).path('${config.workingDirectory}${Platform.pathSeparator}libraries')}');
         } else if (library.downloads!.artifact != null) {
-          classpaths.add(
+          classpaths.add(// Add the specified path if the downloads is available
               '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${library.downloads!.artifact!.path}');
         }
       }
@@ -56,6 +61,7 @@ class Argument {
         '${config.workingDirectory}${Platform.pathSeparator}versions${Platform.pathSeparator}${data.id}${Platform.pathSeparator}${data.id}.jar');
 
     return List.from(value.map((s) {
+      // Map all arguments to the placeholders
       return s
           .toString()
           .replaceAll('\${auth_player_name}', account.profileName)
@@ -70,12 +76,13 @@ class Argument {
           .replaceAll('\${assets_index_name}', data.assets)
           .replaceAll('\${auth_uuid}', account.uuid.replaceAll('-', ''))
           .replaceAll('\${auth_access_token}', account.accessToken)
-          .replaceAll('\${user_type}',
+          .replaceAll(
+              '\${user_type}', // Why is this needed? Metrics?
               account.type == 'microsoft' ? 'microsoft' : 'mojang')
           .replaceAll('\${version_type}',
               data.type.toString().replaceAll('VersionType.', ''))
-          .replaceAll('\${user_properties}', '{}')
-          .replaceAll('\${auth_session}', account.accessToken)
+          .replaceAll('\${user_properties}', '{}') // What is this?
+          .replaceAll('\${auth_session}', account.accessToken) // What is this?
           .replaceAll(
               '\${resolution_width}',
               profile.resolutionWidth == null
@@ -94,6 +101,7 @@ class Argument {
     }));
   }
 
+  // Check if the arguments should be used for the context.
   bool applicable(Account account, Profile profile) =>
       Rule.multiRulesApplicable(rules, account, profile);
 }

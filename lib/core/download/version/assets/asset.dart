@@ -22,6 +22,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'asset.g.dart';
 
+/// Represents a downloadable asset.
+///
+/// TODO Merge with [AssetObject]
 @JsonSerializable(explicitToJson: true)
 class Asset {
   String hash;

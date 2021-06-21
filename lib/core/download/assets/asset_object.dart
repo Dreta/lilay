@@ -20,6 +20,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'asset_object.g.dart';
 
+/// Represents an asset object, available in the asset index of Minecraft.
 @JsonSerializable(explicitToJson: true)
 class AssetObject {
   String hash;
@@ -29,6 +30,7 @@ class AssetObject {
       : this.hash = hash,
         this.size = size;
 
+  /// Get where to download this asset index - /[first two characters of hash]/[hash]
   String get downloadPath => '/${hash.substring(0, 2)}/$hash';
 
   Map<String, dynamic> toJson() => _$AssetObjectToJson(this);

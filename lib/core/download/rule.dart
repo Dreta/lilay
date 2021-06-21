@@ -26,6 +26,8 @@ import 'package:system_info/system_info.dart';
 
 part 'rule.g.dart';
 
+/// Represents a rule to determine whether a library or an argument etc.
+/// should be used under the current context.
 @JsonSerializable(explicitToJson: true)
 class Rule {
   RuleAction action;
@@ -37,6 +39,7 @@ class Rule {
         this.features = features,
         this.os = os;
 
+  /// Whether multiple rules are applicable according the the context.
   static bool multiRulesApplicable(
       List<Rule> rules, Account? account, Profile? profile) {
     bool applicability = rules.isEmpty;
@@ -56,6 +59,7 @@ class Rule {
     return applicability;
   }
 
+  /// Whether this rule is available according to the context.
   applicable(Account? account, Profile? profile) {
     bool featuresCompatible =
         features != null ? features!.applicable(account, profile) : true;
@@ -70,9 +74,14 @@ class Rule {
 
 @JsonSerializable(explicitToJson: true)
 class FeatureSet {
+  // NOTE: The conditions have an AND relationship.
+
+  /// Whether the user is a demo user.
+  /// This is not considered in Lilay.
   @JsonKey(name: 'is_demo_user')
   bool? isDemoUser;
 
+  /// Whether a custom resolution is specified in the profile.
   @JsonKey(name: 'has_custom_resolution')
   bool? hasCustomResolution;
 
@@ -81,8 +90,8 @@ class FeatureSet {
         this.hasCustomResolution = hasCustomResolution;
 
   bool applicable(Account? account, Profile? profile) {
-    // This is truly spaghetti code.
     if (account == null && profile == null) {
+      // Return true if the context is generic.
       return true;
     }
     if (isDemoUser ?? false) {
@@ -91,6 +100,7 @@ class FeatureSet {
     if (profile != null &&
         (hasCustomResolution ?? false) &&
         (profile.resolutionWidth != null || profile.resolutionHeight != null)) {
+      // If we have a custom resolution, then apply it.
       return true;
     }
     return false;
@@ -105,7 +115,7 @@ class FeatureSet {
 @JsonSerializable(explicitToJson: true)
 class OSInfo {
   String name;
-  String? arch;
+  String? arch; // x86,
   String? version;
 
   OSInfo(String name, String? arch, String? version)
@@ -120,7 +130,8 @@ class OSInfo {
     // Check for architecture compatibility
     bool architectureCompatible = true;
     if (arch != null) {
-      architectureCompatible = arch! == SysInfo.kernelArchitecture;
+      architectureCompatible = arch!.replaceAll('amd64', 'x86_64') ==
+          SysInfo.kernelArchitecture.replaceAll('amd64', 'x86_64');
     }
 
     bool versionCompatible = true;

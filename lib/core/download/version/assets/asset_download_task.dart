@@ -40,13 +40,14 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
     try {
       File file = File(
           '$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', dependency.hash.substring(0, 2)).replaceAll('{hash2}', dependency.hash)}');
-      bool available = (await file.exists()) &&
-          (dependency.hash.toLowerCase() ==
-              sha1
-                  .convert(List.from(await file.readAsBytes()))
-                  .toString()
-                  .toLowerCase()) &&
-          (await file.length() == dependency.size);
+      bool available =
+          (await file.exists()) && // Verify the checksum and the size
+              (dependency.hash.toLowerCase() ==
+                  sha1
+                      .convert(List.from(await file.readAsBytes()))
+                      .toString()
+                      .toLowerCase()) &&
+              (await file.length() == dependency.size);
       if (available) {
         progress = 1;
         result = await file.readAsBytes();
@@ -87,6 +88,7 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
         receivedBytes.addAll(chunk);
 
         if (finished) {
+          // Verify the checksum and the size
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
               dependency.hash.toLowerCase()) {
             logger.severe('Asset ${dependency.hash}\'s checksum is invalid.');

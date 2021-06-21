@@ -20,6 +20,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'friendly_download.g.dart';
 
+/// This class represents a generic download information.
 @JsonSerializable(explicitToJson: true)
 class FriendlyDownload {
   String? path; // Where the asset will be saved

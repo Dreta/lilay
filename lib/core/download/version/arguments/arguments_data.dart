@@ -22,6 +22,10 @@ import 'package:lilay/core/download/version/arguments/argument.dart';
 
 part 'arguments_data.g.dart';
 
+/// Represents the provided argument information in the version manifest.
+///
+/// Might not be available. In the case that only [minecraftArguments] is
+/// available, the default set of JVM arguments should be used.
 @JsonSerializable(explicitToJson: true)
 class ArgumentsData {
   List<dynamic>?
@@ -32,6 +36,7 @@ class ArgumentsData {
       : this.game = game,
         this.jvm = jvm;
 
+  /// Get the game arguments parsed into a list of [Argument]s.
   List<Argument> get gameParsed {
     List<Argument> arguments = [];
     for (dynamic i in (game ?? [])) {
@@ -60,6 +65,7 @@ class ArgumentsData {
     return arguments;
   }
 
+  /// Get the JVM arguments parsed into a list of [Argument]s.
   List<Argument> get jvmParsed {
     List<Argument> arguments = [];
     for (dynamic i in (jvm ?? [])) {

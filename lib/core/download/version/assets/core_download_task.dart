@@ -96,6 +96,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
         receivedBytes.addAll(chunk);
 
         if (received >= resp.contentLength!) {
+          // Verify hash and checksum
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
               dependency.downloads.client!.sha1.toLowerCase()) {
             logger

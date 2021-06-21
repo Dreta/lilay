@@ -21,6 +21,8 @@ import 'package:lilay/core/download/version/assets/friendly_download.dart';
 
 part 'core_downloads.g.dart';
 
+/// This class represents the downloads of the game core
+/// in the version manifest.
 @JsonSerializable(explicitToJson: true)
 class CoreDownloads {
   FriendlyDownload? client;

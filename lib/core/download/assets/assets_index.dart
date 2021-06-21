@@ -21,6 +21,7 @@ import 'package:lilay/core/download/assets/asset_object.dart';
 
 part 'assets_index.g.dart';
 
+/// Represents the asset index of Minecraft.
 @JsonSerializable(explicitToJson: true)
 class AssetsIndex {
   Map<String, AssetObject> objects;

@@ -19,8 +19,14 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/download/version/assets/friendly_download.dart';
 
+import 'artifact.dart';
+
 part 'lib_download_info.g.dart';
 
+/// Represents the download information for this library.
+///
+/// Might not be available. In case it isn't available, the download
+/// information must be extracted through [Artifact].
 @JsonSerializable(explicitToJson: true)
 class LibDownloadInfo {
   FriendlyDownload? artifact;

@@ -20,6 +20,11 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'natives_mapping.g.dart';
 
+/// This class represents the mapping of the natives
+/// from the platform to the name in [classifiers].
+///
+/// The mapped natives should have the ${arch} replaced
+/// with the kernel bitness (32/64)
 @JsonSerializable(explicitToJson: true)
 class NativesMapping {
   String? windows;

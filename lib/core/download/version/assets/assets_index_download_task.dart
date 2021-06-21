@@ -51,7 +51,7 @@ class AssetsIndexDownloadTask
     try {
       File file = File(
           '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
-      bool available = (await file.exists()) &&
+      bool available = (await file.exists()) && // Verify checksum and size
           (dependency.assetIndex!.sha1.toLowerCase() ==
               sha1
                   .convert(List.from(await file.readAsBytes()))
@@ -59,6 +59,7 @@ class AssetsIndexDownloadTask
                   .toLowerCase()) &&
           (await file.length() == dependency.assetIndex!.size);
       if (available) {
+        // Convert the JSON into map of assets
         Map<String, dynamic> assetsJson =
             jsonDecode(await file.readAsString())['objects'];
         result = {};
@@ -107,6 +108,26 @@ class AssetsIndexDownloadTask
         receivedBytes.addAll(chunk);
 
         if (received >= resp.contentLength!) {
+          // Verify hash and checksum
+          if (dependency.assetIndex!.sha1.toLowerCase() !=
+              sha1.convert(receivedBytes).toString().toLowerCase()) {
+            logger.severe(
+                'Asset index of ${dependency.id}\'s checksum is invalid.');
+            exceptionPhase = Phase.download;
+            exception = Exception(
+                'Asset index of ${dependency.id}\'s checksum is invalid.');
+            return;
+          }
+
+          if (receivedBytes.length != dependency.assetIndex!.size) {
+            logger.severe(
+                'Asset index of ${dependency.id}\'s size is incorrect.');
+            exceptionPhase = Phase.download;
+            exception = Exception(
+                'Asset index of ${dependency.id}\'s size is invalid.');
+            return;
+          }
+
           String json = utf8.decode(receivedBytes);
           Map<String, dynamic> assetsJson = jsonDecode(json)['objects'];
           Map<String, Asset> assets = {};
