@@ -17,7 +17,7 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:lilay/ui/profiles/create/create_button.dart';
+import 'package:lilay/ui/profiles/create_button.dart';
 import 'package:lilay/ui/profiles/profile.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:provider/provider.dart';

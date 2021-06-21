@@ -18,7 +18,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'create_dialog.dart';
+import 'profile_dialog.dart';
 
 class CreateButton extends StatelessWidget {
   @override
@@ -26,7 +26,8 @@ class CreateButton extends StatelessWidget {
     return ListTile(
         leading: Icon(Icons.add),
         title: Text('Add a profile'),
-        onTap: () => CreateDialog.display(context),
+        onTap: () =>
+            ProfileDialog.display(context, ProfileDialogType.create, null),
         minLeadingWidth: 20);
   }
 }

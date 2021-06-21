@@ -30,38 +30,46 @@ import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
-import 'package:lilay/ui/profiles/create/create_dialog.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
-class EditDialog extends StatefulWidget {
-  final Profile profile;
+class ProfileDialog extends StatefulWidget {
+  // Only support versions released after 1.7.2
+  static final minimumSupportTime = DateTime(2013, 10, 25, 13);
+  final ProfileDialogType type;
+  final Profile? profile;
 
-  EditDialog({required this.profile});
+  ProfileDialog({required this.type, required this.profile});
 
-  static void display(BuildContext context, Profile profile) {
+  static void display(
+      BuildContext context, ProfileDialogType type, Profile? profile) {
     showAnimatedDialog(
         context: context,
         barrierDismissible: true,
-        builder: (context) => EditDialog(profile: profile),
+        builder: (context) => ProfileDialog(type: type, profile: profile),
         animationType: DialogTransitionType.fadeScale,
         curve: Curves.easeInOut,
         duration: Duration(milliseconds: 400));
   }
 
   @override
-  _EditDialogState createState() => _EditDialogState(profile: profile);
+  _ProfileDialogState createState() =>
+      _ProfileDialogState(type: type, profile: profile);
 }
 
-class _EditDialogState extends State<EditDialog> {
+class _ProfileDialogState extends State<ProfileDialog> {
   final Profile profile;
+  final ProfileDialogType type;
   late String _selectedVersion = versions.latest.release;
   late final VersionManifest versions;
   late VersionsDownloadTask task;
 
-  _EditDialogState({required this.profile});
+  _ProfileDialogState({required this.type, Profile? profile})
+      : this.profile = profile ??
+            Profile('', '', null, null, null, null,
+                Profile.DEFAULT_JVM_ARGUMENTS, null, null);
 
   bool loaded = false;
   double? progress = 0;
@@ -126,7 +134,7 @@ class _EditDialogState extends State<EditDialog> {
   }
 
   Future<List<VersionInfo>> _getAvailableVersions() async {
-    final CoreConfig config = Provider.of<CoreConfig>(context);
+    final CoreConfig config = Provider.of<CoreConfig>(context, listen: false);
     final Logger logger = GetIt.I.get<Logger>();
     Directory versions = Directory(
         '${config.workingDirectory}${Platform.pathSeparator}versions');
@@ -148,7 +156,7 @@ class _EditDialogState extends State<EditDialog> {
             }
             if (json['releaseTime'] != null) {
               DateTime releaseTime = DateTime.parse(json['releaseTime']);
-              if (releaseTime.compareTo(CreateDialog.minimumSupportTime) < 0) {
+              if (releaseTime.compareTo(ProfileDialog.minimumSupportTime) < 0) {
                 continue;
               }
             }
@@ -170,7 +178,6 @@ class _EditDialogState extends State<EditDialog> {
   /// Attempt to load the version manifest
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
-    final Logger logger = GetIt.I.get<Logger>();
 
     task = VersionsDownloadTask(
         source: config.metaSource, workingDir: config.workingDirectory);
@@ -182,49 +189,7 @@ class _EditDialogState extends State<EditDialog> {
             () => progress = null); // Make the loading indicator indeterminate
 
         // Enumerate the versions/ directory for valid versions
-        Directory versions = Directory(
-            '${config.workingDirectory}${Platform.pathSeparator}versions');
-        List<VersionInfo> versionObjs = [];
-        await for (FileSystemEntity directory in versions.list()) {
-          if (directory is Directory) {
-            if (directory.path.contains('fabric') ||
-                directory.path.contains('forge') ||
-                directory.path.contains('liteloader')) {
-              continue; // Modded versions are not supported yet.
-            }
-            File data = File(path.join(directory.absolute.path,
-                '${path.basename(directory.path)}.json'));
-            File jar = File(path.join(directory.absolute.path,
-                '${path.basename(directory.path)}.jar'));
-            if (await data.exists() && await jar.exists()) {
-              // If the game is executable (We check the hash later)
-              try {
-                Map<String, dynamic> json =
-                    jsonDecode(await data.readAsString());
-                if (json.containsKey('type') &&
-                    json['type'].toString().contains('old')) {
-                  // Skip
-                  continue;
-                }
-                if (json['releaseTime'] != null) {
-                  DateTime releaseTime = DateTime.parse(json['releaseTime']);
-                  if (releaseTime.compareTo(CreateDialog.minimumSupportTime) <
-                      0) {
-                    continue;
-                  }
-                }
-                VersionData vData = VersionData.fromJson(
-                    json); // Parse and create the VersionInfo
-                versionObjs.add(VersionInfo(
-                    vData.id, vData.type, '', vData.time, vData.releaseTime));
-              } catch (e) {
-                // Ignore parsing errors for the version data - we will discard this version
-                logger.severe(
-                    'Failed to parse the version data in ${directory.absolute.path}: $e.');
-              }
-            }
-          }
-        }
+        List<VersionInfo> versionObjs = await _getAvailableVersions();
 
         // Sort and determine the latest version
         versionObjs.sort((a, b) =>
@@ -249,22 +214,26 @@ class _EditDialogState extends State<EditDialog> {
         // Create the manifest
         setState(() {
           this.versions = VersionManifest(latest, versionObjs);
+          if (type == ProfileDialogType.create) {
+            _selectedVersion = latest.release;
+          }
           loaded = true;
         });
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null) {
         task.save();
-        setState(() async {
+        List<VersionInfo> versionInfos = await _getAvailableVersions();
+        setState(() {
           // Use the downloaded versions manifest
-          List<VersionInfo> versionInfos = await _getAvailableVersions();
           VersionManifest manifest = task.result!;
           List<VersionInfo> applicable = [];
           List<String> applicableVers = [];
+          // Remove legacy versions
           for (VersionInfo version in manifest.versions) {
             if (version.releaseTime!
-                    .compareTo(CreateDialog.minimumSupportTime) >=
+                    .compareTo(ProfileDialog.minimumSupportTime) >=
                 0) {
               applicable.add(version);
               applicableVers.add(version.id);
@@ -274,7 +243,7 @@ class _EditDialogState extends State<EditDialog> {
           for (VersionInfo version in versionInfos) {
             if (version.releaseTime != null &&
                 version.releaseTime!
-                        .compareTo(CreateDialog.minimumSupportTime) <
+                        .compareTo(ProfileDialog.minimumSupportTime) <
                     0) {
               continue;
             }
@@ -285,6 +254,9 @@ class _EditDialogState extends State<EditDialog> {
           }
           manifest.versions = applicable;
           versions = manifest;
+          if (type == ProfileDialogType.create) {
+            _selectedVersion = versions.latest.release;
+          }
           loaded = true;
         });
       }
@@ -512,6 +484,7 @@ class _EditDialogState extends State<EditDialog> {
                   onPressed: () {
                     if (_form.currentState!.validate()) {
                       Logger logger = GetIt.I.get<Logger>();
+
                       profile.name = _name.value.text;
                       profile.version = _selectedVersion;
                       profile.gameDirectory = _gameDir.value.text.isEmpty
@@ -532,10 +505,22 @@ class _EditDialogState extends State<EditDialog> {
                       profile.gameArguments = _gameArgs.value.text.isEmpty
                           ? ''
                           : _gameArgs.value.text;
-                      profiles.notify();
+                      if (type == ProfileDialogType.create) {
+                        profile.selected = profiles.profiles.length == 0;
+                        if (profile.selected) {
+                          profiles.selected = profile;
+                        }
+                        profiles.addProfile(profile);
+                      } else {
+                        profiles.notify();
+                      }
                       profiles.saveTo(
                           GetIt.I.get<File>(instanceName: 'profilesDB'));
-                      logger.info('Edited profile ${profile.name}.');
+                      if (type == ProfileDialogType.create) {
+                        logger.info('Created profile ${profile.name}.');
+                      } else {
+                        logger.info('Edited profile ${profile.name}.');
+                      }
                       Navigator.pop(context);
                     }
                   },
@@ -544,7 +529,9 @@ class _EditDialogState extends State<EditDialog> {
                   child: Padding(
                       padding: const EdgeInsets.only(
                           left: 15, right: 15, top: 10, bottom: 10),
-                      child: Text('Save')))
+                      child: Text(type == ProfileDialogType.create
+                          ? 'Create'
+                          : 'Save')))
             ]));
   }
 
@@ -564,7 +551,10 @@ class _EditDialogState extends State<EditDialog> {
                     children: [
                       Padding(
                           padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Text('Edit ${profile.name}',
+                          child: Text(
+                              type == ProfileDialogType.create
+                                  ? 'Create a profile'
+                                  : 'Edit ${profile.name}',
                               style: textTheme.headline6)),
                       loaded
                           ? Form(
@@ -591,3 +581,5 @@ class _EditDialogState extends State<EditDialog> {
                     ]))));
   }
 }
+
+enum ProfileDialogType { create, edit }
