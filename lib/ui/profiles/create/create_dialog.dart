@@ -111,10 +111,51 @@ class _CreateDialogState extends State<CreateDialog> {
     task.cancelled = true;
   }
 
+  Future<List<VersionInfo>> _getAvailableVersions() async {
+    final CoreConfig config = Provider.of<CoreConfig>(context);
+    final Logger logger = GetIt.I.get<Logger>();
+    Directory versions = Directory(
+        '${config.workingDirectory}${Platform.pathSeparator}versions');
+    List<VersionInfo> versionObjs = [];
+    await for (FileSystemEntity directory in versions.list()) {
+      if (directory is Directory) {
+        File data = File(path.join(
+            directory.absolute.path, '${path.basename(directory.path)}.json'));
+        File jar = File(path.join(
+            directory.absolute.path, '${path.basename(directory.path)}.jar'));
+        if (await data.exists() && await jar.exists()) {
+          // If the game is executable (We check the hash later)
+          try {
+            Map<String, dynamic> json = jsonDecode(await data.readAsString());
+            if (json.containsKey('type') &&
+                json['type'].toString().contains('old')) {
+              // Skip
+              continue;
+            }
+            if (json['releaseTime'] != null) {
+              DateTime releaseTime = DateTime.parse(json['releaseTime']);
+              if (releaseTime.compareTo(CreateDialog.minimumSupportTime) < 0) {
+                continue;
+              }
+            }
+            VersionData vData =
+                VersionData.fromJson(json); // Parse and create the VersionInfo
+            versionObjs.add(VersionInfo(
+                vData.id, vData.type, '', vData.time, vData.releaseTime));
+          } catch (e) {
+            // Ignore parsing errors for the version data - we will discard this version
+            logger.severe(
+                'Failed to parse the version data in ${directory.absolute.path}: $e.');
+          }
+        }
+      }
+    }
+    return versionObjs;
+  }
+
   /// Attempt to load the version manifest
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
-    final Logger logger = GetIt.I.get<Logger>();
 
     task = VersionsDownloadTask(
         source: config.metaSource, workingDir: config.workingDirectory);
@@ -126,47 +167,13 @@ class _CreateDialogState extends State<CreateDialog> {
             () => progress = null); // Make the loading indicator indeterminate
 
         // Enumerate the versions/ directory for valid versions
-        Directory versions = Directory(
-            '${config.workingDirectory}${Platform.pathSeparator}versions');
-        List<VersionInfo> versionObjs = [];
-        await for (FileSystemEntity directory in versions.list()) {
-          if (directory is Directory) {
-            File data = File(path.join(directory.absolute.path,
-                '${path.basename(directory.path)}.json'));
-            File jar = File(path.join(directory.absolute.path,
-                '${path.basename(directory.path)}.jar'));
-            if (await data.exists() && await jar.exists()) {
-              // If the game is executable (We check the hash later)
-              try {
-                Map<String, dynamic> json =
-                    jsonDecode(await data.readAsString());
-                if (json.containsKey('type') &&
-                    json['type'].toString().contains('old')) {
-                  // Skip
-                  continue;
-                }
-                if (json['releaseTime'] != null) {
-                  DateTime releaseTime = DateTime.parse(json['releaseTime']);
-                  if (releaseTime.compareTo(CreateDialog.minimumSupportTime) <
-                      0) {
-                    continue;
-                  }
-                }
-                VersionData vData = VersionData.fromJson(
-                    json); // Parse and create the VersionInfo
-                versionObjs.add(VersionInfo(
-                    vData.id, vData.type, '', vData.time, vData.releaseTime));
-              } catch (e) {
-                // Ignore parsing errors for the version data - we will discard this version
-                logger.severe(
-                    'Failed to parse the version data in ${directory.absolute.path}: $e.');
-              }
-            }
-          }
-        }
+        List<VersionInfo> versionObjs = await _getAvailableVersions();
 
         // Sort and determine the latest version
-        versionObjs.sort((a, b) => (a.releaseTime.compareTo(b.releaseTime)));
+        versionObjs.sort((a, b) =>
+            (a.releaseTime != null && b.releaseTime != null
+                ? a.releaseTime!.compareTo(b.releaseTime!)
+                : -1));
         String? latestRelease;
         String? latestSnapshot;
         for (VersionInfo version in versionObjs.reversed) {
@@ -190,19 +197,36 @@ class _CreateDialogState extends State<CreateDialog> {
         });
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null) {
         task.save();
+        List<VersionInfo> versionInfos = await _getAvailableVersions();
         setState(() {
           // Use the downloaded versions manifest
           VersionManifest manifest = task.result!;
           List<VersionInfo> applicable = [];
+          List<String> applicableVers = [];
+          // Remove legacy versions
           for (VersionInfo version in manifest.versions) {
-            if (version.releaseTime
+            if (version.releaseTime!
                     .compareTo(CreateDialog.minimumSupportTime) >=
                 0) {
               applicable.add(version);
+              applicableVers.add(version.id);
             }
+          }
+          // Add local versions
+          for (VersionInfo version in versionInfos) {
+            if (version.releaseTime != null &&
+                version.releaseTime!
+                        .compareTo(CreateDialog.minimumSupportTime) <
+                    0) {
+              continue;
+            }
+            if (applicableVers.contains(version.id)) {
+              continue;
+            }
+            applicable.add(version);
           }
           manifest.versions = applicable;
           versions = manifest;
@@ -247,7 +271,9 @@ class _CreateDialogState extends State<CreateDialog> {
             value: _selectedVersion,
             items: [
               for (VersionInfo version in versions.versions
-                ..sort((a, b) => a.releaseTime.compareTo(b.releaseTime))
+                ..sort((a, b) => a.releaseTime != null && b.releaseTime != null
+                    ? a.releaseTime!.compareTo(b.releaseTime!)
+                    : -1)
                 ..reversed)
                 // Legacy versions are not supported ATM
                 if (version.type == VersionType.release ||

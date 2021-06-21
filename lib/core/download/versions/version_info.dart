@@ -27,10 +27,10 @@ class VersionInfo {
   VersionType type;
   String url;
   DateTime time;
-  DateTime releaseTime;
+  DateTime? releaseTime;
 
   VersionInfo(String id, VersionType type, String url, DateTime time,
-      DateTime releaseTime)
+      DateTime? releaseTime)
       : this.id = id,
         this.type = type,
         this.url = url,

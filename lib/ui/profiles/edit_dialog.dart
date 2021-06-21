@@ -185,7 +185,10 @@ class _EditDialogState extends State<EditDialog> {
         }
 
         // Sort and determine the latest version
-        versionObjs.sort((a, b) => (a.releaseTime.compareTo(b.releaseTime)));
+        versionObjs.sort((a, b) =>
+            (a.releaseTime != null && b.releaseTime != null
+                ? a.releaseTime!.compareTo(b.releaseTime!)
+                : -1));
         String? latestRelease;
         String? latestSnapshot;
         for (VersionInfo version in versionObjs.reversed) {
@@ -216,7 +219,7 @@ class _EditDialogState extends State<EditDialog> {
           VersionManifest manifest = task.result!;
           List<VersionInfo> applicable = [];
           for (VersionInfo version in manifest.versions) {
-            if (version.releaseTime
+            if (version.releaseTime!
                     .compareTo(CreateDialog.minimumSupportTime) >=
                 0) {
               applicable.add(version);
@@ -264,7 +267,9 @@ class _EditDialogState extends State<EditDialog> {
             value: _selectedVersion,
             items: [
               for (VersionInfo version in versions.versions
-                ..sort((a, b) => a.releaseTime.compareTo(b.releaseTime))
+                ..sort((a, b) => a.releaseTime != null && b.releaseTime != null
+                    ? a.releaseTime!.compareTo(b.releaseTime!)
+                    : -1)
                 ..reversed)
                 // Legacy versions are not supported ATM
                 if (version.type == VersionType.release ||

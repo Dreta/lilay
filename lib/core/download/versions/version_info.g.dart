@@ -12,7 +12,9 @@ VersionInfo _$VersionInfoFromJson(Map<String, dynamic> json) {
     _$enumDecode(_$VersionTypeEnumMap, json['type']),
     json['url'] as String,
     DateTime.parse(json['time'] as String),
-    DateTime.parse(json['releaseTime'] as String),
+    json['releaseTime'] == null
+        ? null
+        : DateTime.parse(json['releaseTime'] as String),
   );
 }
 
@@ -22,7 +24,7 @@ Map<String, dynamic> _$VersionInfoToJson(VersionInfo instance) =>
       'type': _$VersionTypeEnumMap[instance.type],
       'url': instance.url,
       'time': instance.time.toIso8601String(),
-      'releaseTime': instance.releaseTime.toIso8601String(),
+      'releaseTime': instance.releaseTime?.toIso8601String(),
     };
 
 K _$enumDecode<K, V>(
