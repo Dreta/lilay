@@ -39,8 +39,10 @@ class ProfileWidget extends StatelessWidget {
       this.showActions = false});
 
   void delete(BuildContext context) {
-    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
-    final ProfilesProvider profiles = Provider.of<ProfilesProvider>(context);
+    final ScreenProvider screen =
+        Provider.of<ScreenProvider>(context, listen: false);
+    final ProfilesProvider profiles =
+        Provider.of<ProfilesProvider>(context, listen: false);
 
     if (profiles.profiles.length == 1) {
       profiles.selected = null;
