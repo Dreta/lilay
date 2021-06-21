@@ -125,6 +125,48 @@ class _EditDialogState extends State<EditDialog> {
     task.cancelled = true;
   }
 
+  Future<List<VersionInfo>> _getAvailableVersions() async {
+    final CoreConfig config = Provider.of<CoreConfig>(context);
+    final Logger logger = GetIt.I.get<Logger>();
+    Directory versions = Directory(
+        '${config.workingDirectory}${Platform.pathSeparator}versions');
+    List<VersionInfo> versionObjs = [];
+    await for (FileSystemEntity directory in versions.list()) {
+      if (directory is Directory) {
+        File data = File(path.join(
+            directory.absolute.path, '${path.basename(directory.path)}.json'));
+        File jar = File(path.join(
+            directory.absolute.path, '${path.basename(directory.path)}.jar'));
+        if (await data.exists() && await jar.exists()) {
+          // If the game is executable (We check the hash later)
+          try {
+            Map<String, dynamic> json = jsonDecode(await data.readAsString());
+            if (json.containsKey('type') &&
+                json['type'].toString().contains('old')) {
+              // Skip
+              continue;
+            }
+            if (json['releaseTime'] != null) {
+              DateTime releaseTime = DateTime.parse(json['releaseTime']);
+              if (releaseTime.compareTo(CreateDialog.minimumSupportTime) < 0) {
+                continue;
+              }
+            }
+            VersionData vData =
+                VersionData.fromJson(json); // Parse and create the VersionInfo
+            versionObjs.add(VersionInfo(
+                vData.id, vData.type, '', vData.time, vData.releaseTime));
+          } catch (e) {
+            // Ignore parsing errors for the version data - we will discard this version
+            logger.severe(
+                'Failed to parse the version data in ${directory.absolute.path}: $e.');
+          }
+        }
+      }
+    }
+    return versionObjs;
+  }
+
   /// Attempt to load the version manifest
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
@@ -214,16 +256,32 @@ class _EditDialogState extends State<EditDialog> {
     task.callbacks.add(() {
       if (task.result != null) {
         task.save();
-        setState(() {
+        setState(() async {
           // Use the downloaded versions manifest
+          List<VersionInfo> versionInfos = await _getAvailableVersions();
           VersionManifest manifest = task.result!;
           List<VersionInfo> applicable = [];
+          List<String> applicableVers = [];
           for (VersionInfo version in manifest.versions) {
             if (version.releaseTime!
                     .compareTo(CreateDialog.minimumSupportTime) >=
                 0) {
               applicable.add(version);
+              applicableVers.add(version.id);
             }
+          }
+          // Add local versions
+          for (VersionInfo version in versionInfos) {
+            if (version.releaseTime != null &&
+                version.releaseTime!
+                        .compareTo(CreateDialog.minimumSupportTime) <
+                    0) {
+              continue;
+            }
+            if (applicableVers.contains(version.id)) {
+              continue;
+            }
+            applicable.add(version);
           }
           manifest.versions = applicable;
           versions = manifest;
