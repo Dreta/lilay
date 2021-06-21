@@ -241,26 +241,31 @@ class _ProfileDialogState extends State<ProfileDialog> {
     final ThemeData theme = Theme.of(context);
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
+    final List<DropdownMenuItem<String>> items = [];
+    final List<String> ids = [];
+
+    for (VersionInfo version in versions.versions
+      ..sort((a, b) => a.releaseTime != null && b.releaseTime != null
+          ? a.releaseTime!.compareTo(b.releaseTime!)
+          : -1)
+      ..reversed) {
+      // Legacy versions are not supported ATM
+      if (version.type == VersionType.release ||
+          (config.showSnapshots && version.type == VersionType.snapshot)) {
+        items.add(DropdownMenuItem(value: version.id, child: Text(version.id)));
+        ids.add(version.id);
+      }
+    }
+
     return Theme(
-        child: DropdownButtonFormField(
+        child: DropdownButtonFormField<String>(
             decoration: InputDecoration(
                 labelText: 'Version',
                 enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: theme.accentColor))),
             focusNode: _versionFocus,
-            value: _selectedVersion,
-            items: [
-              for (VersionInfo version in versions.versions
-                ..sort((a, b) => a.releaseTime != null && b.releaseTime != null
-                    ? a.releaseTime!.compareTo(b.releaseTime!)
-                    : -1)
-                ..reversed)
-                // Legacy versions are not supported ATM
-                if (version.type == VersionType.release ||
-                    (config.showSnapshots &&
-                        version.type == VersionType.snapshot))
-                  DropdownMenuItem(value: version.id, child: Text(version.id))
-            ],
+            value: ids.contains(_selectedVersion) ? _selectedVersion : ids[0],
+            items: items,
             onChanged: (value) {
               setState(() {
                 _selectedVersion = value as String;
