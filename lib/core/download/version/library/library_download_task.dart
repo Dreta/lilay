@@ -166,6 +166,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         dependency.downloads!.artifact == null) {
       logger
           .info('There is no artifact for this library. Skipping to natives.');
+      result = [];
       return await _downloadNative();
     }
 
@@ -288,7 +289,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         logger.fine('Received ${chunk.length} bytes of data.');
         // The progress is divided into two parts - the artifact and the native.
         // This is the second part, so we add 0.5 to the progress first.
-        progress = 0.5 + received / resp.contentLength!;
+        progress = 0.5 + received / resp.contentLength! / 2;
         notify();
         receivedBytes.addAll(chunk);
 

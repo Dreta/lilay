@@ -105,6 +105,7 @@ class VersionParentDownloadTask extends DownloadTask<VersionData, VersionData> {
       // If a local version is available, use the local version.
       result = local;
       dependency.parent = local;
+      progress = 1;
       return true;
     } else if (childTask != null) {
       // Check if the cache is available in our child task.
@@ -112,6 +113,7 @@ class VersionParentDownloadTask extends DownloadTask<VersionData, VersionData> {
         // If it is available, then apply the parent to our dependency.
         result = childTask!.result;
         dependency.parent = childTask!.result;
+        progress = 1;
         return true;
       }
     }
@@ -131,7 +133,7 @@ class VersionParentDownloadTask extends DownloadTask<VersionData, VersionData> {
     try {
       // Save the parent file.
       File local = File(
-          '$workingDir${Platform.pathSeparator}${VersionDownloadTask.VERSION_PATH.replaceAll('{version}', dependency.id)}');
+          '$workingDir${Platform.pathSeparator}${VersionDownloadTask.VERSION_PATH.replaceAll('{version}', dependency.inheritsFrom!)}');
       await local.parent.create(recursive: true);
       await local.writeAsString(jsonEncode(result!.toJson()));
     } catch (e) {

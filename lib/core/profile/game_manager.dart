@@ -34,7 +34,9 @@ import 'package:lilay/core/download/version/library/library.dart';
 import 'package:lilay/core/download/version/library/library_download_task.dart';
 import 'package:lilay/core/download/version/version_data.dart';
 import 'package:lilay/core/download/version/version_download_task.dart';
+import 'package:lilay/core/download/version/version_parent_download_task.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
+import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/ui/launch/launch_provider.dart';
@@ -70,7 +72,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 6);
+        totalProgress += (task.progress - previousProgress) * (1 / 7);
         previousProgress = task.progress;
         subtitle = 'Versions Manifest (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -86,11 +88,12 @@ class GameManager {
     });
     task.callbacks.add(() async {
       if (task.result != null) {
-        task.save();
+        await task.save();
         // Find from manifest
         for (VersionInfo version in task.result!.versions) {
           if (version.id == profile.version) {
-            downloadVersionData(version);
+            downloadVersionData(task.result!, version);
+            task.cancelled = true;
             return;
           }
         }
@@ -112,8 +115,10 @@ class GameManager {
                 VersionData vData = VersionData.fromJson(
                     json); // Parse and create the VersionInfo
                 if (vData.id == profile.version) {
-                  totalProgress += 1 / 6; // Skip downloading the version data
-                  downloadAssetsIndex(vData);
+                  totalProgress += 1 / 7; // Skip downloading the version data
+                  this.data = vData;
+                  downloadVersionParent(task.result!, vData);
+                  task.cancelled = true;
                   return;
                 }
               } catch (e) {
@@ -133,7 +138,7 @@ class GameManager {
     task.start();
   }
 
-  void downloadVersionData(VersionInfo info) {
+  void downloadVersionData(VersionManifest manifest, VersionInfo info) {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the version data for ${profile.name}.');
     VersionDownloadTask task = VersionDownloadTask(
@@ -147,7 +152,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 6);
+        totalProgress += (task.progress - previousProgress) * (1 / 7);
         previousProgress = task.progress;
         subtitle =
             'Version Data ${info.id} (${(task.progress * 100).round()}%)';
@@ -162,14 +167,59 @@ class GameManager {
         parent.notify();
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null) {
-        task.save();
+        await task.save();
         data = task.result!;
-        downloadAssetsIndex(task.result!);
+        downloadVersionParent(manifest, task.result!);
+        task.cancelled = true;
       }
     });
     task.start();
+  }
+
+  void downloadVersionParent(VersionManifest manifest, VersionData data) {
+    Logger logger = GetIt.I.get<Logger>();
+    if (data.inheritsFrom != null) {
+      logger.info('Downloading the parent of version ${data.id}.');
+      VersionParentDownloadTask task = VersionParentDownloadTask(
+          source: config.metaSource,
+          manifest: manifest,
+          dependency: data,
+          workingDir: config.workingDirectory);
+      this.task = Task.downloadVersionParent;
+      subtitle = 'Parent ${data.inheritsFrom} of ${data.id}';
+      parent.notify();
+      double previousProgress = 0;
+      task.callbacks.add(() {
+        // We divide the progress into different parts.
+        if (task.progress != previousProgress) {
+          totalProgress += (task.progress - previousProgress) * (1 / 7);
+          previousProgress = task.progress;
+          subtitle =
+              'Parent ${data.inheritsFrom} of ${data.id} (${(task.progress * 100).round()}%)';
+          parent.notify();
+        }
+      });
+      task.callbacks.add(() {
+        if (task.exception != null) {
+          error =
+              'An error occurred when downloading the parent version:\n${task.exception.toString()} '
+              '(Phase: ${task.exceptionPhase.toString()})';
+          parent.notify();
+        }
+      });
+      task.callbacks.add(() async {
+        if (task.result != null) {
+          await task.save();
+          downloadAssetsIndex(data);
+          task.cancelled = true;
+        }
+      });
+      task.start();
+    } else {
+      downloadAssetsIndex(data);
+    }
   }
 
   void downloadAssetsIndex(VersionData data) {
@@ -186,7 +236,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 6);
+        totalProgress += (task.progress - previousProgress) * (1 / 7);
         previousProgress = task.progress;
         subtitle =
             'Assets index ${data.assets} (${(task.progress * 100).round()}%)';
@@ -201,10 +251,11 @@ class GameManager {
         parent.notify();
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null) {
-        task.save();
+        await task.save();
         downloadAssets(data, task.result!);
+        task.cancelled = true;
       }
     });
     task.start();
@@ -238,7 +289,7 @@ class GameManager {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
         totalProgress +=
-            (task.progress - previousProgress) * (1 / total) * (1 / 6);
+            (task.progress - previousProgress) * (1 / total) * (1 / 7);
         previousProgress = task.progress;
         subtitle = '${asset.key} (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -251,14 +302,15 @@ class GameManager {
         parent.notify();
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null) {
-        task.save();
+        await task.save();
         if (iterator.moveNext()) {
           _downloadAsset(data, iterator, total);
         } else {
           downloadLibraries(data);
         }
+        task.cancelled = true;
       }
     });
     task.start();
@@ -270,6 +322,7 @@ class GameManager {
     logger.info('Starting to download libraries for ${profile.name}.');
     this.task = Task.downloadLibraries;
     parent.notify();
+
     Iterator<Library> iterator = data.libraries.iterator;
     if (iterator.moveNext()) {
       _downloadLibrary(data, iterator, data.libraries.length);
@@ -292,7 +345,7 @@ class GameManager {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
         totalProgress +=
-            (task.progress - previousProgress) * (1 / total) * (1 / 6);
+            (task.progress - previousProgress) * (1 / total) * (1 / 7);
         previousProgress = task.progress;
         subtitle = '${library.name} (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -305,14 +358,15 @@ class GameManager {
         parent.notify();
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null && task.resultNative != null) {
-        task.save();
+        await task.save();
         if (iterator.moveNext()) {
           _downloadLibrary(data, iterator, total);
         } else {
           downloadCore(data);
         }
+        task.cancelled = true;
       }
     });
     task.start();
@@ -332,7 +386,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 6);
+        totalProgress += (task.progress - previousProgress) * (1 / 7);
         previousProgress = task.progress;
         subtitle = '${data.id} client (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -346,9 +400,9 @@ class GameManager {
         parent.notify();
       }
     });
-    task.callbacks.add(() {
+    task.callbacks.add(() async {
       if (task.result != null) {
-        task.save();
+        await task.save();
         parent.notify();
       }
     });
@@ -480,6 +534,7 @@ class GameManager {
 enum Task {
   downloadManifest,
   downloadVersionData,
+  downloadVersionParent,
   downloadAssetsIndex,
   downloadAssets,
   downloadLibraries,
@@ -492,6 +547,7 @@ extension TaskExtension on Task {
     return {
       Task.downloadManifest: 'Downloading manifest',
       Task.downloadVersionData: 'Verifying and downloading version data',
+      Task.downloadVersionParent: 'Verifying and downloading version parent',
       Task.downloadAssetsIndex: 'Verifying and downloading assets index',
       Task.downloadAssets: 'Verifying and downloading assets',
       Task.downloadLibraries: 'Verifying and downloading libraries',
