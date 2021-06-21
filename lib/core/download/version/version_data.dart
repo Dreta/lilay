@@ -106,7 +106,6 @@ class VersionData {
       assert(selfDownloads != null);
       assert(selfLibraries != null);
       assert(selfMainClass != null);
-      assert(selfMinecraftArguments != null);
       assert(selfReleaseTime != null);
       assert(selfTime != null);
       assert(selfType != null);
