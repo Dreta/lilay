@@ -14,35 +14,41 @@ VersionData _$VersionDataFromJson(Map<String, dynamic> json) {
     json['assetIndex'] == null
         ? null
         : AssetsIndex.fromJson(json['assetIndex'] as Map<String, dynamic>),
-    json['assets'] as String,
-    json['complianceLevel'] as int,
-    CoreDownloads.fromJson(json['downloads'] as Map<String, dynamic>),
+    json['assets'] as String?,
+    json['complianceLevel'] as int?,
+    json['downloads'] == null
+        ? null
+        : CoreDownloads.fromJson(json['downloads'] as Map<String, dynamic>),
     json['id'] as String,
-    (json['libraries'] as List<dynamic>)
-        .map((e) => Library.fromJson(e as Map<String, dynamic>))
+    json['inheritsFrom'] as String?,
+    (json['libraries'] as List<dynamic>?)
+        ?.map((e) => Library.fromJson(e as Map<String, dynamic>))
         .toList(),
-    json['mainClass'] as String,
+    json['mainClass'] as String?,
     json['minecraftArguments'] as String?,
-    DateTime.parse(json['releaseTime'] as String),
-    DateTime.parse(json['time'] as String),
-    _$enumDecode(_$VersionTypeEnumMap, json['type']),
+    json['releaseTime'] == null
+        ? null
+        : DateTime.parse(json['releaseTime'] as String),
+    json['time'] == null ? null : DateTime.parse(json['time'] as String),
+    _$enumDecodeNullable(_$VersionTypeEnumMap, json['type']),
   );
 }
 
 Map<String, dynamic> _$VersionDataToJson(VersionData instance) =>
     <String, dynamic>{
-      'arguments': instance.arguments?.toJson(),
-      'assetIndex': instance.assetIndex?.toJson(),
-      'assets': instance.assets,
-      'complianceLevel': instance.complianceLevel,
-      'downloads': instance.downloads.toJson(),
-      'id': instance.id,
-      'libraries': instance.libraries.map((e) => e.toJson()).toList(),
-      'mainClass': instance.mainClass,
-      'minecraftArguments': instance.minecraftArguments,
-      'releaseTime': instance.releaseTime.toIso8601String(),
-      'time': instance.time.toIso8601String(),
-      'type': _$VersionTypeEnumMap[instance.type],
+      'arguments': instance.selfArguments?.toJson(),
+      'assetIndex': instance.selfAssetIndex?.toJson(),
+      'assets': instance.selfAssets,
+      'complianceLevel': instance.selfComplianceLevel,
+      'downloads': instance.selfDownloads?.toJson(),
+      'id': instance.selfID,
+      'inheritsFrom': instance.selfInheritsFrom,
+      'libraries': instance.selfLibraries?.map((e) => e.toJson()).toList(),
+      'mainClass': instance.selfMainClass,
+      'minecraftArguments': instance.selfMinecraftArguments,
+      'releaseTime': instance.selfReleaseTime?.toIso8601String(),
+      'time': instance.selfTime?.toIso8601String(),
+      'type': _$VersionTypeEnumMap[instance.selfType],
     };
 
 K _$enumDecode<K, V>(
@@ -69,6 +75,17 @@ K _$enumDecode<K, V>(
       return MapEntry(unknownValue, enumValues.values.first);
     },
   ).key;
+}
+
+K? _$enumDecodeNullable<K, V>(
+  Map<K, V> enumValues,
+  dynamic source, {
+  K? unknownValue,
+}) {
+  if (source == null) {
+    return null;
+  }
+  return _$enumDecode<K, V>(enumValues, source, unknownValue: unknownValue);
 }
 
 const _$VersionTypeEnumMap = {

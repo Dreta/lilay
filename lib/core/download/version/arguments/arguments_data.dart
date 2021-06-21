@@ -24,17 +24,17 @@ part 'arguments_data.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class ArgumentsData {
-  List<dynamic>
+  List<dynamic>?
       game; // We must use dynamic here because the argument can either be a string or a ruled argument
-  List<dynamic> jvm;
+  List<dynamic>? jvm;
 
-  ArgumentsData(List<dynamic> game, List<dynamic> jvm)
+  ArgumentsData(List<dynamic>? game, List<dynamic>? jvm)
       : this.game = game,
         this.jvm = jvm;
 
   List<Argument> get gameParsed {
     List<Argument> arguments = [];
-    for (dynamic i in game) {
+    for (dynamic i in (game ?? [])) {
       if (i is String) {
         // If this is a plain argument
         arguments.add(Argument(value: [i], rules: [])); // Add without rules
@@ -62,7 +62,7 @@ class ArgumentsData {
 
   List<Argument> get jvmParsed {
     List<Argument> arguments = [];
-    for (dynamic i in jvm) {
+    for (dynamic i in (jvm ?? [])) {
       if (i is String) {
         arguments.add(Argument(value: [i], rules: []));
       } else if (i is List) {

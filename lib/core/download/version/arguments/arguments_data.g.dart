@@ -8,8 +8,8 @@ part of 'arguments_data.dart';
 
 ArgumentsData _$ArgumentsDataFromJson(Map<String, dynamic> json) {
   return ArgumentsData(
-    json['game'] as List<dynamic>,
-    json['jvm'] as List<dynamic>,
+    json['game'] as List<dynamic>?,
+    json['jvm'] as List<dynamic>?,
   );
 }
 

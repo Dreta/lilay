@@ -46,12 +46,12 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
       File file = File(
           '$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', dependency.id)}');
       bool available = ((await file.exists()) &&
-              (dependency.downloads.client.sha1.toLowerCase() ==
+              (dependency.downloads.client!.sha1.toLowerCase() ==
                   sha1
                       .convert(List.from(await file.readAsBytes()))
                       .toString()
                       .toLowerCase())) &&
-          (await file.length() == dependency.downloads.client.size);
+          (await file.length() == dependency.downloads.client!.size);
       if (available) {
         result = await file.readAsBytes();
         progress = 1;
@@ -72,7 +72,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
     logger.info('Starting to download the core game ${dependency.id}.');
     Request request = Request(
         'GET',
-        Uri.parse(dependency.downloads.client.url
+        Uri.parse(dependency.downloads.client!.url
             .replaceAll(CoreConfig.DEFAULT_CORE_SOURCE, source)));
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
@@ -97,7 +97,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
 
         if (received >= resp.contentLength!) {
           if (sha1.convert(receivedBytes).toString().toLowerCase() !=
-              dependency.downloads.client.sha1.toLowerCase()) {
+              dependency.downloads.client!.sha1.toLowerCase()) {
             logger
                 .severe('Client ${dependency.id}.jar\'s checksum is invalid.');
             exception =
@@ -106,7 +106,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
             return;
           }
 
-          if (receivedBytes.length != dependency.downloads.client.size) {
+          if (receivedBytes.length != dependency.downloads.client!.size) {
             logger.severe('Client ${dependency.id}.jar\'s size is incorrect.');
             exception =
                 Exception('File ${dependency.id}.jar\'s size is incorrect.');

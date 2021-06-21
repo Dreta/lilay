@@ -16,8 +16,15 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:get_it/get_it.dart';
+import 'package:lilay/core/download/version/version_data.dart';
+import 'package:lilay/core/download/versions/version_info.dart';
+import 'package:logging/logging.dart';
+import 'package:path/path.dart';
 
 Random random = Random();
 
@@ -53,6 +60,50 @@ const characters =
 /// Generate a random string.
 String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
     length, (_) => characters.codeUnitAt(random.nextInt(characters.length))));
+
+/// Get all locally available version manifests.
+Stream<VersionData> getAvailableVersions(String workingDir) async* {
+  final Logger logger = GetIt.I.get<Logger>();
+  Directory versions =
+      Directory('${workingDir}${Platform.pathSeparator}versions');
+  await for (FileSystemEntity directory in versions.list()) {
+    if (directory is Directory) {
+      File data = File(
+          join(directory.absolute.path, '${basename(directory.path)}.json'));
+      if (await data.exists()) {
+        try {
+          Map<String, dynamic> json = jsonDecode(await data.readAsString());
+          if (json.containsKey('type') &&
+              json['type'].toString().contains('old')) {
+            // Skip
+            continue;
+          }
+          if (json['releaseTime'] != null) {
+            DateTime releaseTime = DateTime.parse(json['releaseTime']);
+            if (releaseTime.compareTo(
+                    GetIt.I.get<DateTime>(instanceName: 'minimumSupport')) <
+                0) {
+              continue;
+            }
+          }
+          yield VersionData.fromJson(json);
+        } catch (e) {
+          // Ignore parsing errors for the version data - we will discard this version
+          logger.severe(
+              'Failed to parse the version data in ${directory.absolute.path}: $e.');
+        }
+      }
+    }
+  }
+}
+
+/// Get all locally available version infos.
+Stream<VersionInfo> getAvailableVersionInfos(String workingDir) async* {
+  await for (VersionData version in getAvailableVersions(workingDir)) {
+    yield VersionInfo(
+        version.id, version.type, '', version.time, version.releaseTime);
+  }
+}
 
 /// Get the operating system name, in Minecraft's fashion.
 ///

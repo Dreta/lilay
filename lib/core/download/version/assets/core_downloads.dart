@@ -23,14 +23,14 @@ part 'core_downloads.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class CoreDownloads {
-  FriendlyDownload client;
+  FriendlyDownload? client;
   @JsonKey(name: 'client_mappings')
   FriendlyDownload? clientMappings;
   FriendlyDownload? server;
   @JsonKey(name: 'server_mappings')
   FriendlyDownload? serverMappings;
 
-  CoreDownloads(FriendlyDownload client, FriendlyDownload? clientMappings,
+  CoreDownloads(FriendlyDownload? client, FriendlyDownload? clientMappings,
       FriendlyDownload? server, FriendlyDownload? serverMappings)
       : this.client = client,
         this.clientMappings = clientMappings,

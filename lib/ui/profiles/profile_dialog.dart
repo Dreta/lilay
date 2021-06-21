@@ -16,7 +16,6 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker_cross/file_picker_cross.dart';
@@ -24,20 +23,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
-import 'package:lilay/core/download/version/version_data.dart';
 import 'package:lilay/core/download/versions/latest_version.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
 import 'package:lilay/core/download/versions/version_manifest.dart';
 import 'package:lilay/core/download/versions/versions_download_task.dart';
 import 'package:lilay/core/profile/profile.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
+import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
-import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
 class ProfileDialog extends StatefulWidget {
-  // Only support versions released after 1.7.2
-  static final minimumSupportTime = DateTime(2013, 10, 25, 13);
   final ProfileDialogType type;
   final Profile? profile;
 
@@ -133,48 +129,6 @@ class _ProfileDialogState extends State<ProfileDialog> {
     task.cancelled = true;
   }
 
-  Future<List<VersionInfo>> _getAvailableVersions() async {
-    final CoreConfig config = Provider.of<CoreConfig>(context, listen: false);
-    final Logger logger = GetIt.I.get<Logger>();
-    Directory versions = Directory(
-        '${config.workingDirectory}${Platform.pathSeparator}versions');
-    List<VersionInfo> versionObjs = [];
-    await for (FileSystemEntity directory in versions.list()) {
-      if (directory is Directory) {
-        File data = File(path.join(
-            directory.absolute.path, '${path.basename(directory.path)}.json'));
-        File jar = File(path.join(
-            directory.absolute.path, '${path.basename(directory.path)}.jar'));
-        if (await data.exists() && await jar.exists()) {
-          // If the game is executable (We check the hash later)
-          try {
-            Map<String, dynamic> json = jsonDecode(await data.readAsString());
-            if (json.containsKey('type') &&
-                json['type'].toString().contains('old')) {
-              // Skip
-              continue;
-            }
-            if (json['releaseTime'] != null) {
-              DateTime releaseTime = DateTime.parse(json['releaseTime']);
-              if (releaseTime.compareTo(ProfileDialog.minimumSupportTime) < 0) {
-                continue;
-              }
-            }
-            VersionData vData =
-                VersionData.fromJson(json); // Parse and create the VersionInfo
-            versionObjs.add(VersionInfo(
-                vData.id, vData.type, '', vData.time, vData.releaseTime));
-          } catch (e) {
-            // Ignore parsing errors for the version data - we will discard this version
-            logger.severe(
-                'Failed to parse the version data in ${directory.absolute.path}: $e.');
-          }
-        }
-      }
-    }
-    return versionObjs;
-  }
-
   /// Attempt to load the version manifest
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
@@ -189,7 +143,8 @@ class _ProfileDialogState extends State<ProfileDialog> {
             () => progress = null); // Make the loading indicator indeterminate
 
         // Enumerate the versions/ directory for valid versions
-        List<VersionInfo> versionObjs = await _getAvailableVersions();
+        List<VersionInfo> versionObjs =
+            await getAvailableVersionInfos(config.workingDirectory).toList();
 
         // Sort and determine the latest version
         versionObjs.sort((a, b) =>
@@ -224,17 +179,18 @@ class _ProfileDialogState extends State<ProfileDialog> {
     task.callbacks.add(() async {
       if (task.result != null) {
         task.save();
-        List<VersionInfo> versionInfos = await _getAvailableVersions();
+        List<VersionInfo> versionInfos =
+            await getAvailableVersionInfos(config.workingDirectory).toList();
         setState(() {
           // Use the downloaded versions manifest
           VersionManifest manifest = task.result!;
           List<VersionInfo> applicable = [];
           List<String> applicableVers = [];
+          DateTime minimumSupport =
+              GetIt.I.get<DateTime>(instanceName: 'minimumSupport');
           // Remove legacy versions
           for (VersionInfo version in manifest.versions) {
-            if (version.releaseTime!
-                    .compareTo(ProfileDialog.minimumSupportTime) >=
-                0) {
+            if (version.releaseTime!.compareTo(minimumSupport) >= 0) {
               applicable.add(version);
               applicableVers.add(version.id);
             }
@@ -242,9 +198,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
           // Add local versions
           for (VersionInfo version in versionInfos) {
             if (version.releaseTime != null &&
-                version.releaseTime!
-                        .compareTo(ProfileDialog.minimumSupportTime) <
-                    0) {
+                version.releaseTime!.compareTo(minimumSupport) < 0) {
               continue;
             }
             if (applicableVers.contains(version.id)) {

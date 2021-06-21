@@ -31,7 +31,7 @@ import 'version_data.dart';
 /// Download the metadata JSON file of the [version]. The downloaded file
 /// will be saved automatically.
 ///
-/// This is a SHALLOW download. The associated assets, client, libraries etc.
+/// This is a SHALLOW download. The associated assets, libraries, parent etc.
 /// are NOT downloaded within this task.
 class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   static const String VERSION_PATH = 'versions/{version}/{version}.json';

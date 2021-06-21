@@ -52,6 +52,8 @@ void main() async {
   GetIt.I.registerSingleton<Logger>(logger);
 
   GetIt.I.registerSingleton<String>('1.0.0', instanceName: 'version');
+  GetIt.I.registerSingleton<DateTime>(DateTime(2013, 10, 25, 13),
+      instanceName: 'minimumSupport');
 
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('font/UFL.txt');

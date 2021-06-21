@@ -67,6 +67,11 @@ abstract class DownloadTask<D, R> {
     for (TaskUpdateCallback callback in callbacks) callback();
   }
 
+  /// Initialize this task asynchronously.
+  ///
+  /// This will be called before the task starts.
+  Future<void> init() async {}
+
   /// Try to load the cache of this task, if available.
   ///
   /// Returns `true` if succeeded, or `false` if failed.
@@ -77,11 +82,12 @@ abstract class DownloadTask<D, R> {
 
   /// Attempts to load cache and start this task.
   Future<void> start() async {
+    await init();
     if (await tryLoadCache) {
       notify();
       return;
     }
-    download();
+    await download();
   }
 
   /// Download.
