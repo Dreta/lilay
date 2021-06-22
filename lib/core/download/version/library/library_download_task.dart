@@ -56,8 +56,8 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       // Attempt to load the artifact first.
       // Handle two cases: the vanilla case with [dependency.downloads] or the
       // out-of-nowhere case with [dependency.url].
-      bool artifactAvailable;
-      File artifact;
+      bool artifactAvailable = false;
+      File? artifact;
       if (dependency.downloads != null &&
           dependency.downloads!.artifact == null) {
         // If we have no artifacts.
@@ -98,18 +98,15 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
                         .toLowerCase());
           }
         }
-
-        if (artifactAvailable) {
-          // Set the result if the artifact is available.
-          result = await artifact.readAsBytes();
-        }
       }
 
       // Now attempt to load the natives.
       FriendlyDownload? native = dependency.platformNative;
       if (native == null) {
-        resultNative = [];
-        progress = 1;
+        if (artifactAvailable) {
+          resultNative = [];
+          progress = 1;
+        }
         return artifactAvailable;
       }
 
@@ -124,11 +121,10 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
                   .toString()
                   .toLowerCase()) &&
           (await nativeFile.length() == native.size);
-      if (nativeAvailable) {
-        resultNative = await nativeFile.readAsBytes();
-      }
 
       if (artifactAvailable && nativeAvailable) {
+        result = await artifact!.readAsBytes();
+        resultNative = await nativeFile.readAsBytes();
         progress = 1;
       }
       return artifactAvailable && nativeAvailable;
@@ -155,6 +151,8 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       return;
     }
 
+    result = null;
+    resultNative = null;
     _downloadArtifact();
   }
 
