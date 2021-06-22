@@ -68,15 +68,11 @@ class GameManager {
     this.task = Task.downloadManifest;
     subtitle = 'Versions Manifest';
     parent.notify();
-    double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
-      if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 16);
-        previousProgress = task.progress;
-        subtitle = 'Versions Manifest (${(task.progress * 100).round()}%)';
-        parent.notify();
-      }
+      totalProgress = task.progress * (1 / 16);
+      subtitle = 'Versions Manifest (${(task.progress * 100).round()}%)';
+      parent.notify();
     });
     task.callbacks.add(() {
       if (task.exception != null) {
@@ -115,7 +111,7 @@ class GameManager {
                 VersionData vData = VersionData.fromJson(
                     json); // Parse and create the VersionInfo
                 if (vData.id == profile.version) {
-                  totalProgress += 1 / 7; // Skip downloading the version data
+                  totalProgress = 2 / 16; // Skip downloading the version data
                   this.data = vData;
                   downloadVersionParent(task.result!, vData);
                   task.cancelled = true;
@@ -148,16 +144,11 @@ class GameManager {
     this.task = Task.downloadVersionData;
     subtitle = 'Version Data ${info.id}';
     parent.notify();
-    double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
-      if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 16);
-        previousProgress = task.progress;
-        subtitle =
-            'Version Data ${info.id} (${(task.progress * 100).round()}%)';
-        parent.notify();
-      }
+      totalProgress += (1 / 16) + task.progress * (1 / 16);
+      subtitle = 'Version Data ${info.id} (${(task.progress * 100).round()}%)';
+      parent.notify();
     });
     task.callbacks.add(() {
       if (task.exception != null) {
@@ -190,16 +181,12 @@ class GameManager {
       this.task = Task.downloadVersionParent;
       subtitle = 'Parent ${data.inheritsFrom} of ${data.id}';
       parent.notify();
-      double previousProgress = 0;
       task.callbacks.add(() {
-        // We divide the progress into different parts.
-        if (task.progress != previousProgress) {
-          totalProgress += (task.progress - previousProgress) * (1 / 16);
-          previousProgress = task.progress;
-          subtitle =
-              'Parent ${data.inheritsFrom} of ${data.id} (${(task.progress * 100).round()}%)';
-          parent.notify();
-        }
+        // We divide the progress into different parts
+        totalProgress += (2 / 16) + task.progress * (1 / 16);
+        subtitle =
+            'Parent ${data.inheritsFrom} of ${data.id} (${(task.progress * 100).round()}%)';
+        parent.notify();
       });
       task.callbacks.add(() {
         if (task.exception != null) {
@@ -232,16 +219,12 @@ class GameManager {
     this.task = Task.downloadAssetsIndex;
     subtitle = 'Assets index ${data.assets}';
     parent.notify();
-    double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
-      if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (2 / 16);
-        previousProgress = task.progress;
-        subtitle =
-            'Assets index ${data.assets} (${(task.progress * 100).round()}%)';
-        parent.notify();
-      }
+      totalProgress = (3 / 16) + task.progress * (2 / 16);
+      subtitle =
+          'Assets index ${data.assets} (${(task.progress * 100).round()}%)';
+      parent.notify();
     });
     task.callbacks.add(() {
       if (task.exception != null) {
@@ -269,12 +252,15 @@ class GameManager {
     parent.notify();
     Iterator<MapEntry<String, Asset>> iterator = assets.entries.iterator;
     if (iterator.moveNext()) {
-      _downloadAsset(data, iterator, assets.length);
+      _downloadAsset(data, iterator, 1, assets.length);
     }
   }
 
-  void _downloadAsset(VersionData data,
-      Iterator<MapEntry<String, Asset>> iterator, int total) async {
+  void _downloadAsset(
+      VersionData data,
+      Iterator<MapEntry<String, Asset>> iterator,
+      int current,
+      int total) async {
     Logger logger = GetIt.I.get<Logger>();
     MapEntry<String, Asset> asset = iterator.current;
     logger.fine('Downloading asset ${asset.key} for ${profile.name}.');
@@ -284,16 +270,12 @@ class GameManager {
         source: config.assetsSource,
         dependency: asset.value,
         workingDir: config.workingDirectory);
-    double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
-      if (task.progress != previousProgress) {
-        totalProgress +=
-            (task.progress - previousProgress) * (1 / total) * (4 / 16);
-        previousProgress = task.progress;
-        subtitle = '${asset.key} (${(task.progress * 100).round()}%)';
-        parent.notify();
-      }
+      totalProgress = (5 / 16) +
+          (((current - 1) / total) + (task.progress / total)) * (4 / 16);
+      subtitle = '${asset.key} (${(task.progress * 100).round()}%)';
+      parent.notify();
     });
     task.callbacks.add(() {
       if (task.exception != null) {
@@ -306,7 +288,7 @@ class GameManager {
       if (task.result != null) {
         await task.save();
         if (iterator.moveNext()) {
-          _downloadAsset(data, iterator, total);
+          _downloadAsset(data, iterator, current + 1, total);
         } else {
           downloadLibraries(data);
         }
@@ -325,12 +307,12 @@ class GameManager {
 
     Iterator<Library> iterator = data.libraries.iterator;
     if (iterator.moveNext()) {
-      _downloadLibrary(data, iterator, data.libraries.length);
+      _downloadLibrary(data, iterator, 1, data.libraries.length);
     }
   }
 
   void _downloadLibrary(
-      VersionData data, Iterator<Library> iterator, int total) {
+      VersionData data, Iterator<Library> iterator, int current, int total) {
     Logger logger = GetIt.I.get<Logger>();
     Library library = iterator.current;
     logger.fine('Downloading library ${library.name}.');
@@ -340,16 +322,12 @@ class GameManager {
         workingDir: config.workingDirectory);
     subtitle = library.name;
     parent.notify();
-    double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
-      if (task.progress != previousProgress) {
-        totalProgress +=
-            (task.progress - previousProgress) * (1 / total) * (4 / 16);
-        previousProgress = task.progress;
-        subtitle = '${library.name} (${(task.progress * 100).round()}%)';
-        parent.notify();
-      }
+      totalProgress = (9 / 16) +
+          (((current - 1) / total) + (task.progress / total)) * (4 / 16);
+      subtitle = '${library.name} (${(task.progress * 100).round()}%)';
+      parent.notify();
     });
     task.callbacks.add(() {
       if (task.exception != null) {
@@ -362,7 +340,7 @@ class GameManager {
       if (task.result != null && task.resultNative != null) {
         await task.save();
         if (iterator.moveNext()) {
-          _downloadLibrary(data, iterator, total);
+          _downloadLibrary(data, iterator, current + 1, total);
         } else {
           downloadCore(data);
         }
@@ -382,15 +360,11 @@ class GameManager {
     this.task = Task.downloadCore;
     subtitle = '${data.id} client';
     parent.notify();
-    double previousProgress = 0;
     task.callbacks.add(() {
       // We divide the progress into different parts.
-      if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (3 / 16);
-        previousProgress = task.progress;
-        subtitle = '${data.id} client (${(task.progress * 100).round()}%)';
-        parent.notify();
-      }
+      totalProgress = (13 / 16) + task.progress * (3 / 16);
+      subtitle = '${data.id} client (${(task.progress * 100).round()}%)';
+      parent.notify();
     });
     task.callbacks.add(() {
       if (task.exception != null) {
