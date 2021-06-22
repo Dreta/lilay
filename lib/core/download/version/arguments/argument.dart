@@ -25,7 +25,6 @@ import 'package:lilay/core/download/version/library/artifact.dart';
 import 'package:lilay/core/download/version/library/library.dart';
 import 'package:lilay/core/download/version/version_data.dart';
 import 'package:lilay/core/profile/profile.dart';
-import 'package:lilay/utils.dart';
 
 import '../../rule.dart';
 
@@ -68,7 +67,7 @@ class Argument {
           .replaceAll('\${auth_user_name}', account.profileName)
           .replaceAll('\${version_name}', data.id)
           .replaceAll('\${game_directory}',
-              profile.gameDirectory ?? getDefaultMinecraft())
+              profile.gameDirectory ?? config.workingDirectory)
           .replaceAll('\${assets_root}',
               '${config.workingDirectory}${Platform.pathSeparator}assets')
           .replaceAll('\${game_assets',

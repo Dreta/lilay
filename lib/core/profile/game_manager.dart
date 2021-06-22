@@ -502,7 +502,8 @@ class GameManager {
 
     await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),
-        args);
+        args,
+        workingDirectory: profile.gameDirectory ?? config.workingDirectory);
   }
 }
 
