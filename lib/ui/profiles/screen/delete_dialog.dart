@@ -47,12 +47,10 @@ class DeleteDialog extends StatelessWidget {
         content: const Text('This profile will be deleted permanently!'),
         actions: [
           TextButton(
-              child: Text('CANCEL'),
+              child: Text('Cancel'),
               onPressed: () => Navigator.of(context).pop()),
           ElevatedButton(
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(theme.errorColor)),
-              child: Text('DELETE', style: TextStyle(color: Colors.white)),
+              child: Text('Delete'),
               onPressed: () {
                 onConfirm();
                 Navigator.of(context).pop();

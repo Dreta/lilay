@@ -46,10 +46,10 @@ class LaunchConfirmDialog extends StatelessWidget {
             'Another game is already running.\nStarting multiple instances of the game might cause issues.'),
         actions: [
           TextButton(
-              child: Text('CANCEL'),
+              child: Text('Cancel'),
               onPressed: () => Navigator.of(context).pop()),
           ElevatedButton(
-              child: Text('START'),
+              child: Text('Start'),
               onPressed: () {
                 onConfirm();
                 Navigator.of(context).pop();
