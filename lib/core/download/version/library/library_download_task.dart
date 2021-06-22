@@ -104,6 +104,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       FriendlyDownload? native = dependency.platformNative;
       if (native == null) {
         if (artifactAvailable) {
+          result = await artifact!.readAsBytes();
           resultNative = [];
           progress = 1;
         }
