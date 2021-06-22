@@ -72,7 +72,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 7);
+        totalProgress += (task.progress - previousProgress) * (1 / 16);
         previousProgress = task.progress;
         subtitle = 'Versions Manifest (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -152,7 +152,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 7);
+        totalProgress += (task.progress - previousProgress) * (1 / 16);
         previousProgress = task.progress;
         subtitle =
             'Version Data ${info.id} (${(task.progress * 100).round()}%)';
@@ -194,7 +194,7 @@ class GameManager {
       task.callbacks.add(() {
         // We divide the progress into different parts.
         if (task.progress != previousProgress) {
-          totalProgress += (task.progress - previousProgress) * (1 / 7);
+          totalProgress += (task.progress - previousProgress) * (1 / 16);
           previousProgress = task.progress;
           subtitle =
               'Parent ${data.inheritsFrom} of ${data.id} (${(task.progress * 100).round()}%)';
@@ -236,7 +236,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 7);
+        totalProgress += (task.progress - previousProgress) * (2 / 16);
         previousProgress = task.progress;
         subtitle =
             'Assets index ${data.assets} (${(task.progress * 100).round()}%)';
@@ -289,7 +289,7 @@ class GameManager {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
         totalProgress +=
-            (task.progress - previousProgress) * (1 / total) * (1 / 7);
+            (task.progress - previousProgress) * (1 / total) * (4 / 16);
         previousProgress = task.progress;
         subtitle = '${asset.key} (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -345,7 +345,7 @@ class GameManager {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
         totalProgress +=
-            (task.progress - previousProgress) * (1 / total) * (1 / 7);
+            (task.progress - previousProgress) * (1 / total) * (4 / 16);
         previousProgress = task.progress;
         subtitle = '${library.name} (${(task.progress * 100).round()}%)';
         parent.notify();
@@ -386,7 +386,7 @@ class GameManager {
     task.callbacks.add(() {
       // We divide the progress into different parts.
       if (task.progress != previousProgress) {
-        totalProgress += (task.progress - previousProgress) * (1 / 7);
+        totalProgress += (task.progress - previousProgress) * (3 / 16);
         previousProgress = task.progress;
         subtitle = '${data.id} client (${(task.progress * 100).round()}%)';
         parent.notify();
