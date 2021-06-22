@@ -36,8 +36,6 @@ class LaunchButton extends StatelessWidget {
     String text;
     if (launch.status == LaunchStatus.starting) {
       text = 'STARTING';
-    } else if (launch.status == LaunchStatus.started) {
-      text = 'RUNNING';
     } else {
       text = 'START';
     }
@@ -45,7 +43,7 @@ class LaunchButton extends StatelessWidget {
     return FloatingActionButton.extended(
         label: Text(text, style: theme.textTheme.button),
         onPressed: () {
-          if (launch.status == null) {
+          if (launch.status == null || launch.status == LaunchStatus.started) {
             Profile profile = profiles.selected!;
             GameManager manager =
                 GameManager(profile: profile, config: config, parent: launch);
