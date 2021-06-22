@@ -500,10 +500,13 @@ class GameManager {
 
     parent.notify();
 
-    await Process.start(
+    Process process = await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),
         args,
         workingDirectory: profile.gameDirectory ?? config.workingDirectory);
+    await process.exitCode;
+    parent.status = null; // Remove "running" status when the process ends
+    parent.notify();
   }
 }
 

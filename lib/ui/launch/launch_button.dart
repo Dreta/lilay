@@ -36,6 +36,8 @@ class LaunchButton extends StatelessWidget {
     String text;
     if (launch.status == LaunchStatus.starting) {
       text = 'STARTING';
+    } else if (launch.status == LaunchStatus.started) {
+      text = 'RUNNING';
     } else {
       text = 'START';
     }
