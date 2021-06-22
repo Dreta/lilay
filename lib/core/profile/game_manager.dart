@@ -391,7 +391,6 @@ class GameManager {
     this.task = Task.start;
     parent.status = LaunchStatus.started;
     subtitle = null;
-    //parent.notify();
     logger.info('Starting game ${data.id} from profile ${profile.name}.');
 
     logger.info('Setting up the temporary native directory.');
@@ -498,6 +497,8 @@ class GameManager {
 
     logger.info('Starting game ${data.id} with profile ${profile.name}.');
     logger.info('Arguments: ${args.join(' ')}');
+
+    parent.notify();
 
     await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),

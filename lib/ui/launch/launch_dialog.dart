@@ -54,6 +54,9 @@ class LaunchDialog extends StatelessWidget {
     if (double.parse(manager.totalProgress.toStringAsFixed(5)) >= 1 &&
         launch.status == LaunchStatus.starting) {
       manager.startGame(manager.data!, accounts.selectedAccount!);
+    }
+
+    if (launch.status == LaunchStatus.started) {
       return SimpleDialog(title: Text('Game launched'), children: [
         Padding(
             padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
