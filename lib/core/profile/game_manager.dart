@@ -498,14 +498,17 @@ class GameManager {
     logger.info('Starting game ${data.id} with profile ${profile.name}.');
     logger.info('Arguments: ${args.join(' ')}');
 
-    parent.notify();
-
     Process process = await Process.start(
         profile.javaExecutable ?? GetIt.I.get<String>(instanceName: 'java'),
         args,
         workingDirectory: profile.gameDirectory ?? config.workingDirectory);
+    parent.instances++;
+    parent.notify();
     await process.exitCode;
-    parent.status = null; // Remove "running" status when the process ends
+    parent.instances--;
+    if (parent.instances == 0) {
+      parent.status = null; // Remove "running" status when the process ends
+    }
     parent.notify();
   }
 }

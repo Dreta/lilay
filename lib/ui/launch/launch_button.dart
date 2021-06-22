@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/profile/game_manager.dart';
 import 'package:lilay/core/profile/profile.dart';
+import 'package:lilay/ui/launch/launch_confirm_dialog.dart';
 import 'package:lilay/ui/launch/launch_dialog.dart';
 import 'package:lilay/ui/launch/launch_provider.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
@@ -45,7 +46,7 @@ class LaunchButton extends StatelessWidget {
     return FloatingActionButton.extended(
         label: Text(text, style: theme.textTheme.button),
         onPressed: () {
-          if (launch.status == null || launch.status == LaunchStatus.started) {
+          if (launch.status == null) {
             Profile profile = profiles.selected!;
             GameManager manager =
                 GameManager(profile: profile, config: config, parent: launch);
@@ -54,7 +55,20 @@ class LaunchButton extends StatelessWidget {
             manager.startDownload();
             launch.notify();
           }
-          LaunchDialog.display(context);
+          if (launch.status == LaunchStatus.started) {
+            LaunchConfirmDialog.display(context, () {
+              Profile profile = profiles.selected!;
+              GameManager manager =
+                  GameManager(profile: profile, config: config, parent: launch);
+              launch.manager = manager;
+              launch.status = LaunchStatus.starting;
+              manager.startDownload();
+              launch.notify();
+              LaunchDialog.display(context);
+            });
+          } else {
+            LaunchDialog.display(context);
+          }
         },
         backgroundColor: theme.scaffoldBackgroundColor,
         icon: Icon(Icons.send, color: theme.accentColor));

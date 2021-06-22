@@ -23,6 +23,7 @@ import 'package:lilay/core/profile/game_manager.dart';
 class LaunchProvider extends ChangeNotifier {
   LaunchStatus? status;
   GameManager? manager;
+  int instances = 0;
 
   void notify() {
     notifyListeners();
