@@ -129,9 +129,10 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         progress = 1;
       }
       return artifactAvailable && nativeAvailable;
-    } catch (e) {
+    } catch (e, s) {
       exceptionPhase = Phase.loadCache;
       exception = e;
+      print(s);
       notify();
       return false;
     }
@@ -165,6 +166,14 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         dependency.downloads!.artifact == null) {
       logger
           .info('There is no artifact for this library. Skipping to natives.');
+      result = [];
+      return await _downloadNative();
+    }
+
+    if ((dependency.downloads == null && dependency.url!.isEmpty) ||
+        (dependency.downloads != null &&
+            dependency.downloads!.artifact!.url.isEmpty)) {
+      logger.info('The URL for this artifact is empty. Skipping to natives.');
       result = [];
       return await _downloadNative();
     }
@@ -261,6 +270,14 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
     if (native == null) {
       logger.info(
           'There are no natives that are applicable for this platform. Skipping.');
+      resultNative = [];
+      progress = 1;
+      notify();
+      return;
+    }
+
+    if (native.url.isEmpty) {
+      logger.info('The URL for this native is empty. Skipping.');
       resultNative = [];
       progress = 1;
       notify();
