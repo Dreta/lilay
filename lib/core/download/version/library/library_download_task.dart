@@ -124,7 +124,9 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
           (await nativeFile.length() == native.size);
 
       if (artifactAvailable && nativeAvailable) {
-        result = await artifact!.readAsBytes();
+        if (artifact != null) {
+          result = await artifact.readAsBytes();
+        }
         resultNative = await nativeFile.readAsBytes();
         progress = 1;
       }
