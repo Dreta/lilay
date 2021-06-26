@@ -20,16 +20,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 
-class LaunchConfirmDialog extends StatelessWidget {
-  final Function onConfirm;
-
-  const LaunchConfirmDialog({required this.onConfirm});
-
-  static void display(BuildContext context, Function onConfirm) {
+class LaunchCrashDialog extends StatelessWidget {
+  static void display(BuildContext context) {
     showAnimatedDialog(
         context: context,
         barrierDismissible: true,
-        builder: (context) => LaunchConfirmDialog(onConfirm: onConfirm),
+        builder: (context) => LaunchCrashDialog(),
         animationType: DialogTransitionType.fadeScale,
         curve: Curves.easeInOut,
         duration: Duration(milliseconds: 400));
@@ -38,22 +34,15 @@ class LaunchConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-        title: const Text('Are you sure?'),
+        title: const Text('Game crashed'),
         contentPadding:
             const EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 12),
-        actionsPadding: const EdgeInsets.only(bottom: 24, right: 12),
-        content: const Text(
-            'Another game is already running.\nStarting multiple instances of the game might cause issues.'),
+        actionsPadding: const EdgeInsets.only(bottom: 12, right: 12),
+        content:
+            const Text('For detailed information, please read the game log.'),
         actions: [
           TextButton(
-              child: Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop()),
-          ElevatedButton(
-              child: Text('Start'),
-              onPressed: () {
-                onConfirm();
-                Navigator.of(context).pop();
-              })
+              child: Text('Okay'), onPressed: () => Navigator.of(context).pop())
         ]);
   }
 }

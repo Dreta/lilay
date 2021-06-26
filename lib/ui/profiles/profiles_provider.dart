@@ -27,6 +27,9 @@ import 'package:logging/logging.dart';
 /// Provides the currently loaded profiles as a
 /// globally accessible state.
 class ProfilesProvider extends ChangeNotifier {
+  // FIXME Updates on a profile object won't affect the identical object that's available in
+  //       [_selected]. Issues with the reference
+
   final List<Profile> _profiles = [];
   Profile? _selected;
 

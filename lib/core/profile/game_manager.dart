@@ -504,10 +504,13 @@ class GameManager {
         workingDirectory: profile.gameDirectory ?? config.workingDirectory);
     parent.instances++;
     parent.notify();
-    await process.exitCode;
+    int exitCode = await process.exitCode;
     parent.instances--;
     if (parent.instances == 0) {
       parent.status = null; // Remove "running" status when the process ends
+    }
+    if (exitCode != 0) {
+      parent.crashed = true;
     }
     parent.notify();
   }

@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:lilay/core/profile/game_manager.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
+import 'package:lilay/ui/launch/launch_crash_dialog.dart';
 import 'package:provider/provider.dart';
 
 import 'launch_provider.dart';
@@ -62,6 +63,10 @@ class LaunchDialog extends StatelessWidget {
             padding: const EdgeInsets.only(left: 24, right: 24, bottom: 12),
             child: Text('You can close this dialog now.'))
       ]);
+    }
+
+    if (launch.crashed) {
+      return LaunchCrashDialog();
     }
 
     if (manager.error == null) {

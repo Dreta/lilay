@@ -22,6 +22,7 @@ import 'package:lilay/core/profile/game_manager.dart';
 /// Provides the status of the game as a globally accessible state.
 class LaunchProvider extends ChangeNotifier {
   LaunchStatus? status;
+  bool crashed = false;
   GameManager? manager;
   int instances = 0;
 
