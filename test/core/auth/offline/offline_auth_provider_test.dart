@@ -21,13 +21,13 @@ import 'package:lilay/core/auth/offline/offline_auth_provider.dart';
 
 void main() {
   group('OfflineAuthProvider', () {
-    test('Account username correct after login', () {
+    test('Account username correct after login.', () {
       final OfflineAuthProvider provider = OfflineAuthProvider();
       provider.login('Dreta', null, (user) => expect(user.profileName, 'Dreta'),
           (error) => fail('Expected no errors, but received $error.'), null);
     });
 
-    test('Fails when account username is null', () {
+    test('Fails when account username is null.', () {
       final OfflineAuthProvider provider = OfflineAuthProvider();
       provider.login(
           null,
