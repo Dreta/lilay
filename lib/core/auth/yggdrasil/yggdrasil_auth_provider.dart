@@ -28,11 +28,12 @@ import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 class YggdrasilAuthProvider extends AuthProvider {
   @override
   void login(String? username, String? password, Function(Account) callback,
-      Function(String) error, Client client) {
+      Function(String) error, Client? client) {
     assert(username != null);
     assert(password != null);
+    assert(client != null);
 
-    client
+    client!
         .post(Uri.parse('https://authserver.mojang.com/authenticate'),
             headers: {
               'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ class YggdrasilAuthProvider extends AuthProvider {
       }
 
       // Check if the player paid
-      client.get(
+      client!.get(
           Uri.parse(
               'https://api.mojang.com/users/profiles/minecraft/${resp['selectedProfile']['name']}'),
           headers: {
