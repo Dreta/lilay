@@ -81,7 +81,7 @@ class MicrosoftAuthServer {
           ..statusCode = HttpStatus.badRequest
           ..write((await rootBundle.loadString('assets/msauthfailed.html'))
               .replaceAll('{error}',
-              'Invalid request, authentication code is missing.'))
+                  'Invalid request, authentication code is missing.'))
           ..close();
         return;
       }
@@ -106,7 +106,7 @@ class MicrosoftAuthServer {
           ..statusCode = HttpStatus.forbidden
           ..write((await rootBundle.loadString('assets/msauthfailed.html'))
               .replaceAll('{error}',
-              'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}'))
+                  'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}'))
           ..close();
         return;
       }
@@ -140,7 +140,7 @@ class MicrosoftAuthServer {
           ..statusCode = HttpStatus.forbidden
           ..write((await rootBundle.loadString('assets/msauthfailed.html'))
               .replaceAll('{error}',
-              'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.'))
+                  'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.'))
           ..close();
         errorCallback(
             'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.');
@@ -186,7 +186,7 @@ class MicrosoftAuthServer {
             ..statusCode = HttpStatus.forbidden
             ..write((await rootBundle.loadString('assets/msauthfailed.html'))
                 .replaceAll('{error}',
-                'You are a children and can not proceed unless this account is added to a family by an adult.'))
+                    'You are a children and can not proceed unless this account is added to a family by an adult.'))
             ..close();
           errorCallback(
               'You are a children and can not proceed unless this account is added to a family by an adult.');
