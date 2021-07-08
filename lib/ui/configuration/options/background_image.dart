@@ -70,10 +70,17 @@ class _BackgroundImageState extends State<BackgroundImage> {
                     FilePickerCross file =
                         await FilePickerCross.importFromStorage(
                             type: FileTypeCross.image);
+                    if (file.path == null) {
+                      config.backgroundImage = '';
+                      config.backgroundType = BackgroundType.asset;
+                      config.save();
+                      _selected.text = '';
+                      return;
+                    }
                     config.backgroundImage = file.path;
                     config.backgroundType = BackgroundType.custom;
                     config.save();
-                    _selected.text = file.path;
+                    _selected.text = file.path!;
                   },
                   tooltip: 'Browse',
                   icon: Icon(Icons.folder)),

@@ -376,7 +376,11 @@ class _ProfileDialogState extends State<ProfileDialog> {
                   FilePickerCross file =
                       await FilePickerCross.importFromStorage(
                           type: FileTypeCross.any);
-                  _javaExec.text = file.path;
+                  if (file.path == null) {
+                    _javaExec.text = '';
+                    return;
+                  }
+                  _javaExec.text = file.path!;
                 },
                 tooltip: 'Browse',
                 icon: Icon(Icons.folder))));
