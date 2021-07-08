@@ -27,8 +27,11 @@ class OfflineAuthProvider extends AuthProvider {
   @override
   void login(String? username, String? password, Function(Account) callback,
       Function(String) error, Client? client) {
-    assert(username != null);
-    callback(OfflineAccount(name: username!));
+    if (username == null) {
+      error('Username must not be null.');
+      return;
+    }
+    callback(OfflineAccount(name: username));
   }
 
   @override
