@@ -81,12 +81,12 @@ class YggdrasilAccount extends Account {
   bool get paid => _paid;
 
   @override
-  Future<void> refresh() async {
+  Future<void> refresh(Client client) async {
     if (requiresReauth) {
       return;
     }
 
-    Response rValidate = await post(
+    Response rValidate = await client.post(
         Uri.parse('https://authserver.mojang.com/validate'),
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ class YggdrasilAccount extends Account {
         body: jsonEncode({'accessToken': accessToken}));
     if (rValidate.statusCode == 403) {
       // The token is unusable.
-      Response rRefresh = await post(
+      Response rRefresh = await client.post(
           Uri.parse('https://authserver.mojang.com/refresh'),
           headers: {
             'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ class YggdrasilAccount extends Account {
     }
 
     // Check if we have paid
-    Response respPaid = await get(
+    Response respPaid = await client.get(
         Uri.parse(
             'https://api.mojang.com/users/profiles/minecraft/$_profileName'),
         headers: {
@@ -149,8 +149,8 @@ class YggdrasilAccount extends Account {
   }
 
   @override
-  Future<void> invalidate() async {
-    await post(Uri.parse('https://authserver.mojang.com/invalidate'),
+  Future<void> invalidate(Client client) async {
+    await client.post(Uri.parse('https://authserver.mojang.com/invalidate'),
         headers: {
           'Content-Type': 'application/json',
           'User-Agent': 'lilay-minecraft-launcher'

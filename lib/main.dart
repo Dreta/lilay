@@ -26,6 +26,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_auth_provider.dart';
@@ -72,7 +73,7 @@ void main() async {
 
   // Microsoft
   Account.authProviders['microsoft'] =
-      MicrosoftAuthProvider(authServer: MicrosoftAuthServer(35129));
+      MicrosoftAuthProvider(authServer: MicrosoftAuthServer(35129, Client()));
   Account.accountFactories['microsoft'] = MicrosoftAccount.fromJson;
 
   logger.info('Setting up cache directory.');

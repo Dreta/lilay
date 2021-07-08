@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 
 /// AuthProvider allows other classes to provide custom
@@ -54,5 +55,5 @@ abstract class AuthProvider {
   /// however in [MicrosoftAuthProvider], I can't think of a way to
   /// integrate a [Future] into it. Please PR if you have a good idea.
   login(String? username, String? password, Function(Account) callback,
-      Function(String) error);
+      Function(String) error, Client client);
 }

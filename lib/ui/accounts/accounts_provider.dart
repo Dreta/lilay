@@ -21,6 +21,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:logging/logging.dart';
 
@@ -80,7 +81,9 @@ class AccountsProvider extends ChangeNotifier {
       try {
         logger.info(
             'Attempting to refresh the token of account ${account['username']}.');
-        await acc.refresh();
+        Client client = Client();
+        await acc.refresh(client);
+        client.close();
       } catch (e) {
         _loadingStatus = LoadingStatus.failed;
         notifyListeners();

@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/auth/offline/offline_account.dart';
@@ -24,8 +25,8 @@ import 'package:lilay/core/auth/offline/offline_account.dart';
 /// username.
 class OfflineAuthProvider extends AuthProvider {
   @override
-  login(String? username, String? password, Function(Account) callback,
-      Function(String) error) {
+  void login(String? username, String? password, Function(Account) callback,
+      Function(String) error, Client client) {
     assert(username != null);
     callback(OfflineAccount(name: username!));
   }

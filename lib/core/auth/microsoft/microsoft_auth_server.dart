@@ -30,11 +30,13 @@ import 'package:logging/logging.dart';
 /// This class listens on localhost: for a Microsoft authentication
 /// response and acts accordingly.
 class MicrosoftAuthServer {
+  Client httpClient;
   late Function(Account) accountCallback;
   late Function(String) errorCallback;
   late HttpServer _server;
 
-  MicrosoftAuthServer(int port) {
+  MicrosoftAuthServer(int port, Client httpClient)
+      : this.httpClient = httpClient {
     HttpServer.bind(InternetAddress.loopbackIPv4, port).then((server) {
       _server = server;
       _handle();
@@ -79,13 +81,13 @@ class MicrosoftAuthServer {
           ..statusCode = HttpStatus.badRequest
           ..write((await rootBundle.loadString('assets/msauthfailed.html'))
               .replaceAll('{error}',
-                  'Invalid request, authentication code is missing.'))
+              'Invalid request, authentication code is missing.'))
           ..close();
         return;
       }
 
       // Authentication code -> Authentication token
-      Response rToken = await post(
+      Response rToken = await httpClient.post(
           Uri.parse('https://login.live.com/oauth20_token.srf'),
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -104,7 +106,7 @@ class MicrosoftAuthServer {
           ..statusCode = HttpStatus.forbidden
           ..write((await rootBundle.loadString('assets/msauthfailed.html'))
               .replaceAll('{error}',
-                  'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}'))
+              'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}'))
           ..close();
         return;
       }
@@ -115,7 +117,7 @@ class MicrosoftAuthServer {
       account.refreshToken = msBody['refresh_token'];
 
       // Authenticate with Xbox Live
-      Response rXBL = await post(
+      Response rXBL = await httpClient.post(
           Uri.parse('https://user.auth.xboxlive.com/user/authenticate'),
           headers: {
             'Content-Type': 'application/json',
@@ -138,7 +140,7 @@ class MicrosoftAuthServer {
           ..statusCode = HttpStatus.forbidden
           ..write((await rootBundle.loadString('assets/msauthfailed.html'))
               .replaceAll('{error}',
-                  'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.'))
+              'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.'))
           ..close();
         errorCallback(
             'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.');
@@ -150,21 +152,21 @@ class MicrosoftAuthServer {
       account.xblUHS = xblBody['DisplayClaims']['xui'][0]['uhs'];
 
       // Authenticate with XSTS
-      Response rXSTS =
-          await post(Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({
-                'Properties': {
-                  'SandboxId': 'RETAIL',
-                  'UserTokens': [xblToken]
-                },
-                'RelyingParty': 'rp://api.minecraftservices.com/',
-                'TokenType': 'JWT'
-              }));
+      Response rXSTS = await httpClient.post(
+          Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'lilay-minecraft-launcher'
+          },
+          body: jsonEncode({
+            'Properties': {
+              'SandboxId': 'RETAIL',
+              'UserTokens': [xblToken]
+            },
+            'RelyingParty': 'rp://api.minecraftservices.com/',
+            'TokenType': 'JWT'
+          }));
 
       if (rXSTS.statusCode == 401) {
         Map<String, dynamic> xstsBody = jsonDecode(rXSTS.body);
@@ -184,7 +186,7 @@ class MicrosoftAuthServer {
             ..statusCode = HttpStatus.forbidden
             ..write((await rootBundle.loadString('assets/msauthfailed.html'))
                 .replaceAll('{error}',
-                    'You are a children and can not proceed unless this account is added to a family by an adult.'))
+                'You are a children and can not proceed unless this account is added to a family by an adult.'))
             ..close();
           errorCallback(
               'You are a children and can not proceed unless this account is added to a family by an adult.');
@@ -196,8 +198,8 @@ class MicrosoftAuthServer {
       account.xstsToken = xstsBody['Token'];
 
       // Authenticate with Minecraft
-      await account.requestMinecraftToken(errorCallback);
-      await account.requestProfile(errorCallback);
+      await account.requestMinecraftToken(httpClient, errorCallback);
+      await account.requestProfile(errorCallback, httpClient);
       accountCallback(account);
 
       request.response

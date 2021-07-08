@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
@@ -30,8 +31,8 @@ class MicrosoftAuthProvider extends AuthProvider {
       : _authServer = authServer;
 
   @override
-  login(String? username, String? password, Function(Account) callback,
-      Function(String) error) {
+  void login(String? username, String? password, Function(Account) callback,
+      Function(String) error, Client client) {
     // This is where we will have to visit.
     String authUrl =
         'https://login.live.com/oauth20_authorize.srf?client_id=${MicrosoftAccount.CLIENT_ID}'

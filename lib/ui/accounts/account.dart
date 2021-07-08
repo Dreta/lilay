@@ -141,7 +141,9 @@ class _AccountWidgetState extends State<AccountWidget> {
                     tooltip: 'Refresh',
                     onPressed: () async {
                       setState(() => _isRefreshing = true);
-                      await _account.refresh();
+                      Client client = Client();
+                      await _account.refresh(client);
+                      client.close();
                       setState(() => _isRefreshing = false);
                     }),
               IconButton(

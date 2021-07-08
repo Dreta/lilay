@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:uuid/uuid.dart';
 
@@ -53,7 +54,7 @@ class OfflineAccount extends Account {
 
   // An offline account never needs to be refreshed.
   @override
-  Future<void> refresh() async {}
+  Future<void> refresh(Client client) async {}
 
   // An offline account never needs re-authentication.
   @override
@@ -66,5 +67,5 @@ class OfflineAccount extends Account {
   bool get paid => true;
 
   @override
-  Future<void> invalidate() async {}
+  Future<void> invalidate(Client client) async {}
 }

@@ -27,22 +27,24 @@ import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 /// with the provided username (email) and password.
 class YggdrasilAuthProvider extends AuthProvider {
   @override
-  login(String? username, String? password, Function(Account) callback,
-      Function(String) error) {
+  void login(String? username, String? password, Function(Account) callback,
+      Function(String) error, Client client) {
     assert(username != null);
     assert(password != null);
 
-    post(Uri.parse('https://authserver.mojang.com/authenticate'),
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'lilay-minecraft-launcher'
-        },
-        body: jsonEncode({
-          'agent': {'name': 'Minecraft', 'version': 1},
-          'username': username,
-          'password': password,
-          'requestUser': true
-        })).then((response) {
+    client
+        .post(Uri.parse('https://authserver.mojang.com/authenticate'),
+            headers: {
+              'Content-Type': 'application/json',
+              'User-Agent': 'lilay-minecraft-launcher'
+            },
+            body: jsonEncode({
+              'agent': {'name': 'Minecraft', 'version': 1},
+              'username': username,
+              'password': password,
+              'requestUser': true
+            }))
+        .then((response) {
       Map<String, dynamic> resp = jsonDecode(response.body);
       if (response.statusCode != 200) {
         error('${resp['errorMessage']}');
@@ -50,7 +52,7 @@ class YggdrasilAuthProvider extends AuthProvider {
       }
 
       // Check if the player paid
-      get(
+      client.get(
           Uri.parse(
               'https://api.mojang.com/users/profiles/minecraft/${resp['selectedProfile']['name']}'),
           headers: {

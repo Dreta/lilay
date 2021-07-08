@@ -63,10 +63,10 @@ class MicrosoftAccount extends Account {
   String get profileName => _profileName;
 
   @override
-  Future<void> refresh() async {
+  Future<void> refresh(Client client) async {
     // Send a request to MS's token refresh server.
     Response resp =
-        await post(Uri.parse('https://login.live.com/oauth20_token.srf'),
+        await client.post(Uri.parse('https://login.live.com/oauth20_token.srf'),
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded',
               'User-Agent': 'lilay-minecraft-launcher'
@@ -85,7 +85,7 @@ class MicrosoftAccount extends Account {
     refreshToken = respJson['refresh_token'];
 
     // Check if we have paid
-    Response respPaid = await get(
+    Response respPaid = await client.get(
         Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
         headers: {
           'Content-Type': 'application/json',
@@ -119,9 +119,10 @@ class MicrosoftAccount extends Account {
   String get uuid => _uuid;
 
   /// Request a Minecraft access token from Minecraft Xbox services.
-  requestMinecraftToken(Function(String) error) async {
+  Future<void> requestMinecraftToken(
+      Client client, Function(String) error) async {
     try {
-      Response resp = await post(
+      Response resp = await client.post(
           Uri.parse(
               'https://api.minecraftservices.com/authentication/login_with_xbox'),
           headers: {
@@ -143,9 +144,9 @@ class MicrosoftAccount extends Account {
     }
   }
 
-  requestProfile(Function(String) error) async {
+  Future<void> requestProfile(Function(String) error, Client client) async {
     try {
-      Response resp = await get(
+      Response resp = await client.get(
           Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
           headers: {
             'User-Agent': 'lilay-minecraft-launcher',
@@ -187,7 +188,7 @@ class MicrosoftAccount extends Account {
   bool get paid => _paid;
 
   @override
-  Future<void> invalidate() async {
-    // Is there an API endpoint for invalidating a token? idk
+  Future<void> invalidate(Client client) async {
+    // Can't find API endpoint for invalidating a token.
   }
 }

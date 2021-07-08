@@ -19,6 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
@@ -90,6 +91,7 @@ class _LoginDialogState extends State<LoginDialog> {
       Logger logger = GetIt.I.get<Logger>();
       logger.info(
           'Logging to the account $username with authentication provider ${selected.name}.');
+      Client client = Client();
       provider.login(username, password, (account) {
         Navigator.pop(context); // Close the dialog
         logger.info('Successfully logged in to the account $username.');
@@ -97,12 +99,14 @@ class _LoginDialogState extends State<LoginDialog> {
         setState(() {
           _loggingIn = false;
         });
+        client.close();
       }, (error) {
         logger.severe('Failed to login to the account $username: $error');
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Error: $error'), duration: Duration(seconds: 3)));
         Navigator.pop(context);
-      });
+        client.close();
+      }, client);
     }
   }
 

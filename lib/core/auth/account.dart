@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 
 /// Account represents an extensible account for custom Minecraft
@@ -76,10 +77,10 @@ abstract class Account {
   /// if it is unavailable.
   ///
   /// This method will be called when the account is loaded.
-  Future<void> refresh();
+  Future<void> refresh(Client client);
 
   /// Invalidates the access token of this account and log out.
-  Future<void> invalidate();
+  Future<void> invalidate(Client client);
 
   /// Manually convert this class to JSON.
   /// Individual subclasses might want to override this method
