@@ -54,6 +54,6 @@ abstract class AuthProvider {
   /// [callback] should probably be done with a [Future] instead,
   /// however in [MicrosoftAuthProvider], I can't think of a way to
   /// integrate a [Future] into it. Please PR if you have a good idea.
-  login(String? username, String? password, Function(Account) callback,
-      Function(String) error, Client? client);
+  Future<void> login(String? username, String? password,
+      Function(Account) callback, Function(String) error, Client? client);
 }

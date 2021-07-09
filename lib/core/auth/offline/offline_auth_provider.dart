@@ -25,8 +25,12 @@ import 'package:lilay/core/auth/offline/offline_account.dart';
 /// username.
 class OfflineAuthProvider extends AuthProvider {
   @override
-  void login(String? username, String? password, Function(Account) callback,
-      Function(String) error, Client? client) {
+  Future<void> login(
+      String? username,
+      String? password,
+      Function(Account) callback,
+      Function(String) error,
+      Client? client) async {
     if (username == null) {
       error('Username must not be null.');
       return;

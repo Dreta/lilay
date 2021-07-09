@@ -27,25 +27,29 @@ import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 /// with the provided username (email) and password.
 class YggdrasilAuthProvider extends AuthProvider {
   @override
-  void login(String? username, String? password, Function(Account) callback,
-      Function(String) error, Client? client) {
+  Future<void> login(
+      String? username,
+      String? password,
+      Function(Account) callback,
+      Function(String) error,
+      Client? client) async {
     assert(username != null);
     assert(password != null);
     assert(client != null);
 
-    client!
-        .post(Uri.parse('https://authserver.mojang.com/authenticate'),
-            headers: {
-              'Content-Type': 'application/json',
-              'User-Agent': 'lilay-minecraft-launcher'
-            },
-            body: jsonEncode({
-              'agent': {'name': 'Minecraft', 'version': 1},
-              'username': username,
-              'password': password,
-              'requestUser': true
-            }))
-        .then((response) {
+    try {
+      Response response = await client!.post(
+          Uri.parse('https://authserver.mojang.com/authenticate'),
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'lilay-minecraft-launcher'
+          },
+          body: jsonEncode({
+            'agent': {'name': 'Minecraft', 'version': 1},
+            'username': username,
+            'password': password,
+            'requestUser': true
+          }));
       Map<String, dynamic> resp = jsonDecode(response.body);
       if (response.statusCode != 200) {
         error('${resp['errorMessage']}');
@@ -53,18 +57,19 @@ class YggdrasilAuthProvider extends AuthProvider {
       }
 
       // Check if the player paid
-      client!.get(
+      Response respPaid = await client.get(
           Uri.parse(
               'https://api.mojang.com/users/profiles/minecraft/${resp['selectedProfile']['name']}'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher'
-          }).then((respPaid) => callback(YggdrasilAccount(
+          headers: {'User-Agent': 'lilay-minecraft-launcher'});
+      callback(YggdrasilAccount(
           accessToken: resp['accessToken'],
           profileName: resp['selectedProfile']['name'],
           username: resp['user']['username'],
           uuid: resp['selectedProfile']['id'],
-          paid: respPaid.statusCode == 200)));
-    }).catchError((err) => error(err.toString()));
+          paid: respPaid.statusCode == 200));
+    } catch (err) {
+      error(err.toString());
+    }
   }
 
   @override
