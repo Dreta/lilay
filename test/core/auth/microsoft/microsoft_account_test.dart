@@ -35,14 +35,19 @@ void main() {
       account.accessToken = 'lilaytest';
 
       when(client.get(
-          Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode(
-              {'name': 'Dreta', 'id': '6cc9ba8e88034534a3d2ade79263cb1e'}),
-          200));
+              Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
+              headers: anyNamed('headers')))
+          .thenAnswer((invocation) async {
+        if (invocation.namedArguments[Symbol('headers')]['Authorization'] !=
+            'Bearer lilaytest') {
+          fail(
+              'Specified incorrect Authorization header when receiving profile.');
+        }
+        return Response(
+            jsonEncode(
+                {'name': 'Dreta', 'id': '6cc9ba8e88034534a3d2ade79263cb1e'}),
+            200);
+      });
 
       await account.requestProfile(
           (err) => fail('Expected no errors, but received $err.'), client);
@@ -55,14 +60,19 @@ void main() {
       account.accessToken = 'lilaytest';
 
       when(client.get(
-          Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode(
-              {'name': 'Dreta', 'id': '6cc9ba8e88034534a3d2ade79263cb1e'}),
-          200));
+              Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
+              headers: anyNamed('headers')))
+          .thenAnswer((invocation) async {
+        if (invocation.namedArguments[Symbol('headers')]['Authorization'] !=
+            'Bearer lilaytest') {
+          fail(
+              'Specified incorrect Authorization header when receiving profile.');
+        }
+        return Response(
+            jsonEncode(
+                {'name': 'Dreta', 'id': '6cc9ba8e88034534a3d2ade79263cb1e'}),
+            200);
+      });
 
       await account.requestProfile(
           (err) => fail('Expected no errors, but received $err.'), client);
@@ -71,19 +81,24 @@ void main() {
 
     test('Profile shouldn\'t be received when the status code isn\'t 200.',
         () async {
-      final MicrosoftAccount account = MicrosoftAccount();
+          final MicrosoftAccount account = MicrosoftAccount();
       final Client client = MockClient();
       account.accessToken = 'lilaytest';
 
       when(client.get(
-          Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode(
-              {'name': 'Dreta', 'id': '6cc9ba8e88034534a3d2ade79263cb1e'}),
-          418));
+              Uri.parse('https://api.minecraftservices.com/minecraft/profile'),
+              headers: anyNamed('headers')))
+          .thenAnswer((invocation) async {
+        if (invocation.namedArguments[Symbol('headers')]['Authorization'] !=
+            'Bearer lilaytest') {
+          fail(
+              'Specified incorrect Authorization header when receiving profile.');
+        }
+        return Response(
+            jsonEncode(
+                {'name': 'Dreta', 'id': '6cc9ba8e88034534a3d2ade79263cb1e'}),
+            418);
+      });
 
       bool errored = false;
       await account.requestProfile((err) => errored = true, client);
@@ -101,16 +116,23 @@ void main() {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'User-Agent': 'lilay-minecraft-launcher'
               },
-              body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
-                  '&refresh_token=lilaytest'
-                  '&grant_type=refresh_token'
-                  '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth'))
-          .thenAnswer((_) async => Response(
-              jsonEncode({
-                'access_token': 'lilaytest2',
-                'refresh_token': 'lilaytest2'
-              }),
-              200));
+              body: anyNamed('body')))
+          .thenAnswer((invocation) async {
+        Map<String, String> parameters = Uri.splitQueryString(
+            invocation.namedArguments[Symbol('body')].toString());
+        if (parameters['client_id'] != MicrosoftAccount.CLIENT_ID ||
+            parameters['refresh_token'] != 'lilaytest' ||
+            parameters['grant_type'] != 'refresh_token' ||
+            parameters['redirect_uri'] != 'http://localhost:35129/msauth') {
+          fail(
+              'Incorrect arguments passed to Microsoft OAuth2 authorization API.');
+        }
+
+        return Response(
+            jsonEncode(
+                {'access_token': 'lilaytest2', 'refresh_token': 'lilaytest2'}),
+            200);
+      });
 
       when(client.get(
           Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
@@ -144,16 +166,23 @@ void main() {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'User-Agent': 'lilay-minecraft-launcher'
               },
-              body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
-                  '&refresh_token=lilaytest'
-                  '&grant_type=refresh_token'
-                  '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth'))
-          .thenAnswer((_) async => Response(
-              jsonEncode({
-                'access_token': 'lilaytest3',
-                'refresh_token': 'lilaytest3'
-              }),
-              200));
+              body: anyNamed('body')))
+          .thenAnswer((invocation) async {
+        Map<String, String> parameters = Uri.splitQueryString(
+            invocation.namedArguments[Symbol('body')].toString());
+        if (parameters['client_id'] != MicrosoftAccount.CLIENT_ID ||
+            parameters['refresh_token'] != 'lilaytest' ||
+            parameters['grant_type'] != 'refresh_token' ||
+            parameters['redirect_uri'] != 'http://localhost:35129/msauth') {
+          fail(
+              'Incorrect arguments passed to Microsoft OAuth2 authorization API.');
+        }
+
+        return Response(
+            jsonEncode(
+                {'access_token': 'lilaytest3', 'refresh_token': 'lilaytest3'}),
+            200);
+      });
 
       when(client.get(
           Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
@@ -187,11 +216,8 @@ void main() {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'User-Agent': 'lilay-minecraft-launcher'
               },
-              body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
-                  '&refresh_token=lilaytest'
-                  '&grant_type=refresh_token'
-                  '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth'))
-          .thenAnswer((_) async => Response(
+              body: anyNamed('body')))
+          .thenAnswer((invocation) async => Response(
               jsonEncode({
                 'access_token': 'lilaytest3',
                 'refresh_token': 'lilaytest3'
@@ -221,7 +247,7 @@ void main() {
 
     test('Refresh should fail if refresh request returns a non-200 code.',
         () async {
-      final MicrosoftAccount account = MicrosoftAccount();
+          final MicrosoftAccount account = MicrosoftAccount();
       final Client client = MockClient();
       account.accessToken = 'lilaytest';
       account.refreshToken = 'lilaytest';
@@ -231,16 +257,23 @@ void main() {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'User-Agent': 'lilay-minecraft-launcher'
               },
-              body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
-                  '&refresh_token=lilaytest'
-                  '&grant_type=refresh_token'
-                  '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth'))
-          .thenAnswer((_) async => Response(
-              jsonEncode({
-                'access_token': 'lilaytest3',
-                'refresh_token': 'lilaytest3'
-              }),
-              418));
+              body: anyNamed('body')))
+          .thenAnswer((invocation) async {
+        Map<String, String> parameters = Uri.splitQueryString(
+            invocation.namedArguments[Symbol('body')].toString());
+        if (parameters['client_id'] != MicrosoftAccount.CLIENT_ID ||
+            parameters['refresh_token'] != 'lilaytest' ||
+            parameters['grant_type'] != 'refresh_token' ||
+            parameters['redirect_uri'] != 'http://localhost:35129/msauth') {
+          fail(
+              'Incorrect arguments passed to Microsoft OAuth2 authorization API.');
+        }
+
+        return Response(
+            jsonEncode(
+                {'access_token': 'lilaytest2', 'refresh_token': 'lilaytest2'}),
+            418);
+      });
 
       when(client.get(
           Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
@@ -282,11 +315,8 @@ void main() {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'User-Agent': 'lilay-minecraft-launcher'
               },
-              body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
-                  '&refresh_token=lilaytest'
-                  '&grant_type=refresh_token'
-                  '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth'))
-          .thenAnswer((_) async => Response(
+              body: anyNamed('body')))
+          .thenAnswer((invocation) async => Response(
               jsonEncode({
                 'access_token': 'lilaytest3',
                 'refresh_token': 'lilaytest3'
