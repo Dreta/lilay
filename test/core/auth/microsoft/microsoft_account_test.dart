@@ -125,7 +125,7 @@ void main() {
     test(
         'Refresh should set payment status to false if the request returns a non-200 code.',
         () async {
-          final MicrosoftAccount account = MicrosoftAccount();
+      final MicrosoftAccount account = MicrosoftAccount();
       final Client client = MockClient();
       account.accessToken = 'lilaytest';
       account.refreshToken = 'lilaytest';
