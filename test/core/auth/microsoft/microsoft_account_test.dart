@@ -104,7 +104,7 @@ void main() {
 
     test('Refresh should fail if refresh request returns a non-200 code.',
         () async {
-          final MicrosoftAccount account = MicrosoftAccount();
+      final MicrosoftAccount account = MicrosoftAccount();
       final Client client = MockClient();
       account.accessToken = 'lilaytest';
       account.refreshToken = 'lilaytest';
