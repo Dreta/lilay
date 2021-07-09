@@ -81,7 +81,7 @@ void main() {
 
     test('Profile shouldn\'t be received when the status code isn\'t 200.',
         () async {
-          final MicrosoftAccount account = MicrosoftAccount();
+      final MicrosoftAccount account = MicrosoftAccount();
       final Client client = MockClient();
       account.accessToken = 'lilaytest';
 
