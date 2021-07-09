@@ -35,6 +35,86 @@ const String NEW_USERNAME = 'aberdeener@dreta.dev';
 const String UUID = '6cc9ba8e-8803-4534-a3d2-ade79263cb1e';
 const bool PAID = true;
 
+void mockValidate(Client client, int code) {
+  when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'lilay-minecraft-launcher'
+      },
+      body: jsonEncode({'accessToken': TOKEN}))).thenAnswer((invocation) async {
+    Map<String, String>? headers = invocation.namedArguments[Symbol('headers')];
+    if (headers == null || headers['Content-Type'] != 'application/json') {
+      fail('Incorrect headers passed to Yggdrasil validate API.');
+    }
+
+    String? bodyRaw = invocation.namedArguments[Symbol('body')];
+    if (bodyRaw == null) {
+      fail('No body passed to Yggdrasil validate API.');
+    }
+    Map<String, dynamic> body = jsonDecode(bodyRaw);
+    if (body['accessToken'] != TOKEN) {
+      fail('Incorrect body passed to Yggdrasil validate API.');
+    }
+
+    return Response(jsonEncode({'accessToken': TOKEN}), code);
+  });
+}
+
+void mockRefresh(Client client, int code) {
+  when(client.post(Uri.parse('https://authserver.mojang.com/refresh'),
+          headers: anyNamed('headers'),
+          body: jsonEncode({'accessToken': TOKEN, 'requestUser': true})))
+      .thenAnswer((invocation) async {
+    Map<String, String>? headers = invocation.namedArguments[Symbol('headers')];
+    if (headers == null || headers['Content-Type'] != 'application/json') {
+      fail('Incorrect headers passed to Yggdrasil validate API.');
+    }
+
+    String? bodyRaw = invocation.namedArguments[Symbol('body')];
+    if (bodyRaw == null) {
+      fail('No body passed to Yggdrasil validate API.');
+    }
+    Map<String, dynamic> body = jsonDecode(bodyRaw);
+    if (body['accessToken'] != TOKEN) {
+      fail('Incorrect body token passed to Yggdrasil validate API.');
+    }
+
+    return Response(
+        jsonEncode({
+          'accessToken': NEW_TOKEN,
+          'selectedProfile': {'id': UUID, 'name': NEW_NAME},
+          'user': (body['requestUser'] ?? false)
+              ? {
+                  'username': NEW_USERNAME,
+                  'properties': [
+                    {'name': 'preferredLanguage', 'value': 'en'}
+                  ]
+                }
+              : null
+        }),
+        code);
+  });
+}
+
+void mockPaymentCheck(Client client, String name, String token, int code) {
+  when(client.get(
+      Uri.parse('https://api.mojang.com/users/profiles/minecraft/$name'),
+      headers: {
+        'User-Agent': 'lilay-minecraft-launcher',
+        'Authorization': 'Bearer $token'
+      })).thenAnswer((invocation) async {
+    Map<String, String>? headers = invocation.namedArguments[Symbol('headers')];
+    if (headers == null || headers['Authorization'] != 'Bearer $token') {
+      fail('Incorrect headers passed to Mojang user profile API.');
+    }
+    return Response(
+        code == 200
+            ? jsonEncode({'name': name, 'id': UUID.replaceAll('-', '')})
+            : '',
+        code);
+  });
+}
+
 @GenerateMocks([Client])
 void main() {
   group('YggdrasilAccount', () {
@@ -44,39 +124,9 @@ void main() {
       final YggdrasilAccount account = defaultAccount;
       final Client client = MockClient();
 
-      when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
-              headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({'accessToken': TOKEN})))
-          .thenAnswer(
-              (_) async => Response(jsonEncode({'accessToken': TOKEN}), 403));
-
-      when(client.post(Uri.parse('https://authserver.mojang.com/refresh'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: jsonEncode({
-            'accessToken': TOKEN,
-            'requestUser': true
-            // We also want to update the user just in case
-          }))).thenAnswer((_) async => Response(
-          jsonEncode({
-            'accessToken': NEW_TOKEN,
-            'selectedProfile': {'id': UUID, 'name': NEW_NAME},
-            'user': {'username': NEW_USERNAME}
-          }),
-          200));
-
-      when(client.get(
-          Uri.parse(
-              'https://api.mojang.com/users/profiles/minecraft/$NEW_NAME'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer $NEW_TOKEN'
-          })).thenAnswer((_) async => Response('', 200));
+      mockValidate(client, 403);
+      mockRefresh(client, 200);
+      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
 
       await account.refresh(client);
       expect(account.accessToken, NEW_TOKEN);
@@ -87,39 +137,9 @@ void main() {
       final YggdrasilAccount account = defaultAccount;
       final Client client = MockClient();
 
-      when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
-              headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({'accessToken': TOKEN})))
-          .thenAnswer(
-              (_) async => Response(jsonEncode({'accessToken': TOKEN}), 403));
-
-      when(client.post(Uri.parse('https://authserver.mojang.com/refresh'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: jsonEncode({
-            'accessToken': TOKEN,
-            'requestUser': true
-            // We also want to update the user just in case
-          }))).thenAnswer((_) async => Response(
-          jsonEncode({
-            'accessToken': NEW_TOKEN,
-            'selectedProfile': {'id': UUID, 'name': NEW_NAME},
-            'user': {'username': NEW_USERNAME}
-          }),
-          200));
-
-      when(client.get(
-          Uri.parse(
-              'https://api.mojang.com/users/profiles/minecraft/$NEW_NAME'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer $NEW_TOKEN'
-          })).thenAnswer((_) async => Response('', 200));
+      mockValidate(client, 403);
+      mockRefresh(client, 200);
+      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
 
       await account.refresh(client);
       expect(account.username, NEW_USERNAME);
@@ -130,39 +150,9 @@ void main() {
       final YggdrasilAccount account = defaultAccount;
       final Client client = MockClient();
 
-      when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
-              headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({'accessToken': TOKEN})))
-          .thenAnswer(
-              (_) async => Response(jsonEncode({'accessToken': TOKEN}), 403));
-
-      when(client.post(Uri.parse('https://authserver.mojang.com/refresh'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: jsonEncode({
-            'accessToken': TOKEN,
-            'requestUser': true
-            // We also want to update the user just in case
-          }))).thenAnswer((_) async => Response(
-          jsonEncode({
-            'accessToken': NEW_TOKEN,
-            'selectedProfile': {'id': UUID, 'name': NEW_NAME},
-            'user': {'username': NEW_USERNAME}
-          }),
-          200));
-
-      when(client.get(
-          Uri.parse(
-              'https://api.mojang.com/users/profiles/minecraft/$NEW_NAME'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer $NEW_TOKEN'
-          })).thenAnswer((_) async => Response('', 200));
+      mockValidate(client, 403);
+      mockRefresh(client, 200);
+      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
 
       await account.refresh(client);
       expect(account.profileName, NEW_NAME);
@@ -173,33 +163,9 @@ void main() {
       final YggdrasilAccount account = defaultAccount;
       final Client client = MockClient();
 
-      when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
-              headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({'accessToken': TOKEN})))
-          .thenAnswer(
-              (_) async => Response(jsonEncode({'accessToken': TOKEN}), 403));
-
-      when(client.post(Uri.parse('https://authserver.mojang.com/refresh'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: jsonEncode({
-            'accessToken': TOKEN,
-            'requestUser': true
-            // We also want to update the user just in case
-          }))).thenAnswer((_) async => Response(jsonEncode({}), 418));
-
-      when(client.get(
-          Uri.parse(
-              'https://api.mojang.com/users/profiles/minecraft/$NEW_NAME'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer $NEW_TOKEN'
-          })).thenAnswer((_) async => Response('', 200));
+      mockValidate(client, 403);
+      mockRefresh(client, 418);
+      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
 
       await account.refresh(client);
       expect(account.requiresReauth, true);
@@ -208,22 +174,8 @@ void main() {
       final YggdrasilAccount account = defaultAccount;
       final Client client = MockClient();
 
-      when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
-              headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({'accessToken': TOKEN})))
-          .thenAnswer(
-              (_) async => Response(jsonEncode({'accessToken': TOKEN}), 200));
-
-      when(client.get(
-          Uri.parse(
-              'https://api.mojang.com/users/profiles/minecraft/$PROFILE_NAME'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer $TOKEN'
-          })).thenAnswer((_) async => Response('', 200));
+      mockValidate(client, 200);
+      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 200);
 
       await account.refresh(client);
       expect(account.accessToken, TOKEN);
@@ -232,22 +184,8 @@ void main() {
       final YggdrasilAccount account = defaultAccount;
       final Client client = MockClient();
 
-      when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
-              headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({'accessToken': TOKEN})))
-          .thenAnswer(
-              (_) async => Response(jsonEncode({'accessToken': TOKEN}), 200));
-
-      when(client.get(
-          Uri.parse(
-              'https://api.mojang.com/users/profiles/minecraft/$PROFILE_NAME'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer $TOKEN'
-          })).thenAnswer((_) async => Response('', 200));
+      mockValidate(client, 200);
+      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 200);
 
       await account.refresh(client);
       expect(account.paid, true);
@@ -256,22 +194,8 @@ void main() {
       final YggdrasilAccount account = defaultAccount;
       final Client client = MockClient();
 
-      when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
-              headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: jsonEncode({'accessToken': TOKEN})))
-          .thenAnswer(
-              (_) async => Response(jsonEncode({'accessToken': TOKEN}), 200));
-
-      when(client.get(
-          Uri.parse(
-              'https://api.mojang.com/users/profiles/minecraft/$PROFILE_NAME'),
-          headers: {
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer $TOKEN'
-          })).thenAnswer((_) async => Response('', 403));
+      mockValidate(client, 200);
+      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 403);
 
       await account.refresh(client);
       expect(account.paid, false);
