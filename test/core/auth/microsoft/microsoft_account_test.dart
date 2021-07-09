@@ -112,12 +112,16 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       when(client.post(Uri.parse('https://login.live.com/oauth20_token.srf'),
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: anyNamed('body')))
+              headers: anyNamed('headers'), body: anyNamed('body')))
           .thenAnswer((invocation) async {
+        Map<String, String>? headers =
+            invocation.namedArguments[Symbol('headers')];
+        if (headers == null ||
+            headers['Content-Type'] != 'application/x-www-form-urlencoded') {
+          fail(
+              'Incorrect headers passed to Microsoft OAuth2 authorization API.');
+        }
+
         Map<String, String> parameters = Uri.splitQueryString(
             invocation.namedArguments[Symbol('body')].toString());
         if (parameters['client_id'] != MicrosoftAccount.CLIENT_ID ||
@@ -162,12 +166,16 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       when(client.post(Uri.parse('https://login.live.com/oauth20_token.srf'),
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: anyNamed('body')))
+              headers: anyNamed('headers'), body: anyNamed('body')))
           .thenAnswer((invocation) async {
+        Map<String, String>? headers =
+            invocation.namedArguments[Symbol('headers')];
+        if (headers == null ||
+            headers['Content-Type'] != 'application/x-www-form-urlencoded') {
+          fail(
+              'Incorrect headers passed to Microsoft OAuth2 authorization API.');
+        }
+
         Map<String, String> parameters = Uri.splitQueryString(
             invocation.namedArguments[Symbol('body')].toString());
         if (parameters['client_id'] != MicrosoftAccount.CLIENT_ID ||
@@ -212,11 +220,7 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       when(client.post(Uri.parse('https://login.live.com/oauth20_token.srf'),
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: anyNamed('body')))
+              headers: anyNamed('headers'), body: anyNamed('body')))
           .thenAnswer((invocation) async => Response(
               jsonEncode({
                 'access_token': 'lilaytest3',
@@ -253,12 +257,16 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       when(client.post(Uri.parse('https://login.live.com/oauth20_token.srf'),
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: anyNamed('body')))
+              headers: anyNamed('headers'), body: anyNamed('body')))
           .thenAnswer((invocation) async {
+        Map<String, String>? headers =
+            invocation.namedArguments[Symbol('headers')];
+        if (headers == null ||
+            headers['Content-Type'] != 'application/x-www-form-urlencoded') {
+          fail(
+              'Incorrect headers passed to Microsoft OAuth2 authorization API.');
+        }
+
         Map<String, String> parameters = Uri.splitQueryString(
             invocation.namedArguments[Symbol('body')].toString());
         if (parameters['client_id'] != MicrosoftAccount.CLIENT_ID ||
@@ -311,11 +319,7 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       when(client.post(Uri.parse('https://login.live.com/oauth20_token.srf'),
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'User-Agent': 'lilay-minecraft-launcher'
-              },
-              body: anyNamed('body')))
+              headers: anyNamed('headers'), body: anyNamed('body')))
           .thenAnswer((invocation) async => Response(
               jsonEncode({
                 'access_token': 'lilaytest3',
