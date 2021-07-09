@@ -139,21 +139,19 @@ void main() {
       });
 
       when(client.get(
-          Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode({
-            'items': [
-              {'name': 'product_minecraft', 'signature': 'lilaytest'},
-              {'name': 'game_minecraft', 'signature': 'lilaytest'}
-            ],
-            'signature': 'lilaytest',
-            'keyId': 1
-          }),
-          200));
+              Uri.parse(
+                  'https://api.minecraftservices.com/entitlements/mcstore'),
+              headers: anyNamed('headers')))
+          .thenAnswer((invocation) async => Response(
+              jsonEncode({
+                'items': [
+                  {'name': 'product_minecraft', 'signature': 'lilaytest'},
+                  {'name': 'game_minecraft', 'signature': 'lilaytest'}
+                ],
+                'signature': 'lilaytest',
+                'keyId': 1
+              }),
+              200));
 
       await account.refresh(client);
       expect(account.msAccessToken, 'lilaytest2');
@@ -193,21 +191,19 @@ void main() {
       });
 
       when(client.get(
-          Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode({
-            'items': [
-              {'name': 'product_minecraft', 'signature': 'lilaytest'},
-              {'name': 'game_minecraft', 'signature': 'lilaytest'}
-            ],
-            'signature': 'lilaytest',
-            'keyId': 1
-          }),
-          200));
+              Uri.parse(
+                  'https://api.minecraftservices.com/entitlements/mcstore'),
+              headers: anyNamed('headers')))
+          .thenAnswer((invocation) async => Response(
+              jsonEncode({
+                'items': [
+                  {'name': 'product_minecraft', 'signature': 'lilaytest'},
+                  {'name': 'game_minecraft', 'signature': 'lilaytest'}
+                ],
+                'signature': 'lilaytest',
+                'keyId': 1
+              }),
+              200));
 
       await account.refresh(client);
       expect(account.refreshToken, 'lilaytest3');
@@ -234,16 +230,27 @@ void main() {
             'Content-Type': 'application/json',
             'User-Agent': 'lilay-minecraft-launcher',
             'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode({
-            'items': [
-              {'name': 'product_minecraft', 'signature': 'lilaytest'},
-              {'name': 'game_minecraft', 'signature': 'lilaytest'}
-            ],
-            'signature': 'lilaytest',
-            'keyId': 1
-          }),
-          200));
+          })).thenAnswer((invocation) async {
+        Map<String, String>? headers =
+            invocation.namedArguments[Symbol('headers')];
+        if (headers == null ||
+            headers['Content-Type'] != 'application/json' ||
+            headers['Authorization'] != 'Bearer lilaytest') {
+          fail(
+              'Incorrect headers passed to Minecraft Services entitlements API.');
+        }
+
+        return Response(
+            jsonEncode({
+              'items': [
+                {'name': 'product_minecraft', 'signature': 'lilaytest'},
+                {'name': 'game_minecraft', 'signature': 'lilaytest'}
+              ],
+              'signature': 'lilaytest',
+              'keyId': 1
+            }),
+            200);
+      });
 
       await account.refresh(client);
       expect(account.paid, true);
@@ -284,21 +291,19 @@ void main() {
       });
 
       when(client.get(
-          Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode({
-            'items': [
-              {'name': 'product_minecraft', 'signature': 'lilaytest'},
-              {'name': 'game_minecraft', 'signature': 'lilaytest'}
-            ],
-            'signature': 'lilaytest',
-            'keyId': 1
-          }),
-          200));
+              Uri.parse(
+                  'https://api.minecraftservices.com/entitlements/mcstore'),
+              headers: anyNamed('headers')))
+          .thenAnswer((_) async => Response(
+              jsonEncode({
+                'items': [
+                  {'name': 'product_minecraft', 'signature': 'lilaytest'},
+                  {'name': 'game_minecraft', 'signature': 'lilaytest'}
+                ],
+                'signature': 'lilaytest',
+                'keyId': 1
+              }),
+              200));
 
       bool errored = false;
       try {
@@ -328,21 +333,30 @@ void main() {
               200));
 
       when(client.get(
-          Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher',
-            'Authorization': 'Bearer lilaytest'
-          })).thenAnswer((_) async => Response(
-          jsonEncode({
-            'items': [
-              {'name': 'product_minecraft', 'signature': 'lilaytest'},
-              {'name': 'game_minecraft', 'signature': 'lilaytest'}
-            ],
-            'signature': 'lilaytest',
-            'keyId': 1
-          }),
-          418));
+              Uri.parse(
+                  'https://api.minecraftservices.com/entitlements/mcstore'),
+              headers: anyNamed('headers')))
+          .thenAnswer((invocation) async {
+        Map<String, String>? headers =
+            invocation.namedArguments[Symbol('headers')];
+        if (headers == null ||
+            headers['Content-Type'] != 'application/json' ||
+            headers['Authorization'] != 'Bearer lilaytest') {
+          fail(
+              'Incorrect headers passed to Minecraft Services entitlements API.');
+        }
+
+        return Response(
+            jsonEncode({
+              'items': [
+                {'name': 'product_minecraft', 'signature': 'lilaytest'},
+                {'name': 'game_minecraft', 'signature': 'lilaytest'}
+              ],
+              'signature': 'lilaytest',
+              'keyId': 1
+            }),
+            418);
+      });
 
       await account.refresh(client);
       expect(account.paid, false);
