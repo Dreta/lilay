@@ -174,8 +174,7 @@ void mockValidate(Client client, int code) {
 
 void mockRefresh(Client client, int code) {
   when(client.post(Uri.parse('https://authserver.mojang.com/refresh'),
-          headers: anyNamed('headers'),
-          body: jsonEncode({'accessToken': TOKEN, 'requestUser': true})))
+          headers: anyNamed('headers'), body: anyNamed('body')))
       .thenAnswer((invocation) async {
     Map<String, String>? headers = invocation.namedArguments[Symbol('headers')];
     if (headers == null || headers['Content-Type'] != 'application/json') {
