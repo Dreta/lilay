@@ -209,13 +209,11 @@ void mockRefresh(Client client, int code) {
 
 void mockPaymentCheck(Client client, String name, String token, int code) {
   when(client.get(
-      Uri.parse('https://api.mojang.com/users/profiles/minecraft/$name'),
-      headers: {
-        'User-Agent': 'lilay-minecraft-launcher',
-        'Authorization': 'Bearer $token'
-      })).thenAnswer((invocation) async {
+          Uri.parse('https://api.mojang.com/users/profiles/minecraft/$name'),
+          headers: anyNamed('headers')))
+      .thenAnswer((invocation) async {
     Map<String, String>? headers = invocation.namedArguments[Symbol('headers')];
-    if (headers == null || headers['Authorization'] != 'Bearer $token') {
+    if (headers == null) {
       fail('Incorrect headers passed to Mojang user profile API.');
     }
     return Response(
