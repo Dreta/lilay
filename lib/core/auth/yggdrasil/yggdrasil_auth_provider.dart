@@ -33,9 +33,16 @@ class YggdrasilAuthProvider extends AuthProvider {
       Function(Account) callback,
       Function(String) error,
       Client? client) async {
-    assert(username != null);
-    assert(password != null);
-    assert(client != null);
+    if (username == null) {
+      error('Username must not be null.');
+      return;
+    }
+    if (password == null) {
+      error('Password must not be null.');
+    }
+    if (client == null) {
+      error('Client must not be null.');
+    }
 
     try {
       Response response = await client!.post(
