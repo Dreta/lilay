@@ -35,6 +35,118 @@ const String NEW_USERNAME = 'aberdeener@dreta.dev';
 const String UUID = '6cc9ba8e-8803-4534-a3d2-ade79263cb1e';
 const bool PAID = true;
 
+@GenerateMocks([Client])
+void main() {
+  group('YggdrasilAccount', () {
+    test(
+        'Refresh should set the access token correctly when the token is unusable.',
+        () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      mockValidate(client, 403);
+      mockRefresh(client, 200);
+
+      await account.refresh(client);
+      expect(account.accessToken, NEW_TOKEN);
+    });
+    test(
+        'Refresh should set the username correctly when the token is unusable.',
+        () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      mockValidate(client, 403);
+      mockRefresh(client, 200);
+
+      await account.refresh(client);
+      expect(account.username, NEW_USERNAME);
+    });
+    test(
+        'Refresh should set the profile name correctly when the token is unusable.',
+        () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      mockValidate(client, 403);
+      mockRefresh(client, 200);
+
+      await account.refresh(client);
+      expect(account.profileName, NEW_NAME);
+    });
+    test(
+        'Refresh should require re-authentication when the token can\'t be refreshed.',
+        () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      mockValidate(client, 403);
+      mockRefresh(client, 418);
+
+      await account.refresh(client);
+      expect(account.requiresReauth, true);
+    });
+    test('Refresh should use old token if it is still usable.', () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      mockValidate(client, 200);
+
+      await account.refresh(client);
+      expect(account.accessToken, TOKEN);
+    });
+    test(
+        'Update payment status should set the payment status correctly (true).',
+        () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 200);
+
+      await account.updatePaymentStatus(client);
+      expect(account.paid, true);
+    });
+    test(
+        'Update payment status should set the payment status correctly (false).',
+        () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 403);
+
+      await account.updatePaymentStatus(client);
+      expect(account.paid, false);
+    });
+    test('Invalidate token correctly.', () async {
+      final YggdrasilAccount account = defaultAccount;
+      final Client client = MockClient();
+
+      bool called = false;
+      when(client.post(Uri.parse('https://authserver.mojang.com/invalidate'),
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'lilay-minecraft-launcher'
+          },
+          body: jsonEncode({'accessToken': TOKEN}))).thenAnswer((_) async {
+        called = true;
+        return Response('', 200);
+      });
+
+      await account.invalidate(client);
+      expect(called, true);
+    });
+  });
+}
+
+YggdrasilAccount get defaultAccount {
+  return YggdrasilAccount(
+      accessToken: TOKEN,
+      profileName: PROFILE_NAME,
+      username: USERNAME,
+      uuid: UUID,
+      paid: PAID);
+}
+
 void mockValidate(Client client, int code) {
   when(client.post(Uri.parse('https://authserver.mojang.com/validate'),
       headers: {
@@ -113,119 +225,4 @@ void mockPaymentCheck(Client client, String name, String token, int code) {
             : '',
         code);
   });
-}
-
-@GenerateMocks([Client])
-void main() {
-  group('YggdrasilAccount', () {
-    test(
-        'Refresh should set the access token correctly when the token is unusable.',
-        () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      mockValidate(client, 403);
-      mockRefresh(client, 200);
-      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
-
-      await account.refresh(client);
-      expect(account.accessToken, NEW_TOKEN);
-    });
-    test(
-        'Refresh should set the username correctly when the token is unusable.',
-        () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      mockValidate(client, 403);
-      mockRefresh(client, 200);
-      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
-
-      await account.refresh(client);
-      expect(account.username, NEW_USERNAME);
-    });
-    test(
-        'Refresh should set the profile name correctly when the token is unusable.',
-        () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      mockValidate(client, 403);
-      mockRefresh(client, 200);
-      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
-
-      await account.refresh(client);
-      expect(account.profileName, NEW_NAME);
-    });
-    test(
-        'Refresh should require re-authentication when the token can\'t be refreshed.',
-        () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      mockValidate(client, 403);
-      mockRefresh(client, 418);
-      mockPaymentCheck(client, NEW_NAME, NEW_TOKEN, 200);
-
-      await account.refresh(client);
-      expect(account.requiresReauth, true);
-    });
-    test('Refresh should use old token if it is still usable.', () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      mockValidate(client, 200);
-      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 200);
-
-      await account.refresh(client);
-      expect(account.accessToken, TOKEN);
-    });
-    test('Refresh should set the payment status correctly (true).', () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      mockValidate(client, 200);
-      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 200);
-
-      await account.refresh(client);
-      expect(account.paid, true);
-    });
-    test('Refresh should set the payment status correctly (false).', () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      mockValidate(client, 200);
-      mockPaymentCheck(client, PROFILE_NAME, TOKEN, 403);
-
-      await account.refresh(client);
-      expect(account.paid, false);
-    });
-    test('Invalidate token correctly.', () async {
-      final YggdrasilAccount account = defaultAccount;
-      final Client client = MockClient();
-
-      bool called = false;
-      when(client.post(Uri.parse('https://authserver.mojang.com/invalidate'),
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: jsonEncode({'accessToken': TOKEN}))).thenAnswer((_) async {
-        called = true;
-        return Response('', 200);
-      });
-
-      await account.invalidate(client);
-      expect(called, true);
-    });
-  });
-}
-
-YggdrasilAccount get defaultAccount {
-  return YggdrasilAccount(
-      accessToken: TOKEN,
-      profileName: PROFILE_NAME,
-      username: USERNAME,
-      uuid: UUID,
-      paid: PAID);
 }

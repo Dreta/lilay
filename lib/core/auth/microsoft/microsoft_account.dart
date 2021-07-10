@@ -83,8 +83,10 @@ class MicrosoftAccount extends Account {
     Map<String, dynamic> respJson = jsonDecode(resp.body);
     msAccessToken = respJson['access_token'];
     refreshToken = respJson['refresh_token'];
+  }
 
-    // Check if we have paid
+  @override
+  Future<void> updatePaymentStatus(Client client) async {
     Response respPaid = await client.get(
         Uri.parse('https://api.minecraftservices.com/entitlements/mcstore'),
         headers: {

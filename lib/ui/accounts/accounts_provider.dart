@@ -83,6 +83,7 @@ class AccountsProvider extends ChangeNotifier {
             'Attempting to refresh the token of account ${account['username']}.');
         Client client = Client();
         await acc.refresh(client);
+        await acc.updatePaymentStatus(client);
         client.close();
       } catch (e) {
         _loadingStatus = LoadingStatus.failed;

@@ -143,6 +143,7 @@ class _AccountWidgetState extends State<AccountWidget> {
                       setState(() => _isRefreshing = true);
                       Client client = Client();
                       await _account.refresh(client);
+                      await _account.updatePaymentStatus(client);
                       client.close();
                       setState(() => _isRefreshing = false);
                     }),

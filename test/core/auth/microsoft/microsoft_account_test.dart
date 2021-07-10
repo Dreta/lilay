@@ -70,7 +70,6 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       mockMSOAuth2(client, 200);
-      mockEntitlements(client, 200);
 
       await account.refresh(client);
       expect(account.msAccessToken, 'lilaytest');
@@ -83,22 +82,21 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       mockMSOAuth2(client, 200);
-      mockEntitlements(client, 200);
 
       await account.refresh(client);
       expect(account.refreshToken, 'lilaytest');
     });
 
-    test('Refresh should set the correct payment status.', () async {
+    test('Update payment status should set the correct payment status.',
+        () async {
       final MicrosoftAccount account = MicrosoftAccount();
       final Client client = MockClient();
       account.accessToken = 'lilaytest';
       account.refreshToken = 'lilaytest';
 
-      mockMSOAuth2(client, 200);
       mockEntitlements(client, 200);
 
-      await account.refresh(client);
+      await account.updatePaymentStatus(client);
       expect(account.paid, true);
     });
 
@@ -110,7 +108,6 @@ void main() {
       account.refreshToken = 'lilaytest';
 
       mockMSOAuth2(client, 418);
-      mockEntitlements(client, 200);
 
       bool errored = false;
       try {
@@ -123,17 +120,16 @@ void main() {
     });
 
     test(
-        'Refresh should set payment status to false if the request returns a non-200 code.',
+        'Update payment status should set payment status to false if the request returns a non-200 code.',
         () async {
       final MicrosoftAccount account = MicrosoftAccount();
       final Client client = MockClient();
       account.accessToken = 'lilaytest';
       account.refreshToken = 'lilaytest';
 
-      mockMSOAuth2(client, 200);
       mockEntitlements(client, 418);
 
-      await account.refresh(client);
+      await account.updatePaymentStatus(client);
       expect(account.paid, false);
     });
   });

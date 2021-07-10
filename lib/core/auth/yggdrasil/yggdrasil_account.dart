@@ -116,8 +116,10 @@ class YggdrasilAccount extends Account {
       _username = resp['user']['username'];
       _profileName = resp['selectedProfile']['name'];
     }
+  }
 
-    // Check if we have paid
+  @override
+  Future<void> updatePaymentStatus(Client client) async {
     Response respPaid = await client.get(
         Uri.parse(
             'https://api.mojang.com/users/profiles/minecraft/$_profileName'),

@@ -56,6 +56,10 @@ class OfflineAccount extends Account {
   @override
   Future<void> refresh(Client client) async {}
 
+  // An offline account never needs to be paid for.
+  @override
+  Future<void> updatePaymentStatus(Client client) async {}
+
   // An offline account never needs re-authentication.
   @override
   bool get requiresReauth => false;

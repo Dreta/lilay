@@ -79,6 +79,9 @@ abstract class Account {
   /// This method will be called when the account is loaded.
   Future<void> refresh(Client client);
 
+  /// Check the payment status for this account.
+  Future<void> updatePaymentStatus(Client client);
+
   /// Invalidates the access token of this account and log out.
   Future<void> invalidate(Client client);
 
