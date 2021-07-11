@@ -43,6 +43,7 @@ import 'package:lilay/ui/launch/launch_provider.dart';
 import 'package:lilay/ui/profiles/profiles_provider.dart';
 import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
+import 'package:open_url/open_url.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -72,8 +73,8 @@ void main() async {
   Account.accountFactories['offline'] = OfflineAccount.fromJson;
 
   // Microsoft
-  Account.authProviders['microsoft'] =
-      MicrosoftAuthProvider(authServer: MicrosoftAuthServer(35129, Client()));
+  Account.authProviders['microsoft'] = MicrosoftAuthProvider(
+      authServer: MicrosoftAuthServer(35129, Client()), openUrl: openUrl);
   Account.accountFactories['microsoft'] = MicrosoftAccount.fromJson;
 
   logger.info('Setting up cache directory.');

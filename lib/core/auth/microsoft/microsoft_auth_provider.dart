@@ -21,14 +21,13 @@ import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_auth_server.dart';
-import 'package:open_url/open_url.dart';
 
 /// MicrosoftAuthProvider logs a user into their Microsoft account.
 class MicrosoftAuthProvider extends AuthProvider {
-  final MicrosoftAuthServer _authServer;
+  final MicrosoftAuthServer authServer;
+  final Function(String) openUrl;
 
-  MicrosoftAuthProvider({required MicrosoftAuthServer authServer})
-      : _authServer = authServer;
+  MicrosoftAuthProvider({required this.authServer, required this.openUrl});
 
   @override
   Future<void> login(
@@ -48,8 +47,8 @@ class MicrosoftAuthProvider extends AuthProvider {
     openUrl(authUrl);
 
     // Make the auth server use the callback we have from the user.
-    _authServer.accountCallback = callback;
-    _authServer.errorCallback = error;
+    authServer.accountCallback = callback;
+    authServer.errorCallback = error;
   }
 
   @override
