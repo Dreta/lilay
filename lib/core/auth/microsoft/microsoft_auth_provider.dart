@@ -36,6 +36,9 @@ class MicrosoftAuthProvider extends AuthProvider {
       Function(Account) callback,
       Function(String) error,
       Client? client) async {
+    // TODO Use Minecraft's Client ID - ask the user to copy the resulting
+    //      URL after authorization because Flutter doesn't support web views
+    //      on desktop yet.
     // This is where we will have to visit.
     String authUrl =
         'https://login.live.com/oauth20_authorize.srf?client_id=${MicrosoftAccount.CLIENT_ID}'
