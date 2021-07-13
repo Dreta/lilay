@@ -52,16 +52,16 @@ class MicrosoftAuthServer {
       // We are doing a simple check that won't be always accurate here,
       // but for our use case it's perfectly fine.
       if (request.requestedUri.pathSegments.contains('msauth')) {
-        _handleRequest(request);
+        await _handleRequest(request);
       } else if (request.requestedUri.pathSegments.contains('background.png')) {
         // If we are requesting the background image
         // This might look ugly, but I don't think it matters.
-        _handleBackgroundRequest(request);
+        await _handleBackgroundRequest(request);
       }
     }
   }
 
-  _handleBackgroundRequest(HttpRequest request) async {
+  Future<void> _handleBackgroundRequest(HttpRequest request) async {
     final ByteData background = await rootBundle.load('assets/background.png');
 
     request.response
@@ -71,7 +71,7 @@ class MicrosoftAuthServer {
       ..close();
   }
 
-  _handleRequest(HttpRequest request) async {
+  Future<void> _handleRequest(HttpRequest request) async {
     try {
       // Get code from GET request
       String? code = request.uri.queryParameters['code'];
@@ -210,5 +210,9 @@ class MicrosoftAuthServer {
     } catch (e) {
       errorCallback(e.toString());
     }
+  }
+
+  Future<void> stop() async {
+    await _server.close();
   }
 }
