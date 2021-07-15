@@ -39,13 +39,11 @@ class MockClient extends _i1.Mock implements _i5.Client {
       (super.noSuchMethod(Invocation.method(#head, [url], {#headers: headers}),
               returnValue: Future<_i2.Response>.value(_FakeResponse()))
           as _i6.Future<_i2.Response>);
-
   @override
   _i6.Future<_i2.Response> get(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(Invocation.method(#get, [url], {#headers: headers}),
               returnValue: Future<_i2.Response>.value(_FakeResponse()))
           as _i6.Future<_i2.Response>);
-
   @override
   _i6.Future<_i2.Response> post(Uri? url,
           {Map<String, String>? headers,
@@ -56,7 +54,6 @@ class MockClient extends _i1.Mock implements _i5.Client {
                   {#headers: headers, #body: body, #encoding: encoding}),
               returnValue: Future<_i2.Response>.value(_FakeResponse()))
           as _i6.Future<_i2.Response>);
-
   @override
   _i6.Future<_i2.Response> put(Uri? url,
           {Map<String, String>? headers,
@@ -67,7 +64,6 @@ class MockClient extends _i1.Mock implements _i5.Client {
                   {#headers: headers, #body: body, #encoding: encoding}),
               returnValue: Future<_i2.Response>.value(_FakeResponse()))
           as _i6.Future<_i2.Response>);
-
   @override
   _i6.Future<_i2.Response> patch(Uri? url,
           {Map<String, String>? headers,
@@ -78,7 +74,6 @@ class MockClient extends _i1.Mock implements _i5.Client {
                   {#headers: headers, #body: body, #encoding: encoding}),
               returnValue: Future<_i2.Response>.value(_FakeResponse()))
           as _i6.Future<_i2.Response>);
-
   @override
   _i6.Future<_i2.Response> delete(Uri? url,
           {Map<String, String>? headers,
@@ -89,12 +84,10 @@ class MockClient extends _i1.Mock implements _i5.Client {
                   {#headers: headers, #body: body, #encoding: encoding}),
               returnValue: Future<_i2.Response>.value(_FakeResponse()))
           as _i6.Future<_i2.Response>);
-
   @override
   _i6.Future<String> read(Uri? url, {Map<String, String>? headers}) =>
       (super.noSuchMethod(Invocation.method(#read, [url], {#headers: headers}),
           returnValue: Future<String>.value('')) as _i6.Future<String>);
-
   @override
   _i6.Future<_i8.Uint8List> readBytes(Uri? url,
           {Map<String, String>? headers}) =>
@@ -102,14 +95,12 @@ class MockClient extends _i1.Mock implements _i5.Client {
               Invocation.method(#readBytes, [url], {#headers: headers}),
               returnValue: Future<_i8.Uint8List>.value(_i8.Uint8List(0)))
           as _i6.Future<_i8.Uint8List>);
-
   @override
   _i6.Future<_i3.StreamedResponse> send(_i9.BaseRequest? request) =>
       (super.noSuchMethod(Invocation.method(#send, [request]),
               returnValue:
                   Future<_i3.StreamedResponse>.value(_FakeStreamedResponse()))
           as _i6.Future<_i3.StreamedResponse>);
-
   @override
   void close() => super.noSuchMethod(Invocation.method(#close, []),
       returnValueForMissingStub: null);
@@ -127,68 +118,55 @@ class MockAccount extends _i1.Mock implements _i10.Account {
   String get username =>
       (super.noSuchMethod(Invocation.getter(#username), returnValue: '')
           as String);
-
   @override
   String get accessToken =>
       (super.noSuchMethod(Invocation.getter(#accessToken), returnValue: '')
           as String);
-
   @override
   String get profileName =>
       (super.noSuchMethod(Invocation.getter(#profileName), returnValue: '')
           as String);
-
   @override
   String get uuid =>
       (super.noSuchMethod(Invocation.getter(#uuid), returnValue: '') as String);
-
   @override
   String get type =>
       (super.noSuchMethod(Invocation.getter(#type), returnValue: '') as String);
-
   @override
   bool get requiresReauth => (super
           .noSuchMethod(Invocation.getter(#requiresReauth), returnValue: false)
       as bool);
-
   @override
   bool get selected =>
       (super.noSuchMethod(Invocation.getter(#selected), returnValue: false)
           as bool);
-
   @override
   bool get paid =>
       (super.noSuchMethod(Invocation.getter(#paid), returnValue: false)
           as bool);
-
   @override
   set selected(bool? sel) =>
       super.noSuchMethod(Invocation.setter(#selected, sel),
           returnValueForMissingStub: null);
-
   @override
   _i4.AuthProvider get authProvider =>
       (super.noSuchMethod(Invocation.getter(#authProvider),
           returnValue: _FakeAuthProvider()) as _i4.AuthProvider);
-
   @override
   _i6.Future<void> refresh(_i5.Client? client) =>
       (super.noSuchMethod(Invocation.method(#refresh, [client]),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future.value()) as _i6.Future<void>);
-
   @override
   _i6.Future<void> updatePaymentStatus(_i5.Client? client) =>
       (super.noSuchMethod(Invocation.method(#updatePaymentStatus, [client]),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future.value()) as _i6.Future<void>);
-
   @override
   _i6.Future<void> invalidate(_i5.Client? client) =>
       (super.noSuchMethod(Invocation.method(#invalidate, [client]),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future.value()) as _i6.Future<void>);
-
   @override
   Map<String, dynamic> toJson() =>
       (super.noSuchMethod(Invocation.method(#toJson, []),

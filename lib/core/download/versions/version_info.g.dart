@@ -56,6 +56,7 @@ K _$enumDecode<K, V>(
 const _$VersionTypeEnumMap = {
   VersionType.snapshot: 'snapshot',
   VersionType.release: 'release',
+  VersionType.pending: 'pending',
   VersionType.old_beta: 'old_beta',
   VersionType.old_alpha: 'old_alpha',
 };
