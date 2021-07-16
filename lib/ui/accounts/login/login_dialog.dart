@@ -92,7 +92,7 @@ class _LoginDialogState extends State<LoginDialog> {
       logger.info(
           'Logging to the account $username with authentication provider ${selected.name}.');
       Client client = Client();
-      provider.login(username, password, (account) {
+      provider.login(context, username, password, (account) {
         Navigator.pop(context); // Close the dialog
         logger.info('Successfully logged in to the account $username.');
         _addAccount(account); // Allow the account to be added
@@ -193,7 +193,7 @@ class _LoginDialogState extends State<LoginDialog> {
     final ThemeData theme = Theme.of(context);
     return Container(
         alignment: AlignmentDirectional.centerEnd,
-        padding: EdgeInsets.fromLTRB(8, 24, 8, 8),
+        padding: const EdgeInsets.fromLTRB(8, 24, 8, 8),
         child: OverflowBar(
             spacing: 8,
             overflowAlignment: OverflowBarAlignment.end,
@@ -207,7 +207,7 @@ class _LoginDialogState extends State<LoginDialog> {
                           : () => _login(selected),
                   style: theme.elevatedButtonTheme.style,
                   child: Padding(
-                      padding: EdgeInsets.only(
+                      padding: const EdgeInsets.only(
                           left: 15, right: 15, top: 10, bottom: 10),
                       child: Text(selected.useManualAuthentication
                           ? 'Continue'
@@ -245,7 +245,8 @@ class _LoginDialogState extends State<LoginDialog> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                                padding: EdgeInsets.only(top: 5, bottom: 5),
+                                padding:
+                                    const EdgeInsets.only(top: 5, bottom: 5),
                                 child:
                                     Text('Login', style: textTheme.headline6)),
                             Form(

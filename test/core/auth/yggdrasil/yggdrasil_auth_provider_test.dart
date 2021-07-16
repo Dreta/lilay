@@ -43,7 +43,7 @@ void main() {
       mockAuthenticate(client, 200);
       mockPaymentCheck(client, 200);
 
-      await auth.login(USERNAME, PASSWORD, (account) {
+      await auth.login(null, USERNAME, PASSWORD, (account) {
         expect(account.accessToken, TOKEN);
       }, (error) {
         fail('Expected no errors, but received $error.');
@@ -57,7 +57,7 @@ void main() {
       mockAuthenticate(client, 200);
       mockPaymentCheck(client, 200);
 
-      await auth.login(USERNAME, PASSWORD, (account) {
+      await auth.login(null, USERNAME, PASSWORD, (account) {
         expect(account.profileName, PROFILE_NAME);
       }, (error) {
         fail('Expected no errors, but received $error.');
@@ -71,7 +71,7 @@ void main() {
       mockAuthenticate(client, 200);
       mockPaymentCheck(client, 200);
 
-      await auth.login(USERNAME, PASSWORD, (account) {
+      await auth.login(null, USERNAME, PASSWORD, (account) {
         expect(account.username, USERNAME);
       }, (error) {
         fail('Expected no errors, but received $error.');
@@ -85,7 +85,7 @@ void main() {
       mockAuthenticate(client, 200);
       mockPaymentCheck(client, 200);
 
-      await auth.login(USERNAME, PASSWORD, (account) {
+      await auth.login(null, USERNAME, PASSWORD, (account) {
         expect(account.uuid.replaceAll('-', ''), UUID);
       }, (error) {
         fail('Expected no errors, but received $error.');
@@ -99,7 +99,7 @@ void main() {
       mockAuthenticate(client, 200);
       mockPaymentCheck(client, 418);
 
-      await auth.login(USERNAME, PASSWORD, (account) {
+      await auth.login(null, USERNAME, PASSWORD, (account) {
         expect(account.paid, false);
       }, (error) {
         fail('Expected no errors, but received $error.');
@@ -114,7 +114,7 @@ void main() {
       mockPaymentCheck(client, 200);
 
       bool errored = false;
-      await auth.login(USERNAME, PASSWORD, (account) {
+      await auth.login(null, USERNAME, PASSWORD, (account) {
         fail('Expected no result, but received $account.');
       }, (error) {
         errored = true;
@@ -130,7 +130,7 @@ void main() {
       mockPaymentCheck(client, 200);
 
       bool errored = false;
-      await auth.login(null, PASSWORD, (account) {
+      await auth.login(null, null, PASSWORD, (account) {
         fail('Expected no result, but received $account.');
       }, (error) {
         errored = true;
@@ -146,7 +146,7 @@ void main() {
       mockPaymentCheck(client, 200);
 
       bool errored = false;
-      await auth.login(USERNAME, null, (account) {
+      await auth.login(null, USERNAME, null, (account) {
         fail('Expected no result, but received $account.');
       }, (error) {
         errored = true;
@@ -162,7 +162,7 @@ void main() {
       mockPaymentCheck(client, 200);
 
       bool errored = false;
-      await auth.login('wrongusername@example.org', PASSWORD, (account) {
+      await auth.login(null, 'wrongusername@example.org', PASSWORD, (account) {
         fail('Expected no result, but received $account.');
       }, (error) {
         errored = true;
@@ -178,7 +178,7 @@ void main() {
       mockPaymentCheck(client, 200);
 
       bool errored = false;
-      await auth.login(USERNAME, 'wrongpassword123', (account) {
+      await auth.login(null, USERNAME, 'wrongpassword123', (account) {
         fail('Expected no result, but received $account.');
       }, (error) {
         errored = true;
@@ -190,7 +190,7 @@ void main() {
       final YggdrasilAuthProvider auth = YggdrasilAuthProvider();
 
       bool errored = false;
-      await auth.login(USERNAME, PASSWORD, (account) {
+      await auth.login(null, USERNAME, PASSWORD, (account) {
         fail('Expected no result, but received $account.');
       }, (error) {
         errored = true;

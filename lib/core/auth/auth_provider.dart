@@ -16,6 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 
@@ -54,6 +55,6 @@ abstract class AuthProvider {
   /// [callback] should probably be done with a [Future] instead,
   /// however in [MicrosoftAuthProvider], I can't think of a way to
   /// integrate a [Future] into it. Please PR if you have a good idea.
-  Future<void> login(String? username, String? password,
+  Future<void> login(BuildContext? context, String? username, String? password,
       Function(Account) callback, Function(String) error, Client? client);
 }

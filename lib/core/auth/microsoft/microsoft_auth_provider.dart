@@ -16,11 +16,12 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
-import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_auth_server.dart';
+import 'package:lilay/ui/accounts/login/microsoft/microsoft_dialog.dart';
 
 /// MicrosoftAuthProvider logs a user into their Microsoft account.
 class MicrosoftAuthProvider extends AuthProvider {
@@ -31,23 +32,18 @@ class MicrosoftAuthProvider extends AuthProvider {
 
   @override
   Future<void> login(
+      BuildContext? context,
       String? username,
       String? password,
       Function(Account) callback,
       Function(String) error,
       Client? client) async {
-    // TODO Use Minecraft's Client ID - ask the user to copy the resulting
-    //      URL after authorization because Flutter doesn't support web views
-    //      on desktop yet.
-    // This is where we will have to visit.
-    String authUrl =
-        'https://login.live.com/oauth20_authorize.srf?client_id=${MicrosoftAccount.CLIENT_ID}'
-        '&response_type=code'
-        '&redirect_uri=http%3A%2F%2Flocalhost%3A35129%2Fmsauth'
-        '&scope=XboxLive.signin%20offline_access';
+    if (context == null) {
+      error('Build context must not be null.');
+      return;
+    }
 
-    // Open the browser window.
-    openUrl(authUrl);
+    MicrosoftDialog.display(context, openUrl);
 
     // Make the auth server use the callback we have from the user.
     authServer.accountCallback = callback;

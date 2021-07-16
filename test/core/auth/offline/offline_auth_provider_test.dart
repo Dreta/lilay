@@ -23,13 +23,19 @@ void main() {
   group('OfflineAuthProvider', () {
     test('Account username correct after login.', () {
       final OfflineAuthProvider provider = OfflineAuthProvider();
-      provider.login('Dreta', null, (user) => expect(user.profileName, 'Dreta'),
-          (error) => fail('Expected no errors, but received $error.'), null);
+      provider.login(
+          null,
+          'Dreta',
+          null,
+          (user) => expect(user.profileName, 'Dreta'),
+          (error) => fail('Expected no errors, but received $error.'),
+          null);
     });
 
     test('Fails when account username is null.', () {
       final OfflineAuthProvider provider = OfflineAuthProvider();
       provider.login(
+          null,
           null,
           null,
           (user) => fail('Expected error, but received user $user.'),

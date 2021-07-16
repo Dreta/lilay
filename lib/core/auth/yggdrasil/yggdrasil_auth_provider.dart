@@ -18,6 +18,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/auth_provider.dart';
@@ -28,6 +29,7 @@ import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
 class YggdrasilAuthProvider extends AuthProvider {
   @override
   Future<void> login(
+      BuildContext? context,
       String? username,
       String? password,
       Function(Account) callback,
