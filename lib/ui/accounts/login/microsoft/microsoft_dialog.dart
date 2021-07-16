@@ -23,14 +23,17 @@ import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 /// log into a Microsoft account.
 class MicrosoftDialog extends StatefulWidget {
   final Function(String) openUrl;
+  final Function(String) loginCallback;
 
-  const MicrosoftDialog({required this.openUrl});
+  const MicrosoftDialog({required this.openUrl, required this.loginCallback});
 
-  static void display(BuildContext context, Function(String) openUrl) {
+  static void display(BuildContext context, Function(String) openUrl,
+      Function(String) loginCallback) {
     showAnimatedDialog(
         context: context,
         barrierDismissible: true,
-        builder: (context) => MicrosoftDialog(openUrl: openUrl),
+        builder: (context) =>
+            MicrosoftDialog(openUrl: openUrl, loginCallback: loginCallback),
         animationType: DialogTransitionType.fadeScale,
         curve: Curves.easeInOut,
         duration: Duration(milliseconds: 400));
@@ -38,7 +41,7 @@ class MicrosoftDialog extends StatefulWidget {
 
   @override
   _MicrosoftDialogState createState() =>
-      _MicrosoftDialogState(openUrl: openUrl);
+      _MicrosoftDialogState(openUrl: openUrl, loginCallback: loginCallback);
 }
 
 class _MicrosoftDialogState extends State<MicrosoftDialog> {
@@ -55,12 +58,13 @@ class _MicrosoftDialogState extends State<MicrosoftDialog> {
   final TextEditingController _link = TextEditingController();
 
   final Function(String) openUrl;
+  final Function(String) loginCallback;
 
-  _MicrosoftDialogState({required this.openUrl});
+  _MicrosoftDialogState({required this.openUrl, required this.loginCallback});
 
   void _login(String link) {
     if (_form.currentState!.validate()) {
-      // TODO
+      loginCallback(link);
     }
   }
 
@@ -75,7 +79,16 @@ class _MicrosoftDialogState extends State<MicrosoftDialog> {
           if (value == null || value.isEmpty) {
             return 'A link is required.';
           }
-          if (!value.startsWith('https://login.live.com/oauth20_desktop.srf')) {
+
+          Uri uri;
+          try {
+            uri = Uri.parse(value);
+          } catch (e) {
+            return 'Invalid link.';
+          }
+
+          if (!value.startsWith('https://login.live.com/oauth20_desktop.srf') ||
+              !uri.queryParameters.containsKey('code')) {
             return 'The link is incorrect. Please check if you are on an empty page.';
           }
         },

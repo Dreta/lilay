@@ -30,7 +30,6 @@ import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
 import 'package:lilay/core/auth/microsoft/microsoft_auth_provider.dart';
-import 'package:lilay/core/auth/microsoft/microsoft_auth_server.dart';
 import 'package:lilay/core/auth/offline/offline_account.dart';
 import 'package:lilay/core/auth/offline/offline_auth_provider.dart';
 import 'package:lilay/core/auth/yggdrasil/yggdrasil_account.dart';
@@ -73,8 +72,8 @@ void main() async {
   Account.accountFactories['offline'] = OfflineAccount.fromJson;
 
   // Microsoft
-  Account.authProviders['microsoft'] = MicrosoftAuthProvider(
-      authServer: MicrosoftAuthServer(35129, Client()), openUrl: openUrl);
+  Account.authProviders['microsoft'] =
+      MicrosoftAuthProvider(httpClient: Client(), openUrl: openUrl);
   Account.accountFactories['microsoft'] = MicrosoftAccount.fromJson;
 
   logger.info('Setting up cache directory.');
