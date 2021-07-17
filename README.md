@@ -1,4 +1,4 @@
-# lilay
+<img alt="Lilay Icon" src="assets/icon-text.svg" height="128">
 
 Lilay is a Minecraft launcher created because the official launcher sucks.
 
