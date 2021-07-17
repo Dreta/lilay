@@ -46,12 +46,11 @@ class MicrosoftDialog extends StatefulWidget {
 }
 
 class _MicrosoftDialogState extends State<MicrosoftDialog> {
-  static const String OAUTH2_URL =
-      'https://login.live.com/oauth20_authorize.srf'
+  static final String oauth2url = 'https://login.live.com/oauth20_authorize.srf'
       '?client_id=${MicrosoftAccount.CLIENT_ID}'
       '&response_type=code'
       '&scope=service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL'
-      '&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf';
+      '&redirect_uri=${Uri.encodeComponent(MicrosoftAccount.REDIRECT_URI)}';
 
   bool _loggingIn = false;
   DisplayState _display = DisplayState.tutorial;
@@ -91,7 +90,7 @@ class _MicrosoftDialogState extends State<MicrosoftDialog> {
             return 'Invalid link.';
           }
 
-          if (!value.startsWith('https://login.live.com/oauth20_desktop.srf') ||
+          if (!value.startsWith(MicrosoftAccount.REDIRECT_URI) ||
               !uri.queryParameters.containsKey('code')) {
             return 'The link is incorrect. Please check if you are on an empty page.';
           }
@@ -120,7 +119,7 @@ class _MicrosoftDialogState extends State<MicrosoftDialog> {
 
     return ElevatedButton(
         onPressed: () {
-          openUrl(OAUTH2_URL);
+          openUrl(oauth2url);
           setState(() => _display = DisplayState.code);
         },
         style: theme.elevatedButtonTheme.style,

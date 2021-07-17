@@ -97,7 +97,7 @@ class MicrosoftAuthProvider extends AuthProvider {
         body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
             '&code=$code'
             '&grant_type=authorization_code'
-            '&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf');
+            '&redirect_uri=${Uri.encodeComponent(MicrosoftAccount.REDIRECT_URI)}');
 
     if (rToken.statusCode != 200) {
       throw 'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}';

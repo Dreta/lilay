@@ -45,6 +45,7 @@ class MicrosoftAccount extends Account {
   };
 
   static const CLIENT_ID = '00000000402b5328';
+  static const REDIRECT_URI = 'https://login.live.com/oauth20_desktop.srf';
 
   late String accessToken; // Minecraft access token
   late String msAccessToken; // Microsoft access token
