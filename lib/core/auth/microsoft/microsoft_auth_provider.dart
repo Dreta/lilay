@@ -50,6 +50,7 @@ class MicrosoftAuthProvider extends AuthProvider {
         context, openUrl, (link) async => continueLogin(link, callback, error));
   }
 
+  /// Continue logging in after the user provides a link.
   Future<void> continueLogin(
       String link, Function(Account) callback, Function(String) error) async {
     Uri uri;
@@ -62,101 +63,104 @@ class MicrosoftAuthProvider extends AuthProvider {
 
     Map<String, String> params = uri.queryParameters;
     if (!params.containsKey('code')) {
-      error('Access code not present in the link provided.');
+      // Should be impossible, cause [MicrosoftDialog] should have validated
+      // the link to see if a code is present.
+      error('Authentication code not present in the link provided.');
       return;
     }
 
-    String code = params['code']!;
     try {
-      // Authentication code -> Authentication token
-      Response rToken = await httpClient.post(
-          Uri.parse('https://login.live.com/oauth20_token.srf'),
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: 'client_id=00000000402b5328'
-              '&code=$code'
-              '&grant_type=authorization_code'
-              '&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf');
-
-      if (rToken.statusCode != 200) {
-        error(
-            'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}');
-        return;
-      }
-
-      Map<String, dynamic> msBody = jsonDecode(rToken.body);
-      MicrosoftAccount account = MicrosoftAccount();
-      account.msAccessToken = msBody['access_token'];
-      account.refreshToken = msBody['refresh_token'];
-
-      // Authenticate with Xbox Live
-      Response rXBL = await httpClient.post(
-          Uri.parse('https://user.auth.xboxlive.com/user/authenticate'),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: jsonEncode({
-            'Properties': {
-              'AuthMethod': 'RPS',
-              'SiteName': 'user.auth.xboxlive.com',
-              'RpsTicket': '${account.msAccessToken}'
-            },
-            'RelyingParty': 'http://auth.xboxlive.com',
-            'TokenType': 'JWT'
-          }));
-
-      if (rXBL.statusCode != 200) {
-        error(
-            'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.');
-        return;
-      }
-
-      Map<String, dynamic> xblBody = jsonDecode(rXBL.body);
-      String xblToken = xblBody['Token'];
-      account.xblUHS = xblBody['DisplayClaims']['xui'][0]['uhs'];
-
-      // Authenticate with XSTS
-      Response rXSTS = await httpClient.post(
-          Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'lilay-minecraft-launcher'
-          },
-          body: jsonEncode({
-            'Properties': {
-              'SandboxId': 'RETAIL',
-              'UserTokens': [xblToken]
-            },
-            'RelyingParty': 'rp://api.minecraftservices.com/',
-            'TokenType': 'JWT'
-          }));
-
-      if (rXSTS.statusCode == 401) {
-        Map<String, dynamic> xstsBody = jsonDecode(rXSTS.body);
-        if (xstsBody['XErr'] == 2148916233) {
-          error(
-              'You don\'t have an Xbox Live account (separate from Microsoft account).');
-        } else if (xstsBody['XErr'] == 2148916238) {
-          error('Impossible error (Children / Family, Adult)');
-        }
-        return;
-      }
-
-      Map<String, dynamic> xstsBody = jsonDecode(rXSTS.body);
-      account.xstsToken = xstsBody['Token'];
-
-      // Authenticate with Minecraft
+      final MicrosoftAccount account = MicrosoftAccount();
+      await requestMSTokens(params['code']!, account);
+      await requestXboxLiveTokens(account);
+      await requestXSTSTokens(account);
       await account.requestMinecraftToken(httpClient, error);
       await account.requestProfile(error, httpClient);
       callback(account);
     } catch (e) {
       error(e.toString());
     }
+  }
+
+  /// Get Microsoft access token/refresh token with OAuth2 auth code.
+  Future<void> requestMSTokens(String code, MicrosoftAccount account) async {
+    Response rToken = await httpClient.post(
+        Uri.parse('https://login.live.com/oauth20_token.srf'),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'lilay-minecraft-launcher'
+        },
+        body: 'client_id=00000000402b5328'
+            '&code=$code'
+            '&grant_type=authorization_code'
+            '&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf');
+
+    if (rToken.statusCode != 200) {
+      throw 'Microsoft returned non-200 status code. Code: ${rToken.statusCode}, body: ${rToken.body}';
+    }
+
+    Map<String, dynamic> msBody = jsonDecode(rToken.body);
+    account.msAccessToken = msBody['access_token'];
+    account.refreshToken = msBody['refresh_token'];
+  }
+
+  /// Authenticate with Xbox Live.
+  Future<void> requestXboxLiveTokens(MicrosoftAccount account) async {
+    Response rXBL = await httpClient.post(
+        Uri.parse('https://user.auth.xboxlive.com/user/authenticate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'lilay-minecraft-launcher'
+        },
+        body: jsonEncode({
+          'Properties': {
+            'AuthMethod': 'RPS',
+            'SiteName': 'user.auth.xboxlive.com',
+            'RpsTicket': '${account.msAccessToken}'
+          },
+          'RelyingParty': 'http://auth.xboxlive.com',
+          'TokenType': 'JWT'
+        }));
+
+    if (rXBL.statusCode != 200) {
+      throw 'Xbox Live returned a status code (${rXBL.statusCode}) that indicates failure.';
+    }
+
+    Map<String, dynamic> xblBody = jsonDecode(rXBL.body);
+    account.xblToken = xblBody['Token'];
+    account.xblUHS = xblBody['DisplayClaims']['xui'][0]['uhs'];
+  }
+
+  /// Authenticate with XSTS (What is this? I've never heard about this.)
+  Future<void> requestXSTSTokens(MicrosoftAccount account) async {
+    Response rXSTS = await httpClient.post(
+        Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'lilay-minecraft-launcher'
+        },
+        body: jsonEncode({
+          'Properties': {
+            'SandboxId': 'RETAIL',
+            'UserTokens': [account.xblToken]
+          },
+          'RelyingParty': 'rp://api.minecraftservices.com/',
+          'TokenType': 'JWT'
+        }));
+
+    if (rXSTS.statusCode == 401) {
+      Map<String, dynamic> xstsBody = jsonDecode(rXSTS.body);
+      if (xstsBody['XErr'] == 2148916233) {
+        throw 'You don\'t have an Xbox Live account (separate from Microsoft account).';
+      } else if (xstsBody['XErr'] == 2148916238) {
+        // Should never happen with Minecraft's client ID.
+        throw 'Your account is a children account, and must be added into a family.';
+      }
+      throw 'XSTS returned non-200 status code. Code: ${rXSTS.statusCode}, body: ${rXSTS.body}.';
+    }
+
+    Map<String, dynamic> xstsBody = jsonDecode(rXSTS.body);
+    account.xstsToken = xstsBody['Token'];
   }
 
   @override

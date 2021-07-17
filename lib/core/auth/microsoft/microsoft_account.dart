@@ -34,6 +34,7 @@ class MicrosoftAccount extends Account {
     account.accessToken = json['accessToken'];
     account.msAccessToken = json['msAccessToken'];
     account.refreshToken = json['refreshToken'];
+    account.xblToken = json['xblToken'];
     account.xblUHS = json['xblUHS'];
     account.xstsToken = json['xstsToken'];
     account._profileName = json['profileName'];
@@ -48,7 +49,8 @@ class MicrosoftAccount extends Account {
   late String accessToken; // Minecraft access token
   late String msAccessToken; // Microsoft access token
   late String refreshToken; // Microsoft refresh token
-  late String xblUHS; // Xbox Live UHS (what is this?)
+  late String xblToken; // Xbox Live token
+  late String xblUHS; // Xbox Live user hash
   late String xstsToken; // XSTS token
   late String _profileName;
   late String _uuid;
@@ -176,6 +178,7 @@ class MicrosoftAccount extends Account {
       'accessToken': accessToken,
       'msAccessToken': msAccessToken,
       'refreshToken': refreshToken,
+      'xblToken': xblToken,
       'xstsToken': xstsToken,
       'xblUHS': xblUHS,
       'profileName': profileName,
