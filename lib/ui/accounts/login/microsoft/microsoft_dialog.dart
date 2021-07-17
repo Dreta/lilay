@@ -175,6 +175,7 @@ class _MicrosoftDialogState extends State<MicrosoftDialog> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (_loggingIn) LinearProgressIndicator(),
                   Padding(
                       padding: const EdgeInsets.all(24),
                       child: Column(
