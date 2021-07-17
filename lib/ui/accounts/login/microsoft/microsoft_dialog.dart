@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
+import 'package:lilay/core/auth/microsoft/microsoft_account.dart';
 
 /// MicrosoftDialog displays information regarding how to
 /// log into a Microsoft account.
@@ -47,7 +48,7 @@ class MicrosoftDialog extends StatefulWidget {
 class _MicrosoftDialogState extends State<MicrosoftDialog> {
   static const String OAUTH2_URL =
       'https://login.live.com/oauth20_authorize.srf'
-      '?client_id=00000000402b5328'
+      '?client_id=${MicrosoftAccount.CLIENT_ID}'
       '&response_type=code'
       '&scope=service%3A%3Auser.auth.xboxlive.com%3A%3AMBI_SSL'
       '&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf';

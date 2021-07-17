@@ -94,7 +94,7 @@ class MicrosoftAuthProvider extends AuthProvider {
           'Content-Type': 'application/x-www-form-urlencoded',
           'User-Agent': 'lilay-minecraft-launcher'
         },
-        body: 'client_id=00000000402b5328'
+        body: 'client_id=${MicrosoftAccount.CLIENT_ID}'
             '&code=$code'
             '&grant_type=authorization_code'
             '&redirect_uri=https%3A%2F%2Flogin.live.com%2Foauth20_desktop.srf');

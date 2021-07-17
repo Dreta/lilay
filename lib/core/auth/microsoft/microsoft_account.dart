@@ -44,7 +44,7 @@ class MicrosoftAccount extends Account {
     return account;
   };
 
-  static const CLIENT_ID = 'e70bfbaa-5967-4dca-8a36-d26cbfc8863f';
+  static const CLIENT_ID = '00000000402b5328';
 
   late String accessToken; // Minecraft access token
   late String msAccessToken; // Microsoft access token
