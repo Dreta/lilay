@@ -77,7 +77,7 @@ class MicrosoftAuthProvider extends AuthProvider {
       final MicrosoftAccount account = MicrosoftAccount();
       await requestMSTokens(params['code']!, account);
       await requestXboxLiveTokens(account);
-      await requestXSTSTokens(account);
+      await requestXSTSToken(account);
       await account.requestMinecraftToken(httpClient, error);
       await account.requestProfile(error, httpClient);
       callback(account);
@@ -136,7 +136,7 @@ class MicrosoftAuthProvider extends AuthProvider {
   }
 
   /// Authenticate with XSTS (What is this? I've never heard about this.)
-  Future<void> requestXSTSTokens(MicrosoftAccount account) async {
+  Future<void> requestXSTSToken(MicrosoftAccount account) async {
     Response rXSTS = await httpClient.post(
         Uri.parse('https://xsts.auth.xboxlive.com/xsts/authorize'),
         headers: {

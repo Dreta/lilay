@@ -119,6 +119,35 @@ void main() {
       expect(errored, true);
     });
 
+    test('Request Minecraft token should get the correct access token.',
+        () async {
+      final MicrosoftAccount account = MicrosoftAccount();
+      final Client client = MockClient();
+      account.xblUHS = 'lilaytest';
+      account.xstsToken = 'lilaytest';
+
+      mockMinecraftTokenRequest(client, 200);
+
+      await account.requestMinecraftToken(
+          client, (error) => fail('Expected no errors, but received $error.'));
+      expect(account.accessToken, 'lilaytest');
+    });
+
+    test(
+        'Request Minecraft token should fail if request returns a non-200 code.',
+        () async {
+      final MicrosoftAccount account = MicrosoftAccount();
+      final Client client = MockClient();
+      account.xblUHS = 'lilaytest';
+      account.xblToken = 'lilaytest';
+
+      mockMinecraftTokenRequest(client, 418);
+
+      bool errored = false;
+      await account.requestMinecraftToken(client, (error) => errored = true);
+      expect(errored, true);
+    });
+
     test(
         'Update payment status should set payment status to false if the request returns a non-200 code.',
         () async {
@@ -147,6 +176,33 @@ void mockProfileRequest(Client client, int code) {
     return Response(
         jsonEncode({'name': 'Dreta', 'id': '6cc9ba8e88034534a3d2ade79263cb1e'}),
         code);
+  });
+}
+
+void mockMinecraftTokenRequest(Client client, int code) {
+  when(client.post(
+          Uri.parse(
+              'https://api.minecraftservices.com/authentication/login_with_xbox'),
+          headers: anyNamed('headers'),
+          body: anyNamed('body')))
+      .thenAnswer((invocation) async {
+    Map<String, String>? headers = invocation.namedArguments[Symbol('headers')];
+    if (headers == null || headers['Content-Type'] != 'application/json') {
+      fail('Incorrect headers passed to Minecraft token API.');
+    }
+
+    String? bodyRaw = invocation.namedArguments[Symbol('body')];
+    if (bodyRaw == null) {
+      fail('No body passed to Minecraft token API.');
+    }
+
+    Map<String, dynamic> body = jsonDecode(bodyRaw);
+    if (body['identityToken'] != 'XBL3.0 x=lilaytest;lilaytest') {
+      fail('Incorrect body passed to Minecraft token API.');
+    }
+
+    return Response(
+        code == 200 ? jsonEncode({'access_token': 'lilaytest'}) : '', code);
   });
 }
 
