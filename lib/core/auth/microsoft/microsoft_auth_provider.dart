@@ -41,6 +41,10 @@ class MicrosoftAuthProvider extends AuthProvider {
       Function(Account) callback,
       Function(String) error,
       Client? client) async {
+    // ^ So here, we can't actually pass the client to [continueLogin],
+    // where we actually need it, without modifications to [AuthProvider].
+    // Therefore, we are using the provided [httpClient] instead and [null]
+    // should be used for this parameter.
     if (context == null) {
       error('Build context must not be null.');
       return;
