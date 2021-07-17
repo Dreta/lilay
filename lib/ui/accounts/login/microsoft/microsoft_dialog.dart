@@ -23,12 +23,12 @@ import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 /// log into a Microsoft account.
 class MicrosoftDialog extends StatefulWidget {
   final Function(String) openUrl;
-  final Function(String) loginCallback;
+  final Future<void> Function(String) loginCallback;
 
   const MicrosoftDialog({required this.openUrl, required this.loginCallback});
 
   static void display(BuildContext context, Function(String) openUrl,
-      Function(String) loginCallback) {
+      Future<void> Function(String) loginCallback) {
     showAnimatedDialog(
         context: context,
         barrierDismissible: true,
@@ -58,13 +58,16 @@ class _MicrosoftDialogState extends State<MicrosoftDialog> {
   final TextEditingController _link = TextEditingController();
 
   final Function(String) openUrl;
-  final Function(String) loginCallback;
+  final Future<void> Function(String) loginCallback;
 
   _MicrosoftDialogState({required this.openUrl, required this.loginCallback});
 
-  void _login(String link) {
+  void _login(String link) async {
     if (_form.currentState!.validate()) {
-      loginCallback(link);
+      setState(() => _loggingIn = true);
+      await loginCallback(link);
+      Navigator.pop(context);
+      setState(() => _loggingIn = false);
     }
   }
 

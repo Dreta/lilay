@@ -47,7 +47,7 @@ class MicrosoftAuthProvider extends AuthProvider {
     }
 
     MicrosoftDialog.display(
-        context, openUrl, (link) => continueLogin(link, callback, error));
+        context, openUrl, (link) async => continueLogin(link, callback, error));
   }
 
   Future<void> continueLogin(
@@ -63,6 +63,7 @@ class MicrosoftAuthProvider extends AuthProvider {
     Map<String, String> params = uri.queryParameters;
     if (!params.containsKey('code')) {
       error('Access code not present in the link provided.');
+      return;
     }
 
     String code = params['code']!;
@@ -102,7 +103,7 @@ class MicrosoftAuthProvider extends AuthProvider {
             'Properties': {
               'AuthMethod': 'RPS',
               'SiteName': 'user.auth.xboxlive.com',
-              'RpsTicket': 'd=${account.msAccessToken}'
+              'RpsTicket': '${account.msAccessToken}'
             },
             'RelyingParty': 'http://auth.xboxlive.com',
             'TokenType': 'JWT'
