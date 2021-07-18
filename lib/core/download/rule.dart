@@ -94,16 +94,34 @@ class FeatureSet {
       // Return true if the context is generic.
       return true;
     }
-    if (isDemoUser ?? false) {
-      return false; // Never use demo mode
+    List<bool> checks = [];
+    if (isDemoUser != null) {
+      if (isDemoUser!) {
+        if (account!.paid) {
+          checks.add(false);
+        }
+      } else {
+        if (!account!.paid) {
+          checks.add(false);
+        }
+      }
     }
-    if (profile != null &&
-        (hasCustomResolution ?? false) &&
-        (profile.resolutionWidth != null || profile.resolutionHeight != null)) {
-      // If we have a custom resolution, then apply it.
-      return true;
+
+    if (hasCustomResolution != null) {
+      if (hasCustomResolution!) {
+        if (profile!.resolutionWidth == null &&
+            profile.resolutionHeight == null) {
+          checks.add(false);
+        }
+      } else {
+        if (profile!.resolutionWidth != null ||
+            profile.resolutionHeight != null) {
+          checks.add(false);
+        }
+      }
     }
-    return false;
+
+    return checks.isEmpty;
   }
 
   factory FeatureSet.fromJson(Map<String, dynamic> json) =>
