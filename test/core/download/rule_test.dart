@@ -27,7 +27,54 @@ import 'rule_test.mocks.dart';
 
 @GenerateMocks([Account, Profile])
 void main() {
-  group('Rule', () {}); // TODO
+  group('Rule', () {
+    group('Allow if a demo account and Linux is available.', () {
+      test(
+          'Should be applicable if account is demo, resolution is custom, and OS is Linux.',
+          () {
+        final Rule rule = Rule(RuleAction.allow, FeatureSet(true, null),
+            OSInfo('linux', null, null));
+        final MockAccount account = MockAccount();
+        final MockProfile profile = MockProfile();
+        when(account.paid).thenReturn(false);
+        when(profile.resolutionWidth).thenReturn(1920);
+        when(profile.resolutionHeight).thenReturn(1080);
+        expect(
+            rule.customApplicable(account, profile, 'linux', 'x86_64', '5.13'),
+            true);
+      });
+
+      test(
+          'Shouldn\'t be applicable if account is demo, resolution is custom, and OS is Windows.',
+          () {
+        final Rule rule = Rule(RuleAction.allow, FeatureSet(true, null),
+            OSInfo('linux', null, null));
+        final MockAccount account = MockAccount();
+        final MockProfile profile = MockProfile();
+        when(account.paid).thenReturn(false);
+        when(profile.resolutionWidth).thenReturn(1920);
+        when(profile.resolutionHeight).thenReturn(1080);
+        expect(
+            rule.customApplicable(account, profile, 'windows', 'x86_64', '12'),
+            false);
+      });
+
+      test(
+          'Shouldn\'t be applicable if account is paid, resolution isn\'t custom, and OS is Linux',
+          () {
+        final Rule rule = Rule(RuleAction.allow, FeatureSet(true, null),
+            OSInfo('linux', null, null));
+        final MockAccount account = MockAccount();
+        final MockProfile profile = MockProfile();
+        when(account.paid).thenReturn(true);
+        when(profile.resolutionWidth).thenReturn(null);
+        when(profile.resolutionHeight).thenReturn(null);
+        expect(
+            rule.customApplicable(account, profile, 'linux', 'x86_64', '5.13'),
+            false);
+      });
+    });
+  });
 
   group('FeatureSet', () {
     group('Requiring both a demo account and a custom resolution.', () {
@@ -277,7 +324,6 @@ void main() {
   });
 
   group('OSInfo', () {
-    // TODO
     group('Requiring Windows, any architecture, and any version.', () {
       test('Should be applicable if OS is Windows.', () {
         final OSInfo os = OSInfo('windows', null, null);
