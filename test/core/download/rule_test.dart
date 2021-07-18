@@ -278,12 +278,54 @@ void main() {
 
   group('OSInfo', () {
     // TODO
-    group('Requiring Windows, any architecture, and any version.', () {});
+    group('Requiring Windows, any architecture, and any version.', () {
+      test('Should be applicable if OS is Windows.', () {
+        final OSInfo os = OSInfo('windows', null, null);
+        expect(os.customApplicable('windows', 'x86_64', '12'), true);
+      });
 
-    group('Requiring macOS, x86_64, and any version.', () {});
+      test('Shouldn\'t be applicable if OS is Linux.', () {
+        final OSInfo os = OSInfo('windows', null, null);
+        expect(os.customApplicable('linux', 'x86_64', '5.13'), false);
+      });
+    });
 
-    group('Requiring Linux, x86, and any version.', () {});
+    group('Requiring macOS, x86_64, and any version.', () {
+      test('Should be applicable if OS is macOS and arch is x86_64.', () {
+        final OSInfo os = OSInfo('osx', 'x86_64', null);
+        expect(os.customApplicable('osx', 'x86_64', '12'), true);
+      });
 
-    group('Requiring Windows, x86_64, and version /^10./', () {});
+      test('Shouldn\'t be applicable if OS is macOS and arch is arm64.', () {
+        final OSInfo os = OSInfo('osx', 'x86_64', null);
+        expect(os.customApplicable('osx', 'arm64', '12'), false);
+      });
+
+      test('Shouldn\'t be applicable if OS is Linux and arch is x86_64.', () {
+        final OSInfo os = OSInfo('osx', 'x86_64', null);
+        expect(os.customApplicable('linux', 'x86_64', '5.13'), false);
+      });
+
+      test('Shouldn\'t be applicable if OS is Linux and arch is arm64.', () {
+        final OSInfo os = OSInfo('osx', 'x86_64', null);
+        expect(os.customApplicable('linux', 'arm64', '5.13'), false);
+      });
+    });
+
+    group('Requiring Windows, x86_64, and version /^10\\./', () {
+      test(
+          'Should be applicable if OS is Windows, arch is x86_64 and version is 10.11.',
+          () {
+        final OSInfo os = OSInfo('windows', 'x86_64', '^10\\.');
+        expect(os.customApplicable('windows', 'x86_64', '10.11'), true);
+      });
+
+      test(
+          'Shouldn\'t be applicable if OS is Linux, arch is arm64 and version is 5.13.',
+          () {
+        final OSInfo os = OSInfo('windows', 'x86_64', '^10\\.');
+        expect(os.customApplicable('linux', 'arm64', '5.13'), false);
+      });
+    });
   });
 }
