@@ -142,21 +142,26 @@ class OSInfo {
         this.version = version;
 
   bool applicable() {
+    return customApplicable(
+        getOSName(),
+        SysInfo.kernelArchitecture.replaceAll('amd64', 'x86_64'),
+        Platform.operatingSystemVersion);
+  }
+
+  bool customApplicable(String osName, String osArch, String osVersion) {
     // Check for OS name applicability
-    bool nameApplicable = name == getOSName();
+    bool nameApplicable = name == osName;
 
     // Check for architecture compatibility
     bool architectureCompatible = true;
     if (arch != null) {
-      architectureCompatible = arch!.replaceAll('amd64', 'x86_64') ==
-          SysInfo.kernelArchitecture.replaceAll('amd64', 'x86_64');
+      architectureCompatible = arch!.replaceAll('amd64', 'x86_64') == osArch;
     }
 
     bool versionCompatible = true;
     // Check for version applicability
     if (version != null) {
-      versionCompatible =
-          RegExp(version!).hasMatch(Platform.operatingSystemVersion);
+      versionCompatible = RegExp(version!).hasMatch(osVersion);
     }
 
     return nameApplicable && architectureCompatible && versionCompatible;
