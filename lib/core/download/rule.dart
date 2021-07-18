@@ -60,10 +60,19 @@ class Rule {
   }
 
   /// Whether this rule is available according to the context.
-  applicable(Account? account, Profile? profile) {
+  bool applicable(Account? account, Profile? profile) {
     bool featuresCompatible =
         features != null ? features!.applicable(account, profile) : true;
     bool osCompatible = os != null ? os!.applicable() : true;
+    return featuresCompatible && osCompatible;
+  }
+
+  bool customApplicable(Account? account, Profile? profile, String osName,
+      String osArch, String osVersion) {
+    bool featuresCompatible =
+        features != null ? features!.applicable(account, profile) : true;
+    bool osCompatible =
+        os != null ? os!.customApplicable(osName, osArch, osVersion) : true;
     return featuresCompatible && osCompatible;
   }
 
