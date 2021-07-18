@@ -70,7 +70,7 @@ class Argument {
               profile.gameDirectory ?? config.workingDirectory)
           .replaceAll('\${assets_root}',
               '${config.workingDirectory}${Platform.pathSeparator}assets')
-          .replaceAll('\${game_assets',
+          .replaceAll('\${game_assets}',
               '${config.workingDirectory}${Platform.pathSeparator}assets')
           .replaceAll('\${assets_index_name}', data.assets)
           .replaceAll('\${auth_uuid}', account.uuid.replaceAll('-', ''))

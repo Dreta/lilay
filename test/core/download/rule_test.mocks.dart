@@ -30,68 +30,55 @@ class MockAccount extends _i1.Mock implements _i3.Account {
   String get username =>
       (super.noSuchMethod(Invocation.getter(#username), returnValue: '')
           as String);
-
   @override
   String get accessToken =>
       (super.noSuchMethod(Invocation.getter(#accessToken), returnValue: '')
           as String);
-
   @override
   String get profileName =>
       (super.noSuchMethod(Invocation.getter(#profileName), returnValue: '')
           as String);
-
   @override
   String get uuid =>
       (super.noSuchMethod(Invocation.getter(#uuid), returnValue: '') as String);
-
   @override
   String get type =>
       (super.noSuchMethod(Invocation.getter(#type), returnValue: '') as String);
-
   @override
   bool get requiresReauth => (super
           .noSuchMethod(Invocation.getter(#requiresReauth), returnValue: false)
       as bool);
-
   @override
   bool get selected =>
       (super.noSuchMethod(Invocation.getter(#selected), returnValue: false)
           as bool);
-
   @override
   bool get paid =>
       (super.noSuchMethod(Invocation.getter(#paid), returnValue: false)
           as bool);
-
   @override
   set selected(bool? sel) =>
       super.noSuchMethod(Invocation.setter(#selected, sel),
           returnValueForMissingStub: null);
-
   @override
   _i2.AuthProvider get authProvider =>
       (super.noSuchMethod(Invocation.getter(#authProvider),
           returnValue: _FakeAuthProvider()) as _i2.AuthProvider);
-
   @override
   _i4.Future<void> refresh(_i5.Client? client) =>
       (super.noSuchMethod(Invocation.method(#refresh, [client]),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future.value()) as _i4.Future<void>);
-
   @override
   _i4.Future<void> updatePaymentStatus(_i5.Client? client) =>
       (super.noSuchMethod(Invocation.method(#updatePaymentStatus, [client]),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future.value()) as _i4.Future<void>);
-
   @override
   _i4.Future<void> invalidate(_i5.Client? client) =>
       (super.noSuchMethod(Invocation.method(#invalidate, [client]),
           returnValue: Future<void>.value(),
           returnValueForMissingStub: Future.value()) as _i4.Future<void>);
-
   @override
   Map<String, dynamic> toJson() =>
       (super.noSuchMethod(Invocation.method(#toJson, []),
@@ -109,71 +96,57 @@ class MockProfile extends _i1.Mock implements _i6.Profile {
   @override
   String get name =>
       (super.noSuchMethod(Invocation.getter(#name), returnValue: '') as String);
-
   @override
   set name(String? _name) => super.noSuchMethod(Invocation.setter(#name, _name),
       returnValueForMissingStub: null);
-
   @override
   String get version =>
       (super.noSuchMethod(Invocation.getter(#version), returnValue: '')
           as String);
-
   @override
   set version(String? _version) =>
       super.noSuchMethod(Invocation.setter(#version, _version),
           returnValueForMissingStub: null);
-
   @override
   set gameDirectory(String? _gameDirectory) =>
       super.noSuchMethod(Invocation.setter(#gameDirectory, _gameDirectory),
           returnValueForMissingStub: null);
-
   @override
   set resolutionWidth(int? _resolutionWidth) =>
       super.noSuchMethod(Invocation.setter(#resolutionWidth, _resolutionWidth),
           returnValueForMissingStub: null);
-
   @override
   set resolutionHeight(int? _resolutionHeight) => super.noSuchMethod(
       Invocation.setter(#resolutionHeight, _resolutionHeight),
       returnValueForMissingStub: null);
-
   @override
   set javaExecutable(String? _javaExecutable) =>
       super.noSuchMethod(Invocation.setter(#javaExecutable, _javaExecutable),
           returnValueForMissingStub: null);
-
   @override
   String get jvmArguments =>
       (super.noSuchMethod(Invocation.getter(#jvmArguments), returnValue: '')
           as String);
-
   @override
   set jvmArguments(String? _jvmArguments) =>
       super.noSuchMethod(Invocation.setter(#jvmArguments, _jvmArguments),
           returnValueForMissingStub: null);
-
   @override
   String get gameArguments =>
       (super.noSuchMethod(Invocation.getter(#gameArguments), returnValue: '')
           as String);
-
   @override
   set gameArguments(String? _gameArguments) =>
       super.noSuchMethod(Invocation.setter(#gameArguments, _gameArguments),
           returnValueForMissingStub: null);
-
   @override
   bool get selected =>
       (super.noSuchMethod(Invocation.getter(#selected), returnValue: false)
           as bool);
-
   @override
   set selected(bool? _selected) =>
       super.noSuchMethod(Invocation.setter(#selected, _selected),
           returnValueForMissingStub: null);
-
   @override
   Map<String, dynamic> toJson() =>
       (super.noSuchMethod(Invocation.method(#toJson, []),
