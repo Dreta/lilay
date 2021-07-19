@@ -28,8 +28,15 @@ import 'package:logging/logging.dart';
 class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
   static const String MANIFEST_PATH = 'versions/version_manifest_v2.json';
 
-  VersionsDownloadTask({required String source, required String workingDir})
-      : super(source: source, dependency: null, workingDir: workingDir);
+  VersionsDownloadTask(
+      {required String source,
+      required String workingDir,
+      required Client client})
+      : super(
+            source: source,
+            dependency: null,
+            workingDir: workingDir,
+            client: client);
 
   /// Check if a version manifest already exist at the specified [workingDir].
   @override
@@ -65,7 +72,7 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
-      StreamedResponse resp = await request.send();
+      StreamedResponse resp = await client.send(request);
 
       resp.stream.handleError((error) {
         exceptionPhase = Phase.download;

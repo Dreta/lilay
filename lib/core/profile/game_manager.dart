@@ -21,6 +21,7 @@ import 'dart:io';
 
 import 'package:archive/archive.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/assets/asset.dart';
@@ -63,8 +64,11 @@ class GameManager {
   void startDownload() {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the version manifest.');
+    final Client client = Client();
     VersionsDownloadTask task = VersionsDownloadTask(
-        source: config.metaSource, workingDir: config.workingDirectory);
+        source: config.metaSource,
+        workingDir: config.workingDirectory,
+        client: client);
     this.task = Task.downloadManifest;
     subtitle = 'Versions Manifest';
     parent.notify();
@@ -76,6 +80,7 @@ class GameManager {
     });
     task.callbacks.add(() {
       if (task.exception != null) {
+        client.close();
         error =
             'An error occurred when downloading the version manifest:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})';
@@ -84,6 +89,7 @@ class GameManager {
     });
     task.callbacks.add(() async {
       if (task.result != null) {
+        client.close();
         await task.save();
         // Find from manifest
         for (VersionInfo version in task.result!.versions) {
@@ -103,7 +109,7 @@ class GameManager {
             if (await data.exists()) {
               try {
                 Map<String, dynamic> json =
-                    jsonDecode(await data.readAsString());
+                jsonDecode(await data.readAsString());
                 if (json.containsKey('type') &&
                     json['type'].toString().contains('old')) {
                   continue;
@@ -127,7 +133,7 @@ class GameManager {
         }
 
         error =
-            'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
+        'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
         parent.notify();
       }
     });
@@ -137,10 +143,12 @@ class GameManager {
   void downloadVersionData(VersionManifest manifest, VersionInfo info) {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the version data for ${profile.name}.');
+    final Client client = Client();
     VersionDownloadTask task = VersionDownloadTask(
         source: config.metaSource,
         dependency: info,
-        workingDir: config.workingDirectory);
+        workingDir: config.workingDirectory,
+        client: client);
     this.task = Task.downloadVersionData;
     subtitle = 'Version Data ${info.id}';
     parent.notify();
@@ -152,6 +160,7 @@ class GameManager {
     });
     task.callbacks.add(() {
       if (task.exception != null) {
+        client.close();
         error =
             'An error occurred when downloading the version data:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})';
@@ -160,6 +169,7 @@ class GameManager {
     });
     task.callbacks.add(() async {
       if (task.result != null) {
+        client.close();
         await task.save();
         data = task.result!;
         downloadVersionParent(manifest, task.result!);
@@ -173,11 +183,13 @@ class GameManager {
     Logger logger = GetIt.I.get<Logger>();
     if (data.inheritsFrom != null) {
       logger.info('Downloading the parent of version ${data.id}.');
+      Client client = Client();
       VersionParentDownloadTask task = VersionParentDownloadTask(
           source: config.metaSource,
           manifest: manifest,
           dependency: data,
-          workingDir: config.workingDirectory);
+          workingDir: config.workingDirectory,
+          client: client);
       this.task = Task.downloadVersionParent;
       subtitle = 'Parent ${data.inheritsFrom} of ${data.id}';
       parent.notify();
@@ -190,6 +202,7 @@ class GameManager {
       });
       task.callbacks.add(() {
         if (task.exception != null) {
+          client.close();
           error =
               'An error occurred when downloading the parent version:\n${task.exception.toString()} '
               '(Phase: ${task.exceptionPhase.toString()})';
@@ -198,6 +211,7 @@ class GameManager {
       });
       task.callbacks.add(() async {
         if (task.result != null) {
+          client.close();
           await task.save();
           downloadAssetsIndex(data);
           task.cancelled = true;
@@ -212,10 +226,12 @@ class GameManager {
   void downloadAssetsIndex(VersionData data) {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the assets index for ${profile.name}.');
+    final Client client = Client();
     AssetsIndexDownloadTask task = AssetsIndexDownloadTask(
         source: config.metaSource,
         dependency: data,
-        workingDir: config.workingDirectory);
+        workingDir: config.workingDirectory,
+        client: client);
     this.task = Task.downloadAssetsIndex;
     subtitle = 'Assets index ${data.assets}';
     parent.notify();
@@ -228,6 +244,7 @@ class GameManager {
     });
     task.callbacks.add(() {
       if (task.exception != null) {
+        client.close();
         error =
             'An error occurred when downloading the assets index:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})';
@@ -236,6 +253,7 @@ class GameManager {
     });
     task.callbacks.add(() async {
       if (task.result != null) {
+        client.close();
         await task.save();
         downloadAssets(data, task.result!);
         task.cancelled = true;
@@ -251,8 +269,9 @@ class GameManager {
     this.task = Task.downloadAssets;
     parent.notify();
     Iterator<MapEntry<String, Asset>> iterator = assets.entries.iterator;
+    final Client client = Client();
     if (iterator.moveNext()) {
-      _downloadAsset(data, iterator, 1, assets.length);
+      _downloadAsset(data, iterator, 1, assets.length, client);
     }
   }
 
@@ -260,7 +279,8 @@ class GameManager {
       VersionData data,
       Iterator<MapEntry<String, Asset>> iterator,
       int current,
-      int total) async {
+      int total,
+      Client client) async {
     Logger logger = GetIt.I.get<Logger>();
     MapEntry<String, Asset> asset = iterator.current;
     logger.fine('Downloading asset ${asset.key} for ${profile.name}.');
@@ -269,7 +289,8 @@ class GameManager {
     AssetDownloadTask task = AssetDownloadTask(
         source: config.assetsSource,
         dependency: asset.value,
-        workingDir: config.workingDirectory);
+        workingDir: config.workingDirectory,
+        client: client);
     task.callbacks.add(() {
       // We divide the progress into different parts.
       totalProgress = (5 / 16) +
@@ -288,8 +309,9 @@ class GameManager {
       if (task.result != null) {
         await task.save();
         if (iterator.moveNext()) {
-          _downloadAsset(data, iterator, current + 1, total);
+          _downloadAsset(data, iterator, current + 1, total, client);
         } else {
+          client.close();
           downloadLibraries(data);
         }
         task.cancelled = true;
@@ -306,20 +328,22 @@ class GameManager {
     parent.notify();
 
     Iterator<Library> iterator = data.libraries.iterator;
+    final Client client = Client();
     if (iterator.moveNext()) {
-      _downloadLibrary(data, iterator, 1, data.libraries.length);
+      _downloadLibrary(data, iterator, 1, data.libraries.length, client);
     }
   }
 
-  void _downloadLibrary(
-      VersionData data, Iterator<Library> iterator, int current, int total) {
+  void _downloadLibrary(VersionData data, Iterator<Library> iterator,
+      int current, int total, Client client) {
     Logger logger = GetIt.I.get<Logger>();
     Library library = iterator.current;
     logger.fine('Downloading library ${library.name}.');
     LibraryDownloadTask task = LibraryDownloadTask(
         source: config.librariesSource,
         dependency: library,
-        workingDir: config.workingDirectory);
+        workingDir: config.workingDirectory,
+        client: client);
     subtitle = library.name;
     parent.notify();
     task.callbacks.add(() {
@@ -340,8 +364,9 @@ class GameManager {
       if (task.result != null && task.resultNative != null) {
         await task.save();
         if (iterator.moveNext()) {
-          _downloadLibrary(data, iterator, current + 1, total);
+          _downloadLibrary(data, iterator, current + 1, total, client);
         } else {
+          client.close();
           downloadCore(data);
         }
         task.cancelled = true;
@@ -353,10 +378,12 @@ class GameManager {
   void downloadCore(VersionData data) {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading client (${data.id}) of ${profile.name}.');
+    final Client client = Client();
     CoreDownloadTask task = CoreDownloadTask(
         source: config.coreSource,
         dependency: data,
-        workingDir: config.workingDirectory);
+        workingDir: config.workingDirectory,
+        client: Client());
     this.task = Task.downloadCore;
     subtitle = '${data.id} client';
     parent.notify();
@@ -368,6 +395,7 @@ class GameManager {
     });
     task.callbacks.add(() {
       if (task.exception != null) {
+        client.close();
         error =
             'An error occurred when downloading the client (${data.id}) of ${profile.name}:'
             '\n${task.exception.toString()} (Phase: ${task.exceptionPhase.toString()})';
@@ -376,6 +404,7 @@ class GameManager {
     });
     task.callbacks.add(() async {
       if (task.result != null) {
+        client.close();
         await task.save();
         parent.notify();
       }

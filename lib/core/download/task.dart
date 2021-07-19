@@ -16,6 +16,8 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'package:http/http.dart';
+
 /// [DownloadTask] represents the basic structure for all the
 /// downloading in Lilay.
 ///
@@ -46,6 +48,9 @@ abstract class DownloadTask<D, R> {
   /// The result of this task.
   R? result;
 
+  /// The HTTP Client used for this task.
+  Client client;
+
   /// The working directory of this task.
   String workingDir;
 
@@ -56,7 +61,8 @@ abstract class DownloadTask<D, R> {
   DownloadTask(
       {required this.source,
       required this.dependency,
-      required this.workingDir});
+      required this.workingDir,
+      required this.client});
 
   /// Whether this task has been finished.
   bool get finished => progress >= 1;

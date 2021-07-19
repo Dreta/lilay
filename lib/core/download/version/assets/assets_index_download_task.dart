@@ -41,8 +41,13 @@ class AssetsIndexDownloadTask
   AssetsIndexDownloadTask(
       {required String source,
       required VersionData dependency,
-      required String workingDir})
-      : super(source: source, dependency: dependency, workingDir: workingDir);
+      required String workingDir,
+      required Client client})
+      : super(
+            source: source,
+            dependency: dependency,
+            workingDir: workingDir,
+            client: client);
 
   /// Check if the assets index already exist at the specified [workingDir],
   /// and that the hash matches.
@@ -89,7 +94,7 @@ class AssetsIndexDownloadTask
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
-      StreamedResponse resp = await request.send();
+      StreamedResponse resp = await client.send(request);
 
       resp.stream.handleError((error) {
         exceptionPhase = Phase.download;

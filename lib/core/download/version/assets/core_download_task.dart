@@ -35,8 +35,13 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
   CoreDownloadTask(
       {required String source,
       required VersionData dependency,
-      required String workingDir})
-      : super(source: source, dependency: dependency, workingDir: workingDir);
+      required String workingDir,
+      required Client client})
+      : super(
+            source: source,
+            dependency: dependency,
+            workingDir: workingDir,
+            client: client);
 
   /// Check if the client already exist at the specified [workingDir]
   /// and that the hash matches.

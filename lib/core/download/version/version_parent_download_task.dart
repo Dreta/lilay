@@ -19,6 +19,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:http/http.dart';
 import 'package:lilay/core/download/task.dart';
 import 'package:lilay/core/download/version/version_download_task.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
@@ -46,8 +47,13 @@ class VersionParentDownloadTask extends DownloadTask<VersionData, VersionData> {
       {required String source,
       required this.manifest,
       required VersionData dependency,
-      required String workingDir})
-      : super(source: source, dependency: dependency, workingDir: workingDir) {
+      required String workingDir,
+      required Client client})
+      : super(
+            source: source,
+            dependency: dependency,
+            workingDir: workingDir,
+            client: client) {
     assert(dependency.inheritsFrom != null);
   }
 
@@ -73,7 +79,10 @@ class VersionParentDownloadTask extends DownloadTask<VersionData, VersionData> {
     } else {
       // Found in version manifest. Construct a version download task for it.
       childTask = VersionDownloadTask(
-          source: source, dependency: info, workingDir: workingDir);
+          source: source,
+          dependency: info,
+          workingDir: workingDir,
+          client: client);
 
       // Order MATTERS! We must copy our properties before the callbacks can access them!
       childTask!.callbacks.add(() {

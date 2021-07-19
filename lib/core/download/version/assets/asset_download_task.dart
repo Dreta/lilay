@@ -32,8 +32,13 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
   AssetDownloadTask(
       {required String source,
       required Asset dependency,
-      required String workingDir})
-      : super(source: source, dependency: dependency, workingDir: workingDir);
+      required String workingDir,
+      required Client client})
+      : super(
+            source: source,
+            dependency: dependency,
+            workingDir: workingDir,
+            client: client);
 
   @override
   Future<bool> get tryLoadCache async {
@@ -69,7 +74,7 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
-      StreamedResponse resp = await request.send();
+      StreamedResponse resp = await client.send(request);
 
       resp.stream.handleError((error) {
         exceptionPhase = Phase.download;

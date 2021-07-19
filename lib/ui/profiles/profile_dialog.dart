@@ -22,6 +22,7 @@ import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/download/versions/latest_version.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
@@ -133,11 +134,15 @@ class _ProfileDialogState extends State<ProfileDialog> {
   void _loadVersions(BuildContext context) {
     final CoreConfig config = Provider.of<CoreConfig>(context);
 
+    final Client client = Client();
     task = VersionsDownloadTask(
-        source: config.metaSource, workingDir: config.workingDirectory);
+        source: config.metaSource,
+        workingDir: config.workingDirectory,
+        client: client);
     task.callbacks.add(() => setState(() => progress = task.progress));
     task.callbacks.add(() async {
       if (task.exception != null) {
+        client.close();
         // Construct our own version manifest from the downloaded versions
         setState(
             () => progress = null); // Make the loading indicator indeterminate
@@ -149,8 +154,8 @@ class _ProfileDialogState extends State<ProfileDialog> {
         // Sort and determine the latest version
         versionObjs.sort((a, b) =>
             (a.releaseTime != null && b.releaseTime != null
-                ? a.releaseTime!.compareTo(b.releaseTime!)
-                : -1));
+            ? a.releaseTime!.compareTo(b.releaseTime!)
+            : -1));
         String? latestRelease;
         String? latestSnapshot;
         for (VersionInfo version in versionObjs.reversed) {
@@ -164,7 +169,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
           }
         }
         LatestVersion latest =
-            LatestVersion(latestRelease ?? '', latestSnapshot ?? '');
+        LatestVersion(latestRelease ?? '', latestSnapshot ?? '');
 
         // Create the manifest
         setState(() {
@@ -178,6 +183,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
     });
     task.callbacks.add(() async {
       if (task.result != null) {
+        client.close();
         task.save();
         List<VersionInfo> versionInfos =
             await getAvailableVersionInfos(config.workingDirectory).toList();

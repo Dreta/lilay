@@ -39,8 +39,13 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   VersionDownloadTask(
       {required String source,
       required VersionInfo dependency,
-      required String workingDir})
-      : super(source: source, dependency: dependency, workingDir: workingDir);
+      required String workingDir,
+      required Client client})
+      : super(
+            source: source,
+            dependency: dependency,
+            workingDir: workingDir,
+            client: client);
 
   /// Check if the version metadata already exist at the specified [workingDir].
   @override
@@ -74,7 +79,7 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
-      StreamedResponse resp = await request.send();
+      StreamedResponse resp = await client.send(request);
 
       resp.stream.handleError((error) {
         exceptionPhase = Phase.download;
