@@ -154,8 +154,8 @@ class _ProfileDialogState extends State<ProfileDialog> {
         // Sort and determine the latest version
         versionObjs.sort((a, b) =>
             (a.releaseTime != null && b.releaseTime != null
-            ? a.releaseTime!.compareTo(b.releaseTime!)
-            : -1));
+                ? a.releaseTime!.compareTo(b.releaseTime!)
+                : -1));
         String? latestRelease;
         String? latestSnapshot;
         for (VersionInfo version in versionObjs.reversed) {
@@ -169,7 +169,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
           }
         }
         LatestVersion latest =
-        LatestVersion(latestRelease ?? '', latestSnapshot ?? '');
+            LatestVersion(latestRelease ?? '', latestSnapshot ?? '');
 
         // Create the manifest
         setState(() {

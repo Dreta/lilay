@@ -109,7 +109,7 @@ class GameManager {
             if (await data.exists()) {
               try {
                 Map<String, dynamic> json =
-                jsonDecode(await data.readAsString());
+                    jsonDecode(await data.readAsString());
                 if (json.containsKey('type') &&
                     json['type'].toString().contains('old')) {
                   continue;
@@ -133,7 +133,7 @@ class GameManager {
         }
 
         error =
-        'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
+            'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
         parent.notify();
       }
     });
