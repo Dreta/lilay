@@ -85,7 +85,7 @@ class GameManager {
       if (task.exception != null) {
         client.close();
         error =
-        'An error occurred when downloading the version manifest:\n${task.exception.toString()} '
+            'An error occurred when downloading the version manifest:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})';
         parent.notify();
       }
@@ -112,7 +112,7 @@ class GameManager {
             if (await data.exists()) {
               try {
                 Map<String, dynamic> json =
-                jsonDecode(await data.readAsString());
+                    jsonDecode(await data.readAsString());
                 if (json.containsKey('type') &&
                     json['type'].toString().contains('old')) {
                   continue;
@@ -136,7 +136,7 @@ class GameManager {
         }
 
         error =
-        'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
+            'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
         parent.notify();
       }
     });
@@ -450,7 +450,7 @@ class GameManager {
               '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
           try {
             Archive archive =
-            ZipDecoder().decodeBytes(await target.readAsBytes());
+                ZipDecoder().decodeBytes(await target.readAsBytes());
             for (ArchiveFile file in archive.files) {
               if (file.name.toLowerCase().contains('meta') ||
                   file.name.toLowerCase().contains('manifest')) {

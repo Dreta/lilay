@@ -381,8 +381,8 @@ class _ProfileDialogState extends State<ProfileDialog> {
             suffixIcon: IconButton(
                 onPressed: () async {
                   FilePickerCross file =
-                  await FilePickerCross.importFromStorage(
-                      type: FileTypeCross.any);
+                      await FilePickerCross.importFromStorage(
+                          type: FileTypeCross.any);
                   if (file.path == null) {
                     _javaExec.text = '';
                     return;

@@ -69,7 +69,7 @@ class AssetsIndexDownloadTask
       if (available) {
         // Convert the JSON into map of assets
         Map<String, dynamic> assetsJson =
-        jsonDecode(await file.readAsString())['objects'];
+            jsonDecode(await file.readAsString())['objects'];
         result = {};
         for (MapEntry<String, dynamic> asset in assetsJson.entries) {
           result![asset.key] = Asset.fromJson(asset.value);

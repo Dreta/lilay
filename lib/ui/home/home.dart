@@ -57,9 +57,9 @@ class Homepage extends StatelessWidget {
 
     return Scaffold(
         floatingActionButton:
-        profiles.selected != null && accounts.selectedAccount != null
-            ? LaunchButton()
-            : null,
+            profiles.selected != null && accounts.selectedAccount != null
+                ? LaunchButton()
+                : null,
         body: Container(
             decoration: BoxDecoration(
                 image: DecorationImage(image: background, fit: BoxFit.cover)),
@@ -67,14 +67,14 @@ class Homepage extends StatelessWidget {
               NavigationDrawer(),
               Expanded(
                   child: Stack(children: [
-                    AnimatedScreen(
-                        screenType: ScreenType.accounts, child: AccountsScreen()),
-                    AnimatedScreen(
-                        screenType: ScreenType.profiles, child: ProfilesScreen()),
-                    AnimatedScreen(
-                        screenType: ScreenType.configuration,
-                        child: ConfigurationScreen())
-                  ]))
+                AnimatedScreen(
+                    screenType: ScreenType.accounts, child: AccountsScreen()),
+                AnimatedScreen(
+                    screenType: ScreenType.profiles, child: ProfilesScreen()),
+                AnimatedScreen(
+                    screenType: ScreenType.configuration,
+                    child: ConfigurationScreen())
+              ]))
             ])));
   }
 }
