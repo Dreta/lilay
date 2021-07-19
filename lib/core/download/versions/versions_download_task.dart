@@ -47,7 +47,7 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
     try {
       // Check Internet connectivity
       // If Internet is available , we make sure we download a newer version.
-      Request('GET', Uri.parse('https://example.org')).send();
+      client.send(Request('GET', Uri.parse('https://example.org')));
       return false;
     } catch (e) {
       exceptionPhase = Phase.loadCache;
