@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
@@ -53,8 +54,10 @@ class AssetsIndexDownloadTask
   /// and that the hash matches.
   @override
   Future<bool> get tryLoadCache async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File file = File(
+      File file = fs.file(
           '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
       bool available = (await file.exists()) && // Verify checksum and size
           (dependency.assetIndex!.sha1.toLowerCase() ==
@@ -66,7 +69,7 @@ class AssetsIndexDownloadTask
       if (available) {
         // Convert the JSON into map of assets
         Map<String, dynamic> assetsJson =
-            jsonDecode(await file.readAsString())['objects'];
+        jsonDecode(await file.readAsString())['objects'];
         result = {};
         for (MapEntry<String, dynamic> asset in assetsJson.entries) {
           result![asset.key] = Asset.fromJson(asset.value);
@@ -154,8 +157,10 @@ class AssetsIndexDownloadTask
 
   @override
   Future<void> save() async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File local = File(
+      File local = fs.file(
           '$workingDir${Platform.pathSeparator}${ASSETS_INDEX_PATH.replaceAll('{type}', dependency.assets)}');
       await local.parent.create(recursive: true);
       await local.writeAsString(jsonEncode({

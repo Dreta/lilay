@@ -19,6 +19,7 @@
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
@@ -47,8 +48,10 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
   /// and that the hash matches.
   @override
   Future<bool> get tryLoadCache async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File file = File(
+      File file = fs.file(
           '$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', dependency.id)}');
       bool available = ((await file.exists()) &&
               (dependency.downloads.client!.sha1.toLowerCase() ==
@@ -133,8 +136,10 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
 
   @override
   Future<void> save() async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File local = File(
+      File local = fs.file(
           '$workingDir${Platform.pathSeparator}${CLIENT_PATH.replaceAll('{version}', dependency.id)}');
       await local.parent.create(recursive: true);
       await local.writeAsBytes(result!);

@@ -19,6 +19,7 @@
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
@@ -57,6 +58,8 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
 
   @override
   Future<bool> get tryLoadCache async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
       // Attempt to load the artifact first.
       // Handle two cases: the vanilla case with [dependency.downloads] or the
@@ -71,7 +74,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       } else {
         if (dependency.downloads != null) {
           // If the hash and the path is specified, use them.
-          artifact = File(
+          artifact = fs.file(
               '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads!.artifact!.path!)}');
           artifactAvailable = (await artifact.exists()) &&
               (dependency.downloads!.artifact!.sha1.toLowerCase() ==
@@ -84,7 +87,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
           // If the hash and the path aren't available, extract them from
           // the artifact name and the hash URL.
           Artifact artif = Artifact(dependency.name);
-          artifact = File(artif.path(workingDir));
+          artifact = fs.file(artif.path(workingDir));
 
           // Fetch SHA-1 hash of this artifact
           Response hashResp =
@@ -118,7 +121,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
 
       // If a native is available, then the hash and path will always be
       // available. Check for that.
-      File nativeFile = File(
+      File nativeFile = fs.file(
           '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', native.path!)}');
       bool nativeAvailable = (await nativeFile.exists()) &&
           (native.sha1.toLowerCase() ==
@@ -350,16 +353,18 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
 
   @override
   Future<void> save() async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
       if (result!.isNotEmpty) {
-        File local = File(
+        File local = fs.file(
             '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.downloads == null ? Artifact(dependency.name).path(workingDir) : dependency.downloads!.artifact!.path!)}');
         await local.parent.create(recursive: true);
         await local.writeAsBytes(result!);
       }
 
       if (resultNative!.isNotEmpty) {
-        File local = File(
+        File local = fs.file(
             '$workingDir${Platform.pathSeparator}${LIBRARY_PATH.replaceAll('{path}', dependency.platformNative!.path!)}');
         await local.parent.create(recursive: true);
         await local.writeAsBytes(resultNative!);

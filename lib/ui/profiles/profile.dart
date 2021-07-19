@@ -16,8 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-
+import 'package:file/file.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/profile/profile.dart';
@@ -49,7 +48,7 @@ class ProfileWidget extends StatelessWidget {
       screen.current = ScreenType.home;
     } else if (profile.selected) {
       profile.selected = false;
-      for (Profile prof in profiles.profiles) {
+      for (Profile prof in profiles.profiles.values) {
         if (profile != prof) {
           prof.selected = true;
           profiles.selected = prof;
@@ -57,7 +56,7 @@ class ProfileWidget extends StatelessWidget {
         }
       }
     }
-    profiles.removeProfile(profile);
+    profiles.removeProfile(profile.id);
     profiles.saveTo(GetIt.I.get<File>(instanceName: 'profilesDB'));
   }
 
@@ -95,7 +94,7 @@ class ProfileWidget extends StatelessWidget {
           : ScreenType.profiles;
     } else if (showActions) {
       onTapAction = () {
-        for (Profile profile in profiles.profiles) {
+        for (Profile profile in profiles.profiles.values) {
           profile.selected = false;
         }
         profile.selected = true;

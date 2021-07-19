@@ -19,6 +19,7 @@
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/download/assets/asset.dart';
@@ -42,8 +43,10 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
 
   @override
   Future<bool> get tryLoadCache async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File file = File(
+      File file = fs.file(
           '$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', dependency.hash.substring(0, 2)).replaceAll('{hash2}', dependency.hash)}');
       bool available =
           (await file.exists()) && // Verify the checksum and the size
@@ -124,8 +127,10 @@ class AssetDownloadTask extends DownloadTask<Asset, List<int>> {
 
   @override
   Future<void> save() async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File local = File(
+      File local = fs.file(
           '$workingDir${Platform.pathSeparator}${ASSET_PATH.replaceAll('{hash1}', dependency.hash.substring(0, 2)).replaceAll('{hash2}', dependency.hash)}');
       await local.parent.create(recursive: true);
       await local.writeAsBytes(result!);

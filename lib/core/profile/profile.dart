@@ -25,6 +25,7 @@ class Profile {
   static const String DEFAULT_JVM_ARGUMENTS =
       '-Xmx4G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
 
+  int id;
   String name;
 
   /// [VersionData#id]
@@ -41,6 +42,7 @@ class Profile {
   bool selected;
 
   Profile(
+      int id,
       String name,
       String version,
       String? gameDirectory,
@@ -50,7 +52,8 @@ class Profile {
       String? jvmArguments,
       String? gameArguments,
       bool? selected)
-      : this.name = name,
+      : this.id = id,
+        this.name = name,
         this.version = version,
         this.gameDirectory = gameDirectory,
         this.resolutionWidth = resolutionWidth,

@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:archive/archive.dart';
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/auth/account.dart';
@@ -62,6 +63,8 @@ class GameManager {
   VersionData? data; // The downloaded version data for use later.
 
   void startDownload() {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the version manifest.');
     final Client client = Client();
@@ -82,7 +85,7 @@ class GameManager {
       if (task.exception != null) {
         client.close();
         error =
-            'An error occurred when downloading the version manifest:\n${task.exception.toString()} '
+        'An error occurred when downloading the version manifest:\n${task.exception.toString()} '
             '(Phase: ${task.exceptionPhase.toString()})';
         parent.notify();
       }
@@ -100,16 +103,16 @@ class GameManager {
           }
         }
         // Use local version
-        Directory versions = Directory(
+        Directory versions = fs.directory(
             '${config.workingDirectory}${Platform.pathSeparator}versions');
         await for (FileSystemEntity directory in versions.list()) {
           if (directory is Directory) {
-            File data = File(join(
+            File data = fs.file(join(
                 directory.absolute.path, '${basename(directory.path)}.json'));
             if (await data.exists()) {
               try {
                 Map<String, dynamic> json =
-                    jsonDecode(await data.readAsString());
+                jsonDecode(await data.readAsString());
                 if (json.containsKey('type') &&
                     json['type'].toString().contains('old')) {
                   continue;
@@ -133,7 +136,7 @@ class GameManager {
         }
 
         error =
-            'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
+        'An error occurred when finding the version:\nCan\'t find version ${profile.version}.';
         parent.notify();
       }
     });
@@ -163,7 +166,7 @@ class GameManager {
         client.close();
         error =
             'An error occurred when downloading the version data:\n${task.exception.toString()} '
-            '(Phase: ${task.exceptionPhase.toString()})';
+            '(Phailese: ${task.exceptionPhase.toString()})';
         parent.notify();
       }
     });
@@ -416,6 +419,8 @@ class GameManager {
       {required this.profile, required this.config, required this.parent});
 
   void startGame(VersionData data, Account account) async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     Logger logger = GetIt.I.get<Logger>();
     this.task = Task.start;
     parent.status = LaunchStatus.started;
@@ -423,7 +428,7 @@ class GameManager {
     logger.info('Starting game ${data.id} from profile ${profile.name}.');
 
     logger.info('Setting up the temporary native directory.');
-    Directory natives = Directory(
+    Directory natives = fs.directory(
         '${getTempDirectory()}${Platform.pathSeparator}lilayntvs-${getRandomString(8)}');
     logger.info('Natives directory available at ${natives.path}.');
     await natives.create();
@@ -431,7 +436,7 @@ class GameManager {
       if (Rule.multiRulesApplicable(library.rules, account, profile)) {
         FriendlyDownload? native = library.platformNative;
         if (native != null) {
-          File file = File(
+          File file = fs.file(
               '${config.workingDirectory}${Platform.pathSeparator}libraries${Platform.pathSeparator}${native.path}');
           if (!await file.exists()) {
             error = 'Can\'t find required native at ${native.path}.';
@@ -441,18 +446,18 @@ class GameManager {
           await file.copy(
               '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
 
-          File target = File(
+          File target = fs.file(
               '${natives.path}${Platform.pathSeparator}${basename(file.path)}');
           try {
             Archive archive =
-                ZipDecoder().decodeBytes(await target.readAsBytes());
+            ZipDecoder().decodeBytes(await target.readAsBytes());
             for (ArchiveFile file in archive.files) {
               if (file.name.toLowerCase().contains('meta') ||
                   file.name.toLowerCase().contains('manifest')) {
                 continue; // Hardcode files that shouldn't be extracted
               }
               if (file.isFile) {
-                File unzip = File(
+                File unzip = fs.file(
                     '${natives.path}${Platform.pathSeparator}${file.name}');
                 await unzip.parent.create(recursive: true);
                 await unzip.writeAsBytes(file.content);

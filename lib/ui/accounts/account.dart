@@ -18,6 +18,7 @@
 
 import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
@@ -74,7 +75,8 @@ class _AccountWidgetState extends State<AccountWidget> {
       : _account = account,
         _openScreen = openScreen,
         _showActions = showActions {
-    _cachedSkinPath = File(
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+    _cachedSkinPath = fs.file(
         '${GetIt.I.get<Directory>(instanceName: 'cache').absolute.path}${Platform.pathSeparator}${_account.uuid}.png');
 
     if (account.authProvider.requiresPayment && account.paid) {

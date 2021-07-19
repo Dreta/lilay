@@ -17,9 +17,10 @@
  */
 
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:lilay/core/configuration/core/types.dart';
 import 'package:lilay/utils.dart';
@@ -30,7 +31,8 @@ part 'core_config.g.dart';
 @JsonSerializable(explicitToJson: true)
 class CoreConfig extends ChangeNotifier {
   /// This is where the core config will be loaded from.
-  static final File defaultCoreConfig = File('config.json');
+  static final File defaultCoreConfig =
+      GetIt.I.get<FileSystem>().file('config.json');
 
   static const String DEFAULT_META_SOURCE = 'https://launchermeta.mojang.com';
   static const String DEFAULT_ASSETS_SOURCE =

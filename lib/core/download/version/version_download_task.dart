@@ -19,6 +19,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
@@ -50,8 +51,10 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
   /// Check if the version metadata already exist at the specified [workingDir].
   @override
   Future<bool> get tryLoadCache async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File file = File(
+      File file = fs.file(
           '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
       if (await file.exists()) {
         result = VersionData.fromJson(jsonDecode(await file.readAsString()));
@@ -112,8 +115,10 @@ class VersionDownloadTask extends DownloadTask<VersionInfo, VersionData> {
 
   @override
   Future<void> save() async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File local = File(
+      File local = fs.file(
           '$workingDir${Platform.pathSeparator}${VERSION_PATH.replaceAll('{version}', dependency.id)}');
       await local.parent.create(recursive: true);
       await local.writeAsString(jsonEncode(result!.toJson()));

@@ -16,9 +16,9 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-
+import 'package:file/file.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:lilay/core/configuration/core/core_config.dart';
 import 'package:lilay/core/configuration/core/types.dart';
 import 'package:lilay/ui/accounts/accounts_provider.dart';
@@ -38,14 +38,14 @@ import 'package:provider/provider.dart';
 class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
     final CoreConfig config = Provider.of<CoreConfig>(context);
-    final ScreenProvider screen = Provider.of<ScreenProvider>(context);
     final AccountsProvider accounts = Provider.of<AccountsProvider>(context);
     final ProfilesProvider profiles = Provider.of<ProfilesProvider>(context);
 
     ImageProvider background;
     if (config.backgroundType == BackgroundType.custom) {
-      File file = File(config.backgroundImage!);
+      File file = fs.file(config.backgroundImage!);
       if (!file.existsSync()) {
         background = AssetImage('assets/background.png');
       } else {
@@ -57,9 +57,9 @@ class Homepage extends StatelessWidget {
 
     return Scaffold(
         floatingActionButton:
-            profiles.selected != null && accounts.selectedAccount != null
-                ? LaunchButton()
-                : null,
+        profiles.selected != null && accounts.selectedAccount != null
+            ? LaunchButton()
+            : null,
         body: Container(
             decoration: BoxDecoration(
                 image: DecorationImage(image: background, fit: BoxFit.cover)),
@@ -67,14 +67,14 @@ class Homepage extends StatelessWidget {
               NavigationDrawer(),
               Expanded(
                   child: Stack(children: [
-                AnimatedScreen(
-                    screenType: ScreenType.accounts, child: AccountsScreen()),
-                AnimatedScreen(
-                    screenType: ScreenType.profiles, child: ProfilesScreen()),
-                AnimatedScreen(
-                    screenType: ScreenType.configuration,
-                    child: ConfigurationScreen())
-              ]))
+                    AnimatedScreen(
+                        screenType: ScreenType.accounts, child: AccountsScreen()),
+                    AnimatedScreen(
+                        screenType: ScreenType.profiles, child: ProfilesScreen()),
+                    AnimatedScreen(
+                        screenType: ScreenType.configuration,
+                        child: ConfigurationScreen())
+                  ]))
             ])));
   }
 }

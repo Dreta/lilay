@@ -17,8 +17,8 @@
  */
 
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/profile/profile.dart';
@@ -27,18 +27,15 @@ import 'package:logging/logging.dart';
 /// Provides the currently loaded profiles as a
 /// globally accessible state.
 class ProfilesProvider extends ChangeNotifier {
-  // FIXME Updates on a profile object won't affect the identical object that's available in
-  //       [_selected]. Issues with the reference
+  final Map<int, Profile> _profiles = {};
+  int? _selected;
 
-  final List<Profile> _profiles = [];
-  Profile? _selected;
+  Profile? get selected => _selected == null ? null : _profiles[_selected!];
 
-  Profile? get selected => _selected;
-
-  List<Profile> get profiles => _profiles;
+  Map<int, Profile> get profiles => _profiles;
 
   set selected(Profile? selected) {
-    _selected = selected;
+    _selected = selected?.id;
     notifyListeners();
   }
 
@@ -53,9 +50,9 @@ class ProfilesProvider extends ChangeNotifier {
       Profile profile = Profile.fromJson(prof as Map<String, dynamic>);
       logger.info('Loaded profile ${profile.name} (${profile.version}).');
       if (profile.selected) {
-        _selected = profile;
+        _selected = profile.id;
       }
-      _profiles.add(profile);
+      _profiles[profile.id] = profile;
     }
     notifyListeners();
   }
@@ -64,7 +61,7 @@ class ProfilesProvider extends ChangeNotifier {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Saving profiles to ${file.path}.');
     List<Map<String, dynamic>> json = [];
-    for (Profile profile in _profiles) {
+    for (Profile profile in _profiles.values) {
       json.add(profile.toJson());
     }
     await file.writeAsString(jsonEncode(_profiles));
@@ -74,12 +71,26 @@ class ProfilesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Adds the profile to the map of profiles.
+  ///
+  /// Sets the ID to the maximum ID + 1 if the ID is -1.
+  /// This must be called BEFORE saving the profile.
   void addProfile(Profile profile) {
-    _profiles.add(profile);
+    if (profile.id == -1) {
+      int max = -1;
+      for (int id in profiles.keys) {
+        if (id > max) {
+          max = id;
+        }
+      }
+      profile.id = max;
+    }
+
+    _profiles[profile.id] = profile;
     notifyListeners();
   }
 
-  void removeProfile(Profile profile) {
+  void removeProfile(int profile) {
     _profiles.remove(profile);
     notifyListeners();
   }

@@ -19,6 +19,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/download/task.dart';
@@ -41,6 +42,8 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
   /// Check if a version manifest already exist at the specified [workingDir].
   @override
   Future<bool> get tryLoadCache async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
       // Check Internet connectivity
       // If Internet is available , we make sure we download a newer version.
@@ -51,7 +54,7 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
       exception = e;
       notify();
       // Use the cache when we must
-      File file = File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
+      File file = fs.file('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
       if (await file.exists()) {
         result =
             VersionManifest.fromJson(jsonDecode(await file.readAsString()));
@@ -106,8 +109,11 @@ class VersionsDownloadTask extends DownloadTask<void, VersionManifest> {
 
   @override
   Future<void> save() async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
-      File local = File('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
+      File local =
+          fs.file('$workingDir${Platform.pathSeparator}$MANIFEST_PATH');
       await local.parent.create(recursive: true);
       await local.writeAsString(jsonEncode(result!.toJson()));
     } catch (e) {

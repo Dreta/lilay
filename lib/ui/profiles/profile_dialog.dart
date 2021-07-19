@@ -16,8 +16,7 @@
  * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import 'dart:io';
-
+import 'package:file/file.dart';
 import 'package:file_picker_cross/file_picker_cross.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_dialog/flutter_animated_dialog.dart';
@@ -65,8 +64,8 @@ class _ProfileDialogState extends State<ProfileDialog> {
 
   _ProfileDialogState({required this.type, Profile? profile})
       : this.profile = profile ??
-            Profile('', '', null, null, null, null,
-                Profile.DEFAULT_JVM_ARGUMENTS, null, null);
+            Profile(-1 /* To be set later in ProfilesProvider */, '', '', null,
+                null, null, null, Profile.DEFAULT_JVM_ARGUMENTS, null, null);
 
   bool loaded = false;
   double? progress = 0;
@@ -283,6 +282,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
 
   /// Create the game directory text field
   Widget _buildGameDirectoryField(BuildContext context) {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
     final ThemeData theme = Theme.of(context);
 
     return TextFormField(
@@ -292,7 +292,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
         validator: (value) {
           if (value == null || value.isEmpty) return null;
           try {
-            Directory(value);
+            fs.directory(value);
           } catch (e) {
             return 'Invalid path';
           }
@@ -354,6 +354,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
 
   /// Create the Java executable field
   Widget _buildJavaExecField(BuildContext context) {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
     final ThemeData theme = Theme.of(context);
 
     return TextFormField(
@@ -362,7 +363,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
         validator: (value) {
           if (value == null || value.isEmpty) return null;
           try {
-            File file = File(value);
+            File file = fs.file(value);
             if (!file.existsSync()) {
               return 'Can\'t find this executable';
             }
@@ -380,8 +381,8 @@ class _ProfileDialogState extends State<ProfileDialog> {
             suffixIcon: IconButton(
                 onPressed: () async {
                   FilePickerCross file =
-                      await FilePickerCross.importFromStorage(
-                          type: FileTypeCross.any);
+                  await FilePickerCross.importFromStorage(
+                      type: FileTypeCross.any);
                   if (file.path == null) {
                     _javaExec.text = '';
                     return;

@@ -8,6 +8,7 @@ part of 'profile.dart';
 
 Profile _$ProfileFromJson(Map<String, dynamic> json) {
   return Profile(
+    json['id'] as int,
     json['name'] as String,
     json['version'] as String,
     json['gameDirectory'] as String?,
@@ -20,7 +21,9 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
+Map<String, dynamic> _$ProfileToJson(Profile instance) =>
+    <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'version': instance.version,
       'gameDirectory': instance.gameDirectory,

@@ -19,6 +19,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file/file.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:lilay/core/download/task.dart';
 import 'package:lilay/core/download/version/version_download_task.dart';
@@ -139,9 +141,11 @@ class VersionParentDownloadTask extends DownloadTask<VersionData, VersionData> {
 
   @override
   Future<void> save() async {
+    final FileSystem fs = GetIt.I.get<FileSystem>();
+
     try {
       // Save the parent file.
-      File local = File(
+      File local = fs.file(
           '$workingDir${Platform.pathSeparator}${VersionDownloadTask.VERSION_PATH.replaceAll('{version}', dependency.inheritsFrom!)}');
       await local.parent.create(recursive: true);
       await local.writeAsString(jsonEncode(result!.toJson()));

@@ -2,26 +2,8 @@
 // Unfortunately the file_picker_cross library is not null-safe,
 // and I don't think there's an alternative for it.
 
-/*
- * Lilay is a custom Minecraft launcher.
- * Copyright (c) 2021 Gabriel Leen / Dreta
- *
- * Lilay is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Lilay is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Lilay.  If not, see <https://www.gnu.org/licenses/>.
- */
-
-import 'dart:io';
-
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -52,6 +34,8 @@ void main() async {
   });
   GetIt.I.registerSingleton<Logger>(logger);
 
+  FileSystem fs = const LocalFileSystem();
+  GetIt.I.registerSingleton<FileSystem>(fs);
   GetIt.I.registerSingleton<String>('1.0.0', instanceName: 'version');
   GetIt.I.registerSingleton<DateTime>(DateTime(2013, 10, 25, 13),
       instanceName: 'minimumSupport');
@@ -77,21 +61,21 @@ void main() async {
   Account.accountFactories['microsoft'] = MicrosoftAccount.fromJson;
 
   logger.info('Setting up cache directory.');
-  Directory cacheDirectory = Directory('cache');
+  Directory cacheDirectory = fs.directory('cache');
   GetIt.I.registerSingleton<Directory>(cacheDirectory, instanceName: 'cache');
   if (!cacheDirectory.existsSync()) {
     cacheDirectory.createSync();
   }
 
   logger.info('Loading accounts.');
-  GetIt.I.registerSingleton<File>(File('accounts.json'),
+  GetIt.I.registerSingleton<File>(fs.file('accounts.json'),
       instanceName: 'accountsDB');
 
   final AccountsProvider accounts = AccountsProvider();
   accounts.loadFrom(GetIt.I.get<File>(instanceName: 'accountsDB'));
 
   logger.info('Loading profiles.');
-  GetIt.I.registerSingleton<File>(File('profiles.json'),
+  GetIt.I.registerSingleton<File>(fs.file('profiles.json'),
       instanceName: 'profilesDB');
 
   final ProfilesProvider profiles = ProfilesProvider();

@@ -31,7 +31,7 @@ class ProfilesScreen extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Screen(title: 'Profiles', children: [
-      for (Profile profile in profiles.profiles)
+      for (Profile profile in profiles.profiles.values)
         Container(
             margin: const EdgeInsets.only(bottom: 14),
             decoration: BoxDecoration(

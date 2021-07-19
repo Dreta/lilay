@@ -94,11 +94,21 @@ class MockProfile extends _i1.Mock implements _i6.Profile {
   }
 
   @override
+  int get id =>
+      (super.noSuchMethod(Invocation.getter(#id), returnValue: 0) as int);
+
+  @override
+  set id(int? _id) => super.noSuchMethod(Invocation.setter(#id, _id),
+      returnValueForMissingStub: null);
+
+  @override
   String get name =>
       (super.noSuchMethod(Invocation.getter(#name), returnValue: '') as String);
+
   @override
   set name(String? _name) => super.noSuchMethod(Invocation.setter(#name, _name),
       returnValueForMissingStub: null);
+
   @override
   String get version =>
       (super.noSuchMethod(Invocation.getter(#version), returnValue: '')
