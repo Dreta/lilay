@@ -73,7 +73,7 @@ class VersionParentDownloadTask extends DownloadTask<VersionData, VersionData> {
       await for (VersionData version in getAvailableVersions(workingDir)) {
         if (version.id == dependency.inheritsFrom) {
           local = version;
-          break;
+          return;
         }
       }
       throw Exception(
