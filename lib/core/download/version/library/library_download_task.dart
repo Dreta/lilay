@@ -165,10 +165,10 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
 
     result = null;
     resultNative = null;
-    _downloadArtifact();
+    downloadArtifact();
   }
 
-  Future<void> _downloadArtifact() async {
+  Future<void> downloadArtifact() async {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the artifact of library ${dependency.name}.');
 
@@ -177,7 +177,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
       logger
           .info('There is no artifact for this library. Skipping to natives.');
       result = [];
-      return await _downloadNative();
+      return await downloadNative();
     }
 
     if ((dependency.downloads == null && dependency.url!.isEmpty) ||
@@ -185,7 +185,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
             dependency.downloads!.artifact!.url.isEmpty)) {
       logger.info('The URL for this artifact is empty. Skipping to natives.');
       result = [];
-      return await _downloadNative();
+      return await downloadNative();
     }
 
     Artifact artifact = Artifact(dependency.name);
@@ -262,7 +262,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
           result = receivedBytes;
           notify();
 
-          _downloadNative();
+          downloadNative();
         }
       });
     } catch (e) {
@@ -272,7 +272,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
     }
   }
 
-  Future<void> _downloadNative() async {
+  Future<void> downloadNative() async {
     Logger logger = GetIt.I.get<Logger>();
     logger.info('Downloading the native of library ${dependency.name}.');
 
