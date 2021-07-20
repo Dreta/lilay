@@ -64,6 +64,7 @@ class Library {
       return null;
     }
     if (!downloads!.classifiers.containsKey(index)) {
+      print('here');
       return null;
     }
 

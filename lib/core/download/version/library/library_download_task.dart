@@ -29,6 +29,7 @@ import 'package:lilay/core/download/version/assets/friendly_download.dart';
 import 'package:lilay/core/download/version/library/artifact.dart';
 import 'package:lilay/core/download/version/library/library.dart';
 import 'package:logging/logging.dart';
+import 'package:path/path.dart';
 
 /// This task downloads an individual [Library].
 ///
@@ -87,7 +88,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
           // If the hash and the path aren't available, extract them from
           // the artifact name and the hash URL.
           Artifact artif = Artifact(dependency.name);
-          artifact = fs.file(artif.path(workingDir));
+          artifact = fs.file(artif.path(join(workingDir, 'libraries')));
 
           // Fetch SHA-1 hash of this artifact
           Response hashResp =
@@ -97,7 +98,6 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
             artifactAvailable = true;
           } else {
             String hash = hashResp.body.trim();
-
             artifactAvailable = (await artifact.exists()) &&
                 (hash.toLowerCase() ==
                     sha1
@@ -139,10 +139,9 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
         progress = 1;
       }
       return artifactAvailable && nativeAvailable;
-    } catch (e, s) {
+    } catch (e) {
       exceptionPhase = Phase.loadCache;
       exception = e;
-      print(s);
       notify();
       return false;
     }
