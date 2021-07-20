@@ -91,7 +91,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
 
           // Fetch SHA-1 hash of this artifact
           Response hashResp =
-              await get(Uri.parse(artif.urlHash(dependency.url!)));
+              await client.get(Uri.parse(artif.urlHash(dependency.url!)));
           if (hashResp.statusCode != 200) {
             // Don't check the hash if it isn't available.
             artifactAvailable = true;
@@ -221,7 +221,7 @@ class LibraryDownloadTask extends DownloadTask<Library, List<int>> {
           if (dependency.downloads == null) {
             // If the hash isn't directly available.
             Response hashResp =
-                await get(Uri.parse(artifact.urlHash(dependency.url!)));
+                await client.get(Uri.parse(artifact.urlHash(dependency.url!)));
             if (hashResp.statusCode == 200) {
               // If the hash is available online.
               if (sha1.convert(receivedBytes).toString().toLowerCase() !=
