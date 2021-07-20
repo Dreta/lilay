@@ -20,6 +20,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:file/file.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lilay/core/download/version/version_data.dart';
 import 'package:lilay/core/download/versions/version_info.dart';
@@ -64,11 +65,12 @@ String getRandomString(int length) => String.fromCharCodes(Iterable.generate(
 /// Get all locally available version manifests.
 Stream<VersionData> getAvailableVersions(String workingDir) async* {
   final Logger logger = GetIt.I.get<Logger>();
+  final FileSystem fs = GetIt.I.get<FileSystem>();
   Directory versions =
-      Directory('${workingDir}${Platform.pathSeparator}versions');
+      fs.directory('$workingDir${Platform.pathSeparator}versions');
   await for (FileSystemEntity directory in versions.list()) {
     if (directory is Directory) {
-      File data = File(
+      File data = fs.file(
           join(directory.absolute.path, '${basename(directory.path)}.json'));
       if (await data.exists()) {
         try {
@@ -126,15 +128,16 @@ String getOSName() {
 ///
 /// Returns an empty string if Java is unavailable.
 Future<String> detectJavaInstallation() async {
+  final FileSystem fs = GetIt.I.get<FileSystem>();
   if (Platform.environment.containsKey('JAVA_HOME')) {
     // Use the JAVA_HOME environment variable when available.
     String javaHome = Platform.environment['JAVA_HOME']!;
     File javaExec;
     if (javaHome.endsWith('/') || javaHome.endsWith('\\')) {
-      javaExec = File(
+      javaExec = fs.file(
           '${javaHome}bin${Platform.pathSeparator}java${Platform.isWindows ? '.exe' : ''}');
     } else {
-      javaExec = File(
+      javaExec = fs.file(
           '$javaHome${Platform.pathSeparator}bin${Platform.pathSeparator}java${Platform.isWindows ? '.exe' : ''}');
     }
     if (await javaExec.exists()) return javaExec.absolute.path;
