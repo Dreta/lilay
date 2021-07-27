@@ -36,15 +36,15 @@ import 'package:mockito/mockito.dart';
 
 import 'library_download_task_test.mocks.dart';
 
-final String artifactContent = 'Dreta';
-final String nativeContent = 'twoexjayteen';
-final String wrongArtifContent = 'YearPasts';
-final String wrongNativeContent = 'aterD';
-final String artifactUrl =
+const String ARTIF_CONTENT = 'Dreta';
+const String NATIVE_CONTENT = 'twoexjayteen';
+const String WRONG_ARTIF_CONTENT = 'YearPasts';
+const String WRONG_NATIVE_CONTENT = 'aterD';
+const String ARTIF_URL =
     'https://maven.dreta.dev/dev/dreta/lilay/1.0/lilay-1.0.jar';
-final String artifactHashUrl =
+const String ARTIF_HASH_URL =
     'https://maven.dreta.dev/dev/dreta/lilay/1.0/lilay-1.0.jar.sha1';
-final String nativeUrl =
+const String NATIVE_URL =
     'https://maven.dreta.dev/dev/dreta/lilay-native/1.0/lilay-native-1.0.jar';
 
 @GenerateMocks([ByteStream, Client, StreamedResponse, StreamSubscription])
@@ -55,26 +55,26 @@ void main() {
             FriendlyDownload(
                 'dev/dreta/lilay/1.0/lilay-1.0.jar',
                 '062d0e3bfafabb22903e0afe00d0d535239cf179',
-                artifactContent.codeUnits.length,
-                artifactUrl),
+                ARTIF_CONTENT.codeUnits.length,
+                ARTIF_URL),
             {
               'natives-windows': FriendlyDownload(
                       'dev/dreta/lilay-native/1.0/lilay-native-1.0.jar',
                       'e0267d156830d0a04069cb091f0e2d811a738358',
-                      nativeContent.codeUnits.length,
-                      nativeUrl)
+                      NATIVE_CONTENT.codeUnits.length,
+                      NATIVE_URL)
                   .toJson(),
               'natives-macos': FriendlyDownload(
                       'dev/dreta/lilay-native/1.0/lilay-native-1.0.jar',
                       'e0267d156830d0a04069cb091f0e2d811a738358',
-                      nativeContent.codeUnits.length,
-                      nativeUrl)
+                      NATIVE_CONTENT.codeUnits.length,
+                      NATIVE_URL)
                   .toJson(),
               'natives-linux': FriendlyDownload(
                       'dev/dreta/lilay-native/1.0/lilay-native-1.0.jar',
                       'e0267d156830d0a04069cb091f0e2d811a738358',
-                      nativeContent.codeUnits.length,
-                      nativeUrl)
+                      NATIVE_CONTENT.codeUnits.length,
+                      NATIVE_URL)
                   .toJson()
             }),
         'dev.dreta:lilay:1.0',
@@ -106,13 +106,13 @@ void main() {
         final File file = fs.file(
             '/home/john/.minecraft/libraries/dev/dreta/lilay/1.0/lilay-1.0.jar');
         await file.create(recursive: true);
-        await file.writeAsString(artifactContent);
+        await file.writeAsString(ARTIF_CONTENT);
 
         mockArtifactHashRequest(client);
 
         expect(await task.tryLoadCache, true);
         expect(task.progress, 1);
-        expect(String.fromCharCodes(task.result!), artifactContent);
+        expect(String.fromCharCodes(task.result!), ARTIF_CONTENT);
       });
 
       test('Should correctly load native if it exists and it is valid.',
@@ -131,16 +131,16 @@ void main() {
         final File artifact = fs.file(
             '/home/john/.minecraft/libraries/dev/dreta/lilay/1.0/lilay-1.0.jar');
         await artifact.create(recursive: true);
-        await artifact.writeAsString(artifactContent);
+        await artifact.writeAsString(ARTIF_CONTENT);
 
         final File native = fs.file(
             '/home/john/.minecraft/libraries/dev/dreta/lilay-native/1.0/lilay-native-1.0.jar');
         await native.create(recursive: true);
-        await native.writeAsString(nativeContent);
+        await native.writeAsString(NATIVE_CONTENT);
 
         expect(await task.tryLoadCache, true);
         expect(task.progress, 1);
-        expect(String.fromCharCodes(task.resultNative!), nativeContent);
+        expect(String.fromCharCodes(task.resultNative!), NATIVE_CONTENT);
       });
 
       test('Shouldn\'t load artifact if it exists but isn\'t valid.', () async {
@@ -158,7 +158,7 @@ void main() {
         final File file = fs.file(
             '/home/john/.minecraft/libraries/dev/dreta/lilay/1.0/lilay-1.0.jar');
         await file.create(recursive: true);
-        await file.writeAsString(wrongArtifContent);
+        await file.writeAsString(WRONG_ARTIF_CONTENT);
 
         mockArtifactHashRequest(client);
 
@@ -180,12 +180,12 @@ void main() {
         final File artifact = fs.file(
             '/home/john/.minecraft/libraries/dev/dreta/lilay/1.0/lilay-1.0.jar');
         await artifact.create(recursive: true);
-        await artifact.writeAsString(artifactContent);
+        await artifact.writeAsString(ARTIF_CONTENT);
 
         final File native = fs.file(
             '/home/john/.minecraft/libraries/dev/dreta/lilay-native/1.0/lilay-native-1.0.jar');
         await native.create(recursive: true);
-        await native.writeAsString(wrongNativeContent);
+        await native.writeAsString(WRONG_NATIVE_CONTENT);
 
         expect(await task.tryLoadCache, false);
       });
@@ -272,19 +272,19 @@ void main() {
         await GetIt.I.reset();
         GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
         when(resp.stream).thenAnswer((_) => bs);
-        when(resp.contentLength).thenReturn(artifactContent.length);
+        when(resp.contentLength).thenReturn(ARTIF_CONTENT.length);
         when(bs.handleError(any, test: anyNamed('test'))).thenAnswer((_) => bs);
         when(bs.listen(any,
                 onError: anyNamed('onError'),
                 onDone: anyNamed('onDone'),
                 cancelOnError: anyNamed('cancelOnError')))
             .thenAnswer((invocation) {
-          invocation.positionalArguments[0](artifactContent.codeUnits);
+          invocation.positionalArguments[0](ARTIF_CONTENT.codeUnits);
           return MockStreamSubscription();
         });
         when(client.send(any)).thenAnswer((_) async => resp);
         await task.downloadArtifact();
-        expect(String.fromCharCodes(task.result!), artifactContent);
+        expect(String.fromCharCodes(task.result!), ARTIF_CONTENT);
       });
 
       test('Artifact download should fail if the hash or size is wrong.',
@@ -297,14 +297,14 @@ void main() {
         await GetIt.I.reset();
         GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
         when(resp.stream).thenAnswer((_) => bs);
-        when(resp.contentLength).thenReturn(wrongArtifContent.length);
+        when(resp.contentLength).thenReturn(WRONG_ARTIF_CONTENT.length);
         when(bs.handleError(any, test: anyNamed('test'))).thenAnswer((_) => bs);
         when(bs.listen(any,
                 onError: anyNamed('onError'),
                 onDone: anyNamed('onDone'),
                 cancelOnError: anyNamed('cancelOnError')))
             .thenAnswer((invocation) {
-          invocation.positionalArguments[0](wrongArtifContent.codeUnits);
+          invocation.positionalArguments[0](WRONG_ARTIF_CONTENT.codeUnits);
           return MockStreamSubscription();
         });
         when(client.send(any)).thenAnswer((_) async => resp);
@@ -376,19 +376,19 @@ void main() {
         await GetIt.I.reset();
         GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
         when(resp.stream).thenAnswer((_) => bs);
-        when(resp.contentLength).thenReturn(nativeContent.length);
+        when(resp.contentLength).thenReturn(NATIVE_CONTENT.length);
         when(bs.handleError(any, test: anyNamed('test'))).thenAnswer((_) => bs);
         when(bs.listen(any,
                 onError: anyNamed('onError'),
                 onDone: anyNamed('onDone'),
                 cancelOnError: anyNamed('cancelOnError')))
             .thenAnswer((invocation) {
-          invocation.positionalArguments[0](nativeContent.codeUnits);
+          invocation.positionalArguments[0](NATIVE_CONTENT.codeUnits);
           return MockStreamSubscription();
         });
         when(client.send(any)).thenAnswer((_) async => resp);
         await task.downloadNative();
-        expect(String.fromCharCodes(task.resultNative!), nativeContent);
+        expect(String.fromCharCodes(task.resultNative!), NATIVE_CONTENT);
       });
 
       test('Native download should fail if the hash or size is wrong.',
@@ -401,14 +401,14 @@ void main() {
         await GetIt.I.reset();
         GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
         when(resp.stream).thenAnswer((_) => bs);
-        when(resp.contentLength).thenReturn(wrongNativeContent.length);
+        when(resp.contentLength).thenReturn(WRONG_NATIVE_CONTENT.length);
         when(bs.handleError(any, test: anyNamed('test'))).thenAnswer((_) => bs);
         when(bs.listen(any,
                 onError: anyNamed('onError'),
                 onDone: anyNamed('onDone'),
                 cancelOnError: anyNamed('cancelOnError')))
             .thenAnswer((invocation) {
-          invocation.positionalArguments[0](wrongNativeContent.codeUnits);
+          invocation.positionalArguments[0](WRONG_NATIVE_CONTENT.codeUnits);
           return MockStreamSubscription();
         });
         when(client.send(any)).thenAnswer((_) async => resp);
@@ -447,8 +447,8 @@ void main() {
       await GetIt.I.reset();
       GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
       GetIt.I.registerSingleton<FileSystem>(fs);
-      task.result = artifactContent.codeUnits;
-      task.resultNative = nativeContent.codeUnits;
+      task.result = ARTIF_CONTENT.codeUnits;
+      task.resultNative = NATIVE_CONTENT.codeUnits;
 
       await task.save();
       expect(
@@ -471,8 +471,8 @@ void main() {
       await GetIt.I.reset();
       GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
       GetIt.I.registerSingleton<FileSystem>(fs);
-      task.result = artifactContent.codeUnits;
-      task.resultNative = nativeContent.codeUnits;
+      task.result = ARTIF_CONTENT.codeUnits;
+      task.resultNative = NATIVE_CONTENT.codeUnits;
 
       await task.save();
       expect(
@@ -495,14 +495,14 @@ void main() {
       await GetIt.I.reset();
       GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
       GetIt.I.registerSingleton<FileSystem>(fs);
-      task.result = artifactContent.codeUnits;
-      task.resultNative = nativeContent.codeUnits;
+      task.result = ARTIF_CONTENT.codeUnits;
+      task.resultNative = NATIVE_CONTENT.codeUnits;
 
       await task.save();
 
       File file = fs.file(
           '/home/john/.minecraft/libraries/dev/dreta/lilay/1.0/lilay-1.0.jar');
-      expect(await file.readAsString(), artifactContent);
+      expect(await file.readAsString(), ARTIF_CONTENT);
     });
 
     test('Save should correctly write the native data to the path.', () async {
@@ -516,19 +516,19 @@ void main() {
       await GetIt.I.reset();
       GetIt.I.registerSingleton<Logger>(Logger('Lilay'));
       GetIt.I.registerSingleton<FileSystem>(fs);
-      task.result = artifactContent.codeUnits;
-      task.resultNative = nativeContent.codeUnits;
+      task.result = ARTIF_CONTENT.codeUnits;
+      task.resultNative = NATIVE_CONTENT.codeUnits;
 
       await task.save();
 
       File file = fs.file(
           '/home/john/.minecraft/libraries/dev/dreta/lilay-native/1.0/lilay-native-1.0.jar');
-      expect(await file.readAsString(), nativeContent);
+      expect(await file.readAsString(), NATIVE_CONTENT);
     });
   });
 }
 
 void mockArtifactHashRequest(MockClient client) {
-  when(client.get(Uri.parse(artifactHashUrl))).thenAnswer(
+  when(client.get(Uri.parse(ARTIF_HASH_URL))).thenAnswer(
       (_) async => Response('062d0e3bfafabb22903e0afe00d0d535239cf179', 200));
 }
