@@ -109,6 +109,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
               dependency.downloads.client!.sha1.toLowerCase()) {
             logger
                 .severe('Client ${dependency.id}.jar\'s checksum is invalid.');
+            exceptionPhase = Phase.download;
             exception =
                 Exception('File ${dependency.id}.jar\'s checksum is invalid.');
             notify();
@@ -117,6 +118,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
 
           if (receivedBytes.length != dependency.downloads.client!.size) {
             logger.severe('Client ${dependency.id}.jar\'s size is incorrect.');
+            exceptionPhase = Phase.download;
             exception =
                 Exception('File ${dependency.id}.jar\'s size is incorrect.');
             notify();
