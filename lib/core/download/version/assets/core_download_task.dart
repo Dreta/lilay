@@ -85,7 +85,7 @@ class CoreDownloadTask extends DownloadTask<VersionData, List<int>> {
     request.headers['User-Agent'] = 'lilay-minecraft-launcher';
 
     try {
-      StreamedResponse resp = await request.send();
+      StreamedResponse resp = await client.send(request);
 
       resp.stream.handleError((error) {
         exceptionPhase = Phase.download;
