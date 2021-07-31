@@ -26,6 +26,7 @@ import 'package:lilay/utils.dart';
 import 'package:logging/logging.dart';
 import 'package:open_url/open_url.dart';
 import 'package:provider/provider.dart';
+import 'package:window_size/window_size.dart';
 
 void main() async {
   Logger logger = Logger('Lilay');
@@ -90,6 +91,8 @@ void main() async {
   GetIt.I.registerSingleton<String>(java, instanceName: 'java');
 
   logger.info('Starting app.');
+  WidgetsFlutterBinding.ensureInitialized();
+  setWindowTitle('Lilay');
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider.value(value: accounts),
     ChangeNotifierProvider.value(value: profiles),
